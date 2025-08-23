@@ -1,6 +1,6 @@
 # Prompts - AI Development Workspace
 
-**Developer**: sqazi  
+**Developer**: sq  
 **Email**: dev@shahzeb.me  
 **Created**: August 18th, 2025  
 **Last Updated**: December 19th, 2025  
