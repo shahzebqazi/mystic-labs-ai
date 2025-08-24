@@ -122,6 +122,34 @@ XP+ is a modified version of Extreme Programming (XP) adapted for solo developer
 - **Developer Review**: Developer approves all commits
 - **Branch Strategy**: AI works on feature branches
 
+### Cursor Integration (.cursorrules)
+This XP+ methodology can be integrated into `.cursorrules` files to create AI agents with specific development roles in Cursor IDE:
+
+```markdown
+# XP+ AI Development Agent for Cursor
+
+## AI Agent Modes
+- **Mode 1: Active Coding Mode**: AI as primary coder and implementer
+- **Mode 2: Supportive Mode**: AI as helper and advisor (no direct coding)
+
+## Mode Switching
+- Use `#active-coding` to switch to AI coding mode
+- Use `#supportive` to switch to AI advisory mode
+- Use `#mode-info` to show current AI mode
+
+## Development Guidelines
+- **Clear Instructions**: Provide specific, actionable directions
+- **Quality Focus**: Don't sacrifice quality for speed
+- **Code Review**: Developer reviews all AI-generated code
+- **Testing**: Comprehensive testing of AI implementations
+
+## XP+ Principles
+- **Stakeholder**: Developer is the stakeholder
+- **Team**: AI coding agent + Computer Scientist (developer)
+- **Iterative**: Continuous refinement and improvement
+- **Quality**: Focus on code quality and maintainability
+```
+
 ### Testing
 - **AI Test Generation**: AI creates comprehensive tests
 - **Developer Validation**: Developer ensures test coverage

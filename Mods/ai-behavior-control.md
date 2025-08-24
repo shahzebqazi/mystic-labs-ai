@@ -159,6 +159,30 @@
 - **Permissions**: Works with security mods
 - **Workflow**: Integrates with workflow automation
 
+### Cursor Integration (.cursorrules)
+This mod can be integrated into `.cursorrules` files to control AI behavior in Cursor IDE:
+
+```markdown
+# AI Behavior Control Configuration for Cursor
+
+## AI Permissions
+- **Mode**: read-only (read-only, docs-only, edit-only, full-access)
+- **File Operations**: disabled (disabled, read, write, create, delete)
+- **Content Generation**: disabled (disabled, docs-only, code-only, full)
+- **Execution Control**: disabled (disabled, suggest, confirm, auto)
+
+## Quick Commands
+- `#read-only` - Switch to read-only mode
+- `#docs-only` - Switch to documentation-only mode
+- `#edit-only` - Switch to edit-existing-files mode
+- `#full-access` - Switch to full access mode (use with caution)
+
+## Safety Features
+- **Permission Validation**: Verify current mode before operations
+- **Confirmation Required**: Always confirm dangerous operations
+- **Fallback Behavior**: Graceful fallback to safe mode on errors
+```
+
 ### File Integration
 - **Map.md**: Respects style guidelines
 - **Memories**: Updates permission history

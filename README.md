@@ -59,6 +59,114 @@ Codex/
 
 ---
 
+## Cursor Rules (.cursorrules)
+
+### Overview
+`.cursorrules` files are **project-specific AI configuration files** that automatically execute when you open a project/workspace in Cursor. They transform the AI into a specialized assistant tailored to your project's needs.
+
+### How It Works
+
+#### Automatic Execution
+- **On Workspace Open**: Cursor reads `.cursorrules` when you open a project
+- **AI Configuration**: The AI immediately adopts the behavior defined in the file
+- **Persistent Behavior**: The AI maintains this configuration for the entire session
+- **Project-Specific**: Each project can have different `.cursorrules` for different AI behaviors
+
+#### Behavior Transformation
+When you open a project with `.cursorrules`:
+- **Before**: AI behaves as default Cursor assistant
+- **After**: AI immediately transforms into the specified role/personality
+- **Context**: AI understands the project context and behaves accordingly
+- **Memory**: AI maintains this behavior throughout the session
+
+### Example Configurations
+
+#### Web Development Project
+```markdown
+# .cursorrules for Web Project
+- You are a frontend expert
+- Focus on React and modern web practices
+- Always suggest testing approaches
+- Use TypeScript best practices
+```
+
+#### Data Science Project
+```markdown
+# .cursorrules for Data Project
+- You are a data science specialist
+- Focus on Python, pandas, scikit-learn
+- Always suggest data validation
+- Use Jupyter notebook best practices
+```
+
+#### Documentation Project
+```markdown
+# .cursorrules for Docs Project
+- You are a documentation specialist
+- Focus on clear, structured writing
+- Always follow style guidelines
+- Use consistent formatting patterns
+```
+
+### Key Benefits
+
+#### Project-Specific AI
+- **Web Projects**: Get frontend/backend expertise
+- **Data Projects**: Get data science guidance
+- **Documentation**: Get writing and organization help
+- **Research**: Get academic and research methodology support
+
+#### Consistent Behavior
+- **Same AI Personality**: Every time you open the project
+- **Project Context**: AI understands your specific project needs
+- **Specialized Knowledge**: AI focuses on relevant expertise areas
+- **Custom Commands**: Project-specific quick commands and shortcuts
+
+### Advanced Usage
+
+#### Dynamic Switching
+You can change `.cursorrules` while Cursor is open:
+1. **Edit .cursorrules** → Modify the file
+2. **Restart Cursor** → Close and reopen the project
+3. **New Behavior** → AI adopts the new configuration
+
+#### Integration with Codex
+Your Codex system provides ready-to-use `.cursorrules` configurations:
+- **Default Profile**: General development assistance
+- **Expert Profile**: Deep technical expertise
+- **Mentor Profile**: Educational guidance
+- **Rapid Profile**: Quick implementation focus
+
+### Best Practices
+
+#### Creating Effective Rules
+1. **Be Specific**: Define clear roles and expertise areas
+2. **Project Context**: Include project-specific requirements
+3. **Behavior Guidelines**: Specify how AI should interact
+4. **Custom Commands**: Define project-specific shortcuts
+5. **Integration**: Reference your existing style guides and patterns
+
+#### File Management
+- **Version Control**: Include `.cursorrules` in your git repository
+- **Project Isolation**: Each project maintains its own configuration
+- **Consistency**: Use similar patterns across related projects
+- **Documentation**: Document what each configuration does
+
+### Technical Details
+
+#### File Location
+- **Project Root**: Place `.cursorrules` in your project's root directory
+- **File Format**: Use Markdown syntax for easy editing
+- **Naming**: Must be exactly `.cursorrules` (with the dot)
+
+#### Execution Timing
+- **Workspace Open**: Rules are read and applied immediately
+- **Session Persistence**: Rules remain active until project is closed
+- **No Reload**: Changes require restarting Cursor to take effect
+- **Memory**: AI maintains context and behavior throughout session
+
+---
+
 ## Topics Guide
 
 ### Overview
@@ -147,6 +255,33 @@ This section documents the user preferences and mods system architecture for AI 
 
 #### Overview
 This section covers the integration of Codex with Cursor IDE, including profile management, AI behavior configuration, and automated setup procedures.
+
+### 6. AI Behavior Standards and Terminology
+
+#### Universal AI Behavior Concepts
+- **System Prompts** - The most common term across AI platforms
+- **Context Instructions** - Instructions that define AI behavior
+- **Behavior Configuration** - How AI should behave in a given context
+- **AI Personas** - Different AI personalities/roles
+- **Instruction Sets** - Collections of behavioral instructions
+
+#### Technical Implementation Terms
+- **Prompt Engineering** - The practice of designing these instructions
+- **Context Injection** - Inserting behavior rules into AI conversations
+- **Behavioral Conditioning** - Training AI to behave in specific ways
+- **Role Definition** - Defining what role the AI should play
+
+#### Platform-Specific Standards
+- **OpenAI Function Calling** - Structured behavior definition
+- **Claude Constitutional AI** - Built-in behavioral guidelines
+- **Anthropic System Prompts** - Standardized instruction format
+- **LangChain Agents** - Configurable AI behavior patterns
+
+#### Cross-Platform Integration
+- **Universal Standards** - Emerging industry-wide behavior definitions
+- **AI Alignment** - Ensuring AI behaves as intended
+- **Behavioral Consistency** - Same AI behavior across platforms
+- **Contextual Intelligence** - AI adapting to different situations
 
 #### Cursor Profile System
 - **Default Profile**: Standard AI coding assistant (helpful, concise, practical)

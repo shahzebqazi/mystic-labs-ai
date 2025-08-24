@@ -120,3 +120,36 @@ Each profile can have different:
 - Example usage patterns
 - Technical depth
 - Teaching approaches
+
+## Integration
+
+### Mod Integration
+- **Cursor Profiles**: Works with profile switching
+- **Auto-Execution**: Integrates with execution controls
+- **Agent Training**: Integrates with learning system
+- **Workflow Preferences**: Works with workflow automation
+
+### Cursor Integration (.cursorrules)
+This mod provides ready-to-use `.cursorrules` configurations for Cursor IDE:
+
+```markdown
+# Cursor Profile Configuration
+
+## Available Profiles
+- **Default**: Standard AI coding assistant (helpful, concise, practical)
+- **Expert**: Advanced developer with deep technical knowledge
+- **Mentor**: Educational approach with detailed explanations
+- **Rapid**: Quick implementation focus with minimal explanations
+
+## Profile Switching
+- Use `#default` to switch to default profile
+- Use `#expert` to switch to expert profile
+- Use `#mentor` to switch to mentor profile
+- Use `#rapid` to switch to rapid profile
+
+## Profile Characteristics
+- **Default**: Balanced assistance for general development tasks
+- **Expert**: Deep architectural insights and optimization focus
+- **Mentor**: Educational explanations and best practice guidance
+- **Rapid**: Fast prototyping and quick fixes
+```

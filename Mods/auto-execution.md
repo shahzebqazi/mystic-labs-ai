@@ -143,3 +143,34 @@ You can customize which operations fall into each category:
 - **Short Timeout**: 10-30 seconds for quick decisions
 - **Medium Timeout**: 1-5 minutes for complex operations
 - **Long Timeout**: 10+ minutes for major system changes
+
+## Integration
+
+### Mod Integration
+- **Cursor Profiles**: Works with profile switching
+- **Agent Training**: Integrates with learning system
+- **Workflow Preferences**: Works with workflow automation
+- **Permissions**: Works with security mods
+
+### Cursor Integration (.cursorrules)
+This mod can be integrated into `.cursorrules` files to control code execution in Cursor IDE:
+
+```markdown
+# Auto-Execution Control for Cursor
+
+## Execution Levels
+- **Manual Mode**: All code execution requires user approval
+- **Semi-Auto Mode**: Safe operations auto-execute, dangerous ones require approval
+- **Full-Auto Mode**: All operations execute automatically (use with caution)
+
+## Safety Rules
+- **Safe Operations**: Code generation, file creation, formatting
+- **Require Approval**: File deletion, system commands, package installation
+- **Always Confirm**: Execution level changes, dangerous operations
+
+## Quick Commands
+- `#manual` - Switch to manual execution mode
+- `#semi-auto` - Switch to semi-automatic mode
+- `#full-auto` - Switch to full automatic mode (use with caution)
+- `#execution-status` - Show current execution settings
+```
