@@ -7,7 +7,7 @@
 
 ## What This Is
 
-A simple workspace for AI-assisted development. It's just you, some AI tools, and a way to keep track of what you're working on.
+A **modular prompt system** for AI-assisted development. Every file in this repository is a **meta prompt** that can work independently or be combined with others. It's a collection of AI behavior configurations, tools, and methodologies that you can mix and match based on your needs.
 
 ## Current AI Configuration
 
@@ -20,12 +20,34 @@ This project includes a `.cursorrules` file that configures the AI to operate as
 
 The AI operates silently in the background, only interrupting when clarification is needed. You can interact with the logging system using the provided commands or let it work automatically.
 
+## Meta Prompt System
+
+### How It Works
+Every file in this repository is a **meta prompt** - a self-contained AI behavior configuration that can:
+- **Work independently** as a standalone AI assistant
+- **Combine with other prompts** for enhanced functionality
+- **Reference shared resources** like Map.md for style guidelines
+- **Adapt to available components** when dependencies are missing
+
+### Prompt Categories
+- **Style Guides** (Map.md): Foundation for consistent AI behavior
+- **Behavior Mods** (Mods/): AI personality and permission controls
+- **Specialized Tools** (Tools/): Domain-specific AI assistants
+- **Methodologies** (XP+, Research Protocols): AI collaboration patterns
+
+### Modular Usage
+- **Single Prompt**: Use any individual file as a complete AI configuration
+- **Prompt Combinations**: Mix multiple prompts for complex AI behaviors
+- **Dependency Management**: Prompts automatically adapt to available resources
+- **Custom Assembly**: Create personalized AI configurations from available prompts
+
 ## Quick Start
 
-1. **Map.md** - Style guide, patterns, and AI interaction rules
-2. **Memories.md** - AI remembers your preferences and current context
-3. **Mods/** - System mods for functionality (chat sounds, profiles, etc.)
-4. **AI-ML-Topics-Guide.md** - Reference for AI/ML concepts and mods system
+1. **Map.md** - Meta prompt for style guide, patterns, and AI interaction rules
+2. **Memories.md** - Meta prompt for AI learning and preference tracking
+3. **Mods/** - Meta prompts for AI behavior control and configuration
+4. **Tools/** - Meta prompts for specialized AI assistants and methodologies
+5. **README.md** - Complete guide to the meta prompt system and usage
 
 ## Project Structure
 
@@ -51,17 +73,26 @@ Codex/
 
 ## How to Use
 
+### Understanding Meta Prompts
+Every file in this repository is a **meta prompt** - a complete, self-contained AI configuration that can be used independently or combined with others.
+
 ### For You
-- Check **Map/** folder for style guides and AI interaction rules
-- Review **Memories/** folder to see what AI has learned about you
-- Use **Mods/** folder to understand system functionality
-- Reference **AI-ML-Topics-Guide.md** for AI/ML concepts and mods system
+- **Single Prompt**: Use any individual file as a complete AI assistant
+- **Prompt Combinations**: Mix multiple prompts for enhanced AI behavior
+- **Custom Assembly**: Create personalized AI configurations from available prompts
+- **Modular Usage**: Enable only the AI features you need
 
 ### For AI
-- Read **Map/** folder first to understand style guidelines and interaction patterns
-- Check **Memories/** folder for learned preferences and current context
-- Review **Mods/** folder for system configuration options
-- Update memories after working together
+- **Independent Operation**: Each prompt works as a standalone AI configuration
+- **Modular Integration**: Prompts can reference and combine with each other
+- **Adaptive Behavior**: AI adapts to available prompts and dependencies
+- **Consistent Styling**: Uses Map.md guidelines when available, defaults when not
+
+### Meta Prompt Examples
+- **Map.md**: Use alone for consistent AI behavior and style guidelines
+- **Technical Writer**: Use alone for automated development logging
+- **AI Behavior Control + Cursor Profiles**: Combine for safe, personality-switching AI
+- **XP+ + Studio Log**: Combine for AI-assisted music production with development methodology
 
 ## iOS Notes Sync
 
@@ -74,7 +105,7 @@ Codex/
 ## Cursor Rules (.cursorrules)
 
 ### Overview
-`.cursorrules` files are **project-specific AI configuration files** that automatically execute when you open a project/workspace in Cursor. They transform the AI into a specialized assistant tailored to your project's needs.
+`.cursorrules` files are **project-specific AI configuration files** that automatically execute when you open a project/workspace in Cursor. In Codex, every file is a **meta prompt** that can be used as `.cursorrules` to transform the AI into a specialized assistant tailored to your project's needs.
 
 ### How It Works
 
@@ -148,6 +179,13 @@ Your Codex system provides ready-to-use `.cursorrules` configurations:
 - **Expert Profile**: Deep technical expertise
 - **Mentor Profile**: Educational guidance
 - **Rapid Profile**: Quick implementation focus
+
+#### Meta Prompt Usage
+Every file in Codex can be used as `.cursorrules`:
+- **Single File**: Copy any individual file to `.cursorrules` for focused AI behavior
+- **Combined Files**: Merge multiple prompts for complex AI configurations
+- **Modular Assembly**: Mix and match prompts based on your project needs
+- **Dependency Handling**: Prompts automatically adapt to available resources
 
 ### Best Practices
 
