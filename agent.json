@@ -1,0 +1,37 @@
+{
+  "name": "Codex AI Development Assistant",
+  "description": "Comprehensive AI development workspace with modular prompts, tools, and methodologies",
+  "version": "1.0.0",
+  "author": "Codex User",
+  "repository": "https://github.com/username/codex",
+  "type": "background-agent",
+  "tools": [
+    "meta-prompts",
+    "ai-assistants",
+    "development-workflows",
+    "cursor-integration"
+  ],
+  "triggers": [
+    "file-change",
+    "git-commit",
+    "cursor-activity",
+    "development-session"
+  ],
+  "permissions": {
+    "read-workspace": true,
+    "read-git": true,
+    "read-file-content": true,
+    "execute-commands": false,
+    "write-logs": true
+  },
+  "monitoring": {
+    "file-types": [".md", ".yaml", ".json", ".py", ".js", ".ts"],
+    "exclude-patterns": [".git/", "node_modules/", "venv/"],
+    "scan-interval": "30 seconds"
+  },
+  "logging": {
+    "enabled": true,
+    "log-level": "INFO",
+    "log-to-console": true
+  }
+}
