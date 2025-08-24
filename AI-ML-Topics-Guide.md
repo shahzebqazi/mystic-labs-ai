@@ -482,4 +482,246 @@ When recreating these files:
 
 ---
 
-*This document provides a comprehensive overview of three key AI/ML concepts. Each topic builds upon fundamental principles while offering practical insights for implementation in game development and other AI applications.*
+## 4. User Preferences and Mods System
+
+### Overview
+This section documents the user preferences and mods system architecture for AI development environments. It covers personal working styles, configurable behaviors, and system-level functionality. For detailed mods documentation, see the `Mods/README.md` file.
+
+### User Preferences Framework
+
+#### Communication Style
+- **Response Preferences**: Concise, actionable responses with examples only when requested
+- **Emoji Handling**: No emojis in responses or database storage, handle in UI layer only
+- **Professional Tone**: Maintain professional but approachable communication style
+
+#### Workflow Preferences
+- **Configuration**: Prefer editing JSON files over using scripts
+- **Version Control**: Active git utilization with meaningful commit messages
+- **Documentation**: Comprehensive documentation with clear examples and patterns
+- **File Organization**: Clean, logical file structure with consistent naming
+
+#### Development Approach
+- **Planning**: Plan before code, outline approach before implementation
+- **Incremental Development**: Build features step by step
+- **Testing**: Test early and often, comprehensive unit testing required
+- **Code Quality**: Focus on readability, maintainability, and performance
+
+### Mods System Architecture
+
+#### Core Mods
+1. **Chat Sound Control**: Toggle chat completion sounds and adjust volume
+2. **Cursor Profiles**: Switch between AI personalities (Default, Expert, Mentor, Rapid)
+3. **Auto-Execution**: Control code execution permissions (Manual, Semi-auto, Full-auto)
+4. **Agent Training**: Configure AI learning modes and skill development
+5. **Workflow Preferences**: User-specific workflow automation and context management
+6. **AI Personality**: Configure adaptive, consistent, or contextual AI behaviors
+7. **Permissions**: Granular access control and security management
+
+#### Mod Configuration
+- **Markdown-based**: Each mod is a Markdown file with clear structure
+- **Metadata**: Name, version, description, author, type, category
+- **Settings**: Configurable parameters and behavior options
+- **Commands**: Available commands and keyboard shortcuts
+- **Integration**: Hooks with other mods and system components
+
+#### Mod Types
+- **System Mods**: Control core system behavior (sounds, execution, permissions)
+- **AI Mods**: Configure AI capabilities and behavior patterns
+- **Workflow Mods**: Automate development tasks and processes
+- **Integration Mods**: Connect with external tools and services
+
+### Implementation Considerations
+
+#### Mod Management
+- **Discovery**: System scans Mods/ folder for available mods
+- **Validation**: Checks dependencies and compatibility
+- **Activation**: Loads enabled mods in dependency order
+- **Runtime**: Mods can be toggled on/off during use
+
+#### Configuration Persistence
+- **File-based**: Markdown configuration files for each mod
+- **State Management**: Track enabled/disabled status
+- **User Preferences**: Store personal working style preferences
+- **Integration**: Connect with external configuration systems
+
+#### Future Enhancements
+- **Database Backend**: Move from file-based to database storage
+- **Mod Marketplace**: Community mods and sharing
+- **Advanced Scripting**: Custom mod behaviors and automation
+- **Cloud Sync**: Synchronize preferences across devices
+
+### Best Practices
+
+#### Mod Development
+1. **Single Responsibility**: Each mod should do one thing well
+2. **Clear Naming**: Use descriptive names and descriptions
+3. **Dependencies**: Minimize inter-mod dependencies
+4. **Documentation**: Include usage examples and commands
+5. **Testing**: Test mods before enabling in production
+
+#### User Experience
+1. **Consistency**: Maintain consistent behavior across mods
+2. **Discoverability**: Make mods easy to find and configure
+3. **Performance**: Ensure mods don't impact system performance
+4. **Accessibility**: Provide multiple ways to interact with mods
+
+#### Security and Privacy
+1. **Permission Model**: Implement granular access control
+2. **Audit Logging**: Track all mod interactions and changes
+3. **Data Protection**: Secure handling of user preferences
+4. **Escalation Control**: Require approval for dangerous operations
+
+---
+
+## 5. Cursor Integration and Configuration
+
+### Overview
+This section covers the integration of Codex with Cursor IDE, including profile management, AI behavior configuration, and automated setup procedures. The system provides seamless switching between different AI personalities and execution modes within Cursor.
+
+### Cursor Profile System
+
+#### Available Profiles
+1. **Default Profile**: Standard AI coding assistant (helpful, concise, practical)
+2. **Expert Profile**: Advanced developer with deep technical knowledge
+3. **Mentor Profile**: Educational approach with detailed explanations
+4. **Rapid Profile**: Quick implementation focus with minimal explanations
+
+#### Profile Characteristics
+- **Default**: Balanced assistance for general development tasks
+- **Expert**: Deep architectural insights and optimization focus
+- **Mentor**: Educational explanations and best practice guidance
+- **Rapid**: Fast prototyping and quick fixes
+
+### Installation and Configuration
+
+#### Prerequisites
+- Cursor IDE installed and configured
+- Git repository with Codex project structure
+- Terminal access for profile switching
+
+#### Automated Setup
+The system includes a profile switcher script (`switch-profile.sh`) that:
+- Manages profile switching by copying appropriate `.cursorrules` files
+- Creates backups of current configurations
+- Provides command-line interface for profile management
+- Validates profile configurations before activation
+
+#### Manual Configuration
+To manually configure Cursor with Codex:
+
+1. **Copy Profile Files**: Copy desired profile from `profiles/` directory to root as `.cursorrules`
+2. **Restart Cursor**: Restart Cursor to load new AI configuration
+3. **Verify Activation**: Check AI behavior matches selected profile
+
+#### Profile Switching Commands
+```bash
+# List available profiles
+./switch-profile.sh list
+
+# Switch to specific profile
+./switch-profile.sh expert
+
+# Show current profile
+./switch-profile.sh current
+
+# Restore previous profile
+./switch-profile.sh restore
+```
+
+### AI Behavior Configuration
+
+#### Execution Control
+- **Manual Mode**: All code execution requires user approval
+- **Semi-Auto Mode**: Safe operations auto-execute, dangerous ones require approval
+- **Full-Auto Mode**: All operations execute automatically (use with caution)
+
+#### Code Execution Safety
+- **Default Mode**: Manual execution (require user approval)
+- **Safe Operations**: Code generation, file creation, formatting
+- **Require Approval**: File deletion, system commands, package installation
+- **Always Confirm**: Execution level changes, dangerous operations
+
+#### Personality Modes
+- **Adaptive**: AI learns and adapts to user preferences
+- **Consistent**: AI maintains stable behavior patterns
+- **Contextual**: AI switches personality based on task type
+
+#### Quick Commands
+Each profile supports specific quick commands:
+- `#verbose` - Detailed explanations
+- `#quick` - Concise responses
+- `#explain` - Educational mode
+- `#review` - Comprehensive code review
+
+#### AI Personality Configuration
+- **Style**: Concise and professional
+- **Detail Level**: On-demand (provide detailed explanations when asked)
+- **Emoji Usage**: Disabled
+- **Formality**: Professional
+- **Approach**: Analytical and systematic
+- **Creativity Level**: Balanced
+- **Risk Tolerance**: Calculated
+
+#### Response Guidelines
+- Always read relevant files before making suggestions
+- Provide multiple solution approaches when appropriate
+- Include code examples when relevant
+- Explain reasoning behind recommendations
+- Use symbolic language system for status tracking (!, @, #, $, %, etc.)
+
+### Integration Features
+
+#### Context Awareness
+- AI reads project files to understand current context
+- Integrates with Codex memory system for persistent learning
+- Adapts responses based on project type and complexity
+
+#### File Integration
+- Follows Map.md style guidelines consistently
+- Uses symbolic language system for status tracking
+- Respects mods configuration and user preferences
+
+#### Memory System
+- Maintains learning progress across sessions
+- Stores user preferences and working patterns
+- Provides context for AI interactions
+
+### Configuration Files
+
+#### Profile Structure
+Each profile file (`profiles/[name].cursorrules`) contains:
+- Profile metadata and characteristics
+- Behavior configuration
+- Response style guidelines
+- Quick command definitions
+
+#### Main Configuration
+The root `.cursorrules` file (generated by profile switching) defines:
+- Current AI personality and behavior
+- Execution safety settings
+- Response guidelines and patterns
+- Integration with Codex systems
+
+### Best Practices
+
+#### Profile Selection
+1. **Start with Default**: Begin with default profile for general development
+2. **Context Switching**: Use Expert profile for complex architectural decisions
+3. **Learning Mode**: Switch to Mentor profile when learning new concepts
+4. **Quick Development**: Use Rapid profile for prototyping and quick fixes
+
+#### Configuration Management
+1. **Backup Profiles**: Always backup before switching profiles
+2. **Test Changes**: Verify AI behavior after profile changes
+3. **Consistent Naming**: Use consistent naming conventions for profiles
+4. **Version Control**: Commit profile changes to track evolution
+
+#### Integration
+1. **Mod Compatibility**: Ensure profiles work with other Codex mods
+2. **Context Preservation**: Maintain context when switching profiles
+3. **Learning Continuity**: Preserve AI learning across profile switches
+4. **Performance**: Monitor AI response quality in different profiles
+
+---
+
+*This document provides a comprehensive overview of three key AI/ML concepts plus user preferences, mods system architecture, and Cursor integration. Each topic builds upon fundamental principles while offering practical insights for implementation in AI development environments.*

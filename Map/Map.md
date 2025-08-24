@@ -212,6 +212,139 @@ $   - PM
 - Implement clear separation between sections
 - Use tables for structured data
 
+## Code Style Guidelines
+
+### General Principles
+- **Readability First**: Code should be easy to understand
+- **Consistency**: Follow established patterns within the project
+- **Maintainability**: Write code that's easy to modify and extend
+- **Documentation**: Include necessary comments and documentation
+
+### Code Organization
+- **Functional Paradigm**: Prefer functional programming for App.rs
+- **Single Responsibility**: Each function should do one thing well
+- **Clear Interfaces**: Design APIs that are intuitive to use
+- **Error Handling**: Implement proper error handling and validation
+
+### Commenting Standards
+- **Descriptive Comments**: Write comments that explain "why" not "what"
+- **Avoid Redundancy**: Don't comment obvious code
+- **Update Comments**: Keep comments in sync with code changes
+- **Documentation**: Use docstrings for public APIs
+
+### Formatting Standards
+- **Minimal Spacing**: Use empty lines sparingly and purposefully
+- **Consistent Indentation**: Follow language-specific conventions
+- **Line Length**: Respect reasonable line length limits
+- **Naming Conventions**: Use clear, descriptive names
+
+## Development Practices
+
+### Testing Requirements
+- **Unit Tests**: Every function in App.rs must have unit tests
+- **Test Coverage**: Aim for comprehensive test coverage
+- **Test Quality**: Write meaningful tests that catch real issues
+- **Test Maintenance**: Keep tests updated with code changes
+
+### Security and Quality Standards
+- **Data Handling**: Never hardcode sensitive information
+- **Input Validation**: Always validate and sanitize user inputs
+- **Error Messages**: Don't expose internal system details in error messages
+- **Code Readability**: Write code that's easy for other developers to understand
+- **Documentation**: Include usage examples for complex functions
+- **API Design**: Design APIs that are intuitive and well-documented
+
+### Technology Stack Preferences
+- **DSP Libraries**: Build custom DSP library, avoid existing C/C++ libraries
+- **Password Manager**: Haskell backend with SQLite, Lua LÖVE 2D frontend
+- **Version Control**: Improve git utilization, active version control required
+
+### Performance Standards
+- **Code Efficiency**: Prioritize performance in DSP and audio processing code
+- **Memory Management**: Minimize memory allocations in hot paths
+- **Algorithm Selection**: Choose algorithms based on time/space complexity requirements
+
+### Security Practices
+- **Data Handling**: Never hardcode sensitive information
+- **Input Validation**: Always validate and sanitize user inputs
+- **Error Messages**: Don't expose internal system details in error messages
+
+## AI Interaction Patterns
+
+### Response Guidelines
+- **Concise Responses**: Provide actionable, to-the-point answers
+- **Examples on Demand**: Include examples only when specifically requested
+- **Multiple Approaches**: Offer 2-3 alternative solutions when appropriate
+- **Trade-off Explanation**: Highlight pros/cons of different approaches
+- **No Emojis**: Avoid emoji usage in responses and database storage
+- **Professional Tone**: Maintain professional but approachable communication style
+
+### Problem-Solving Approach
+- **Understand First**: Ask clarifying questions when needed
+- **Plan Before Code**: Outline approach before implementation
+- **Incremental Development**: Build features step by step
+- **Follow-up Questions**: Ask if more details are needed
+- **Workflow Preferences**: Prefer JSON configuration over scripts, active git utilization
+- **Vim Commands**: Only provide full Vim command lists when specifically requested
+
+### Code Review Standards
+- **Issue Identification**: Point out bugs, inefficiencies, and style problems
+- **Actionable Suggestions**: Offer specific, implementable improvements
+- **Reasoning**: Explain why suggestions are beneficial
+- **Style Respect**: Work within established coding patterns
+
+### Context Awareness
+- **File Reading**: Always read relevant files before making suggestions
+- **Proactive Suggestions**: Suggest improvements to existing code and documentation
+- **Error Prevention**: Point out potential issues before they become problems
+- **Pattern Recognition**: Learn and apply user's preferred approaches
+
+### Response Adaptation
+- **Query Complexity**: Adapt response style based on query complexity
+- **Context Switching**: Adjust behavior when switching between projects or technologies
+- **Priority Awareness**: Modify response patterns for urgent vs. routine tasks
+- **Learning Integration**: Continuously update understanding of user preferences
+
+## File Management Patterns
+
+### Working with Existing Files
+- **Read First**: Always read the file before making changes
+- **Preserve Structure**: Maintain existing organization and patterns
+- **Version Control**: Make atomic commits for logical changes
+- **Backup Strategy**: Create backups before major refactoring
+
+### Creating New Files
+- **Follow Patterns**: Use existing file structures and naming conventions
+- **Include Headers**: Add appropriate file headers and documentation
+- **Consider Dependencies**: Think about how new files integrate with existing code
+- **Update Indexes**: Modify any index or navigation files
+
+### Project Organization
+- **Clean Structure**: Maintain logical file organization
+- **Documentation**: Keep README.md and other docs up to date
+- **Git Workflow**: Use meaningful commit messages, branch for features
+- **Consistent Naming**: Follow established naming conventions
+
+## Communication Triggers
+
+### Special Commands
+- **"My Vim Progress"**: Show complete Vim command reference
+- **"Explain This"**: Provide detailed explanation of code or concept
+- **"Show Alternatives"**: Present multiple approaches to a problem
+- **"Review This"**: Perform comprehensive code review
+- **"Update Memories"**: Update AI learning with new information
+
+### Command Usage Patterns
+- **Vim Commands**: Only provide full command lists when specifically requested
+- **Simple Queries**: For simple coding queries, deliver summarized response and ask if more details desired
+- **Context Awareness**: Adapt response style based on query complexity and context
+
+### Context Switches
+- **Project Focus**: When switching between different projects or tasks
+- **Technology Change**: When moving between different programming languages or frameworks
+- **Priority Shift**: When urgent tasks require different response patterns
+- **Workflow Change**: When switching between different development modes
+
 ## Update Protocol
 
 ### When to Update Map
