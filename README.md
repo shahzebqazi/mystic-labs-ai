@@ -217,6 +217,100 @@ Every file in Codex can be used as `.cursorrules`:
 
 ---
 
+## Background Agent Deployment
+
+### Overview
+Codex can be deployed as a **Cursor Background Agent** or forked to create customized agent configurations. This allows you to run specialized AI assistants that work silently in the background, monitoring your development environment and providing automated assistance.
+
+### Background Agent Capabilities
+
+#### What It Does
+- **Silent Operation**: Works in the background without interrupting your workflow
+- **Automatic Monitoring**: Tracks file changes, git commits, and development activities
+- **Proactive Assistance**: Identifies issues and suggests improvements automatically
+- **Continuous Learning**: Builds context about your project over time
+
+#### Available Agents
+- **Technical Writer**: Automated development logging and documentation
+- **Code Reviewer**: Continuous code quality monitoring and suggestions
+- **Project Manager**: Task tracking and progress monitoring
+- **Security Monitor**: Vulnerability detection and security best practices
+
+### Deployment Options
+
+#### Option 1: Fork and Customize
+1. **Fork Codex Repository**: Create your own copy on GitHub/GitLab
+2. **Remove Unwanted Features**: Delete mods, tools, or prompts you don't need
+3. **Configure for Your Needs**: Customize the agent behavior and permissions
+4. **Deploy as Background Agent**: Install from your forked repository
+
+#### Option 2: Direct Background Agent
+1. **Install from Codex**: Use the main repository directly as a background agent
+2. **Configure Permissions**: Set what the agent can access and modify
+3. **Customize Behavior**: Adjust logging levels, monitoring frequency, and triggers
+
+### Configuration Process
+
+#### Initial Setup
+When you first deploy Codex as a background agent, you'll be prompted to configure:
+
+1. **Project Scope**: Which directories and file types to monitor
+2. **Logging Preferences**: What activities to track and how to store them
+3. **Permission Levels**: What the agent can read, write, or modify
+4. **Integration Settings**: Git hooks, file watchers, and external tools
+5. **Notification Preferences**: How and when to alert you about findings
+
+#### Customization Options
+- **Selective Monitoring**: Choose specific folders, file types, or git branches
+- **Logging Levels**: Set verbosity from minimal to comprehensive
+- **Trigger Conditions**: Define when the agent should take action
+- **Output Formats**: Configure log formats, notification methods, and reports
+
+### Repository Requirements
+
+#### For Background Agent Deployment
+- **Git Repository**: Must be a valid git repository (public or private)
+- **Agent Configuration**: Requires `agent.json` file with proper configuration
+- **Tool Integration**: Background agents need access to workspace and git information
+- **Permission Handling**: Must respect user privacy and security settings
+
+#### Forking Considerations
+- **Public vs Private**: You can fork to either public or private repositories
+- **Customization**: Remove unwanted features to create focused agents
+- **Updates**: Pull updates from the main Codex repository as needed
+- **Distribution**: Share your customized agents with your team or community
+
+### Integration with Existing Workflow
+
+#### Seamless Operation
+- **Non-Intrusive**: Works alongside your existing development tools
+- **Git Integration**: Monitors commits, branches, and repository changes
+- **IDE Compatibility**: Works with Cursor, VS Code, and other editors
+- **Cross-Platform**: Functions on macOS, Windows, and Linux
+
+#### Command Integration
+Background agents provide commands for manual interaction:
+- `#agent-status` - Show current agent status and recent activities
+- `#agent-configure` - Modify agent behavior and settings
+- `#agent-report` - Generate summary reports of monitored activities
+- `#agent-pause` - Temporarily disable background monitoring
+
+### Best Practices
+
+#### Agent Configuration
+1. **Start Simple**: Begin with basic monitoring and add features gradually
+2. **Permission Principle**: Grant minimal necessary permissions
+3. **Regular Review**: Periodically review agent logs and activities
+4. **Performance Monitoring**: Ensure the agent doesn't impact development speed
+
+#### Repository Management
+1. **Version Control**: Keep your agent configurations in version control
+2. **Documentation**: Document customizations and configuration changes
+3. **Testing**: Test agent behavior in development environments first
+4. **Backup**: Maintain backups of your agent configurations
+
+---
+
 ## Topics Guide
 
 ### Overview
