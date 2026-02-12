@@ -1,198 +1,126 @@
 {
   "scan_root": "/Volumes/X4-SD/Books",
-  "scanned_at": "2026-02-12T04:24:39+00:00",
-  "total_books": 249,
+  "scanned_at": "2026-02-12T04:32:28+00:00",
+  "total_books": 299,
   "by_bucket": {
-    "A": 13,
+    "A": 17,
     "B": 14,
-    "C": 16,
-    "D": 15,
+    "C": 18,
+    "D": 23,
     "E": 14,
-    "F": 11,
-    "G": 7,
+    "F": 17,
+    "G": 13,
     "H": 15,
-    "I": 1,
-    "J": 9,
+    "I": 3,
+    "J": 11,
     "K": 4,
     "L": 8,
-    "M": 17,
+    "M": 21,
     "N": 10,
     "O": 0,
     "P": 23,
     "Q": 0,
     "R": 15,
-    "S": 23,
-    "T": 11,
+    "S": 33,
+    "T": 13,
     "U": 1,
     "V": 10,
-    "W": 9,
+    "W": 13,
     "X": 1,
     "Y": 0,
     "Z": 2
   },
   "non_zero_buckets": {
-    "A": 13,
+    "A": 17,
     "B": 14,
-    "C": 16,
-    "D": 15,
+    "C": 18,
+    "D": 23,
     "E": 14,
-    "F": 11,
-    "G": 7,
+    "F": 17,
+    "G": 13,
     "H": 15,
-    "I": 1,
-    "J": 9,
+    "I": 3,
+    "J": 11,
     "K": 4,
     "L": 8,
-    "M": 17,
+    "M": 21,
     "N": 10,
     "P": 23,
     "R": 15,
-    "S": 23,
-    "T": 11,
+    "S": 33,
+    "T": 13,
     "U": 1,
     "V": 10,
-    "W": 9,
+    "W": 13,
     "X": 1,
     "Z": 2
   },
   "changed_buckets": [
     {
       "bucket": "A",
-      "old_count": 0,
-      "new_count": 13,
-      "delta": 13
-    },
-    {
-      "bucket": "B",
-      "old_count": 0,
-      "new_count": 14,
-      "delta": 14
-    },
-    {
-      "bucket": "C",
-      "old_count": 0,
-      "new_count": 16,
-      "delta": 16
-    },
-    {
-      "bucket": "D",
-      "old_count": 0,
-      "new_count": 15,
-      "delta": 15
-    },
-    {
-      "bucket": "E",
-      "old_count": 0,
-      "new_count": 14,
-      "delta": 14
-    },
-    {
-      "bucket": "F",
-      "old_count": 0,
-      "new_count": 11,
-      "delta": 11
-    },
-    {
-      "bucket": "G",
-      "old_count": 0,
-      "new_count": 7,
-      "delta": 7
-    },
-    {
-      "bucket": "H",
-      "old_count": 0,
-      "new_count": 15,
-      "delta": 15
-    },
-    {
-      "bucket": "I",
-      "old_count": 0,
-      "new_count": 1,
-      "delta": 1
-    },
-    {
-      "bucket": "J",
-      "old_count": 0,
-      "new_count": 9,
-      "delta": 9
-    },
-    {
-      "bucket": "K",
-      "old_count": 0,
-      "new_count": 4,
+      "old_count": 13,
+      "new_count": 17,
       "delta": 4
     },
     {
-      "bucket": "L",
-      "old_count": 0,
-      "new_count": 8,
+      "bucket": "C",
+      "old_count": 16,
+      "new_count": 18,
+      "delta": 2
+    },
+    {
+      "bucket": "D",
+      "old_count": 15,
+      "new_count": 23,
       "delta": 8
     },
     {
-      "bucket": "M",
-      "old_count": 0,
+      "bucket": "F",
+      "old_count": 11,
       "new_count": 17,
-      "delta": 17
+      "delta": 6
     },
     {
-      "bucket": "N",
-      "old_count": 0,
-      "new_count": 10,
-      "delta": 10
+      "bucket": "G",
+      "old_count": 7,
+      "new_count": 13,
+      "delta": 6
     },
     {
-      "bucket": "P",
-      "old_count": 0,
-      "new_count": 23,
-      "delta": 23
+      "bucket": "I",
+      "old_count": 1,
+      "new_count": 3,
+      "delta": 2
     },
     {
-      "bucket": "R",
-      "old_count": 0,
-      "new_count": 15,
-      "delta": 15
+      "bucket": "J",
+      "old_count": 9,
+      "new_count": 11,
+      "delta": 2
+    },
+    {
+      "bucket": "M",
+      "old_count": 17,
+      "new_count": 21,
+      "delta": 4
     },
     {
       "bucket": "S",
-      "old_count": 0,
-      "new_count": 23,
-      "delta": 23
-    },
-    {
-      "bucket": "T",
-      "old_count": 0,
-      "new_count": 11,
-      "delta": 11
-    },
-    {
-      "bucket": "U",
-      "old_count": 0,
-      "new_count": 1,
-      "delta": 1
-    },
-    {
-      "bucket": "V",
-      "old_count": 0,
-      "new_count": 10,
+      "old_count": 23,
+      "new_count": 33,
       "delta": 10
     },
     {
-      "bucket": "W",
-      "old_count": 0,
-      "new_count": 9,
-      "delta": 9
-    },
-    {
-      "bucket": "X",
-      "old_count": 0,
-      "new_count": 1,
-      "delta": 1
-    },
-    {
-      "bucket": "Z",
-      "old_count": 0,
-      "new_count": 2,
+      "bucket": "T",
+      "old_count": 11,
+      "new_count": 13,
       "delta": 2
+    },
+    {
+      "bucket": "W",
+      "old_count": 9,
+      "new_count": 13,
+      "delta": 4
     }
   ]
 }

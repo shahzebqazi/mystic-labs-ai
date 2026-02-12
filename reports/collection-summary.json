@@ -1,14 +1,50 @@
 {
   "scan_root": "/Volumes/X4-SD/Books",
-  "scanned_at": "2026-02-12T04:24:39+00:00",
-  "total_files": 249,
+  "scanned_at": "2026-02-12T04:32:28+00:00",
+  "total_files": 299,
   "by_format": {
-    ".epub": 247,
+    ".epub": 297,
     ".pdf": 2
   },
   "duplicate_work_keys": [
     {
+      "work_key": "a christmas carol in prose being a ghost story of christmas|dickens charles",
+      "count": 2
+    },
+    {
+      "work_key": "a doll s house a play|ibsen henrik",
+      "count": 2
+    },
+    {
+      "work_key": "a modest proposal for preventing the children of poor people in ireland from being a burden on their parents or country and for making them beneficial to the publick|swift jonathan",
+      "count": 2
+    },
+    {
+      "work_key": "a room with a view|forster e m",
+      "count": 2
+    },
+    {
       "work_key": "argonauts of the western pacific an account of native enterprise and adventure in the archipelagoes of melanesian new guinea|malinowski bronislaw",
+      "count": 2
+    },
+    {
+      "work_key": "cranford|gaskell elizabeth cleghorn",
+      "count": 2
+    },
+    {
+      "work_key": "crime and punishment|dostoyevsky fyodor",
+      "count": 2
+    },
+    {
+      "work_key": "grimms fairy tales|grimm jacob",
+      "count": 2
+    },
+    {
+      "work_key": "history of tom jones a foundling|fielding henry",
+      "count": 2
+    },
+    {
+      "work_key": "how to observe morals and manners|martineau harriet",
       "count": 2
     },
     {
@@ -17,6 +53,14 @@
     },
     {
       "work_key": "hung lou meng or the dream of the red chamber a chinese novel book i|cao xueqin",
+      "count": 2
+    },
+    {
+      "work_key": "little women or meg jo beth and amy|alcott louisa may",
+      "count": 2
+    },
+    {
+      "work_key": "my life volume 1|wagner richard",
       "count": 2
     },
     {
@@ -32,7 +76,43 @@
       "count": 2
     },
     {
+      "work_key": "the adventures of ferdinand count fathom complete|smollett t",
+      "count": 2
+    },
+    {
+      "work_key": "the adventures of roderick random|smollett t",
+      "count": 2
+    },
+    {
+      "work_key": "the adventures of tom sawyer complete|twain mark",
+      "count": 2
+    },
+    {
+      "work_key": "the blue castle a novel|montgomery l m",
+      "count": 2
+    },
+    {
       "work_key": "the einstein theory of relativity a concise statement|lorentz h a",
+      "count": 2
+    },
+    {
+      "work_key": "the enchanted april|arnim elizabeth von",
+      "count": 2
+    },
+    {
+      "work_key": "the expedition of humphry clinker|smollett t",
+      "count": 2
+    },
+    {
+      "work_key": "the great gatsby|fitzgerald f scott",
+      "count": 2
+    },
+    {
+      "work_key": "the importance of being earnest a trivial comedy for serious people|wilde oscar",
+      "count": 2
+    },
+    {
+      "work_key": "the king in yellow|chambers robert w",
       "count": 2
     },
     {
@@ -42,12 +122,44 @@
     {
       "work_key": "the six books of proclus the platonic successor on the theology of plato vol 1 of 2|proclus",
       "count": 2
+    },
+    {
+      "work_key": "the strange case of dr jekyll and mr hyde|stevenson robert louis",
+      "count": 2
+    },
+    {
+      "work_key": "the yellow wallpaper|gilman charlotte perkins",
+      "count": 2
+    },
+    {
+      "work_key": "twenty years after|dumas alexandre",
+      "count": 2
+    },
+    {
+      "work_key": "ulysses|joyce james",
+      "count": 2
+    },
+    {
+      "work_key": "white nights and other stories|dostoyevsky fyodor",
+      "count": 2
     }
   ],
   "sample_files": [
     {
+      "rel_path": "A/Alcott, Louisa May/._Little Women; Or, Meg, Jo, Beth, and Amy - Alcott, Louisa May.epub",
+      "title": "._Little Women; Or, Meg, Jo, Beth, and Amy",
+      "author": "Alcott, Louisa May",
+      "fmt": ".epub"
+    },
+    {
       "rel_path": "A/Alcott, Louisa May/Jack and Jill - Alcott, Louisa May.epub",
       "title": "Jack and Jill",
+      "author": "Alcott, Louisa May",
+      "fmt": ".epub"
+    },
+    {
+      "rel_path": "A/Alcott, Louisa May/Little Women; Or, Meg, Jo, Beth, and Amy - Alcott, Louisa May.epub",
+      "title": "Little Women; Or, Meg, Jo, Beth, and Amy",
       "author": "Alcott, Louisa May",
       "fmt": ".epub"
     },
@@ -79,6 +191,18 @@
       "rel_path": "A/Aristotle/The Poetics of Aristotle - Aristotle.epub",
       "title": "The Poetics of Aristotle",
       "author": "Aristotle",
+      "fmt": ".epub"
+    },
+    {
+      "rel_path": "A/Arnim, Elizabeth Von/._The Enchanted April - Arnim, Elizabeth Von.epub",
+      "title": "._The Enchanted April",
+      "author": "Arnim, Elizabeth Von",
+      "fmt": ".epub"
+    },
+    {
+      "rel_path": "A/Arnim, Elizabeth Von/The Enchanted April - Arnim, Elizabeth Von.epub",
+      "title": "The Enchanted April",
+      "author": "Arnim, Elizabeth Von",
       "fmt": ".epub"
     },
     {
@@ -250,6 +374,18 @@
       "fmt": ".epub"
     },
     {
+      "rel_path": "C/Chambers, Robert W/._The King in Yellow - Chambers, Robert W.epub",
+      "title": "._The King in Yellow",
+      "author": "Chambers, Robert W",
+      "fmt": ".epub"
+    },
+    {
+      "rel_path": "C/Chambers, Robert W/The King in Yellow - Chambers, Robert W.epub",
+      "title": "The King in Yellow",
+      "author": "Chambers, Robert W",
+      "fmt": ".epub"
+    },
+    {
       "rel_path": "C/Chekhov, Anton Pavlovich/The Darling and Other Stories - Chekhov, Anton Pavlovich.epub",
       "title": "The Darling and Other Stories",
       "author": "Chekhov, Anton Pavlovich",
@@ -307,42 +443,6 @@
       "rel_path": "D/Dante Alighieri/The Divine Comedy - Dante Alighieri.epub",
       "title": "The Divine Comedy",
       "author": "Dante Alighieri",
-      "fmt": ".epub"
-    },
-    {
-      "rel_path": "D/Darwin, Charles/The Descent of Man, and Selection in Relation to Sex - Darwin, Charles.epub",
-      "title": "The Descent of Man, and Selection in Relation to Sex",
-      "author": "Darwin, Charles",
-      "fmt": ".epub"
-    },
-    {
-      "rel_path": "D/Darwin, Charles/The Origin of Species- Or, the Preservation of Favoured Races in the Struggle for Life - Darwin, Charles.epub",
-      "title": "The Origin of Species- Or, the Preservation of Favoured Races in the Struggle for Life",
-      "author": "Darwin, Charles",
-      "fmt": ".epub"
-    },
-    {
-      "rel_path": "D/Darwin, Charles/The Voyage of the Beagle - Darwin, Charles.epub",
-      "title": "The Voyage of the Beagle",
-      "author": "Darwin, Charles",
-      "fmt": ".epub"
-    },
-    {
-      "rel_path": "D/De Morgan, Augustus/A Budget of Paradoxes, Volume I - De Morgan, Augustus.epub",
-      "title": "A Budget of Paradoxes, Volume I",
-      "author": "De Morgan, Augustus",
-      "fmt": ".epub"
-    },
-    {
-      "rel_path": "D/Dearmer, Percy/Bell's Cathedrals- The Cathedral Church of Wells - A Description of Its Fabric and a Brief History of the Episcopal See - Dearmer, Percy.epub",
-      "title": "Bell's Cathedrals- The Cathedral Church of Wells - A Description of Its Fabric and a Brief History of the Episcopal See",
-      "author": "Dearmer, Percy",
-      "fmt": ".epub"
-    },
-    {
-      "rel_path": "D/Descartes, Rene\u0301/Discourse on the Method of Rightly Conducting One's Reason and of Seeking Truth in the Sciences - Descartes, Rene\u0301.epub",
-      "title": "Discourse on the Method of Rightly Conducting One's Reason and of Seeking Truth in the Sciences",
-      "author": "Descartes, Rene\u0301",
       "fmt": ".epub"
     }
   ]
