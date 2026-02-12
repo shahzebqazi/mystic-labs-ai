@@ -1,0 +1,198 @@
+{
+  "scan_root": "/Volumes/X4-SD/Author Letter Bucket Collection",
+  "scanned_at": "2026-02-12T04:09:27+00:00",
+  "total_books": 231,
+  "by_bucket": {
+    "A": 13,
+    "B": 14,
+    "C": 12,
+    "D": 15,
+    "E": 14,
+    "F": 11,
+    "G": 7,
+    "H": 15,
+    "I": 1,
+    "J": 9,
+    "K": 4,
+    "L": 6,
+    "M": 15,
+    "N": 10,
+    "O": 0,
+    "P": 17,
+    "Q": 0,
+    "R": 15,
+    "S": 19,
+    "T": 11,
+    "U": 1,
+    "V": 10,
+    "W": 9,
+    "X": 1,
+    "Y": 0,
+    "Z": 2
+  },
+  "non_zero_buckets": {
+    "A": 13,
+    "B": 14,
+    "C": 12,
+    "D": 15,
+    "E": 14,
+    "F": 11,
+    "G": 7,
+    "H": 15,
+    "I": 1,
+    "J": 9,
+    "K": 4,
+    "L": 6,
+    "M": 15,
+    "N": 10,
+    "P": 17,
+    "R": 15,
+    "S": 19,
+    "T": 11,
+    "U": 1,
+    "V": 10,
+    "W": 9,
+    "X": 1,
+    "Z": 2
+  },
+  "changed_buckets": [
+    {
+      "bucket": "A",
+      "old_count": 0,
+      "new_count": 13,
+      "delta": 13
+    },
+    {
+      "bucket": "B",
+      "old_count": 0,
+      "new_count": 14,
+      "delta": 14
+    },
+    {
+      "bucket": "C",
+      "old_count": 0,
+      "new_count": 12,
+      "delta": 12
+    },
+    {
+      "bucket": "D",
+      "old_count": 0,
+      "new_count": 15,
+      "delta": 15
+    },
+    {
+      "bucket": "E",
+      "old_count": 0,
+      "new_count": 14,
+      "delta": 14
+    },
+    {
+      "bucket": "F",
+      "old_count": 0,
+      "new_count": 11,
+      "delta": 11
+    },
+    {
+      "bucket": "G",
+      "old_count": 0,
+      "new_count": 7,
+      "delta": 7
+    },
+    {
+      "bucket": "H",
+      "old_count": 0,
+      "new_count": 15,
+      "delta": 15
+    },
+    {
+      "bucket": "I",
+      "old_count": 0,
+      "new_count": 1,
+      "delta": 1
+    },
+    {
+      "bucket": "J",
+      "old_count": 0,
+      "new_count": 9,
+      "delta": 9
+    },
+    {
+      "bucket": "K",
+      "old_count": 0,
+      "new_count": 4,
+      "delta": 4
+    },
+    {
+      "bucket": "L",
+      "old_count": 0,
+      "new_count": 6,
+      "delta": 6
+    },
+    {
+      "bucket": "M",
+      "old_count": 0,
+      "new_count": 15,
+      "delta": 15
+    },
+    {
+      "bucket": "N",
+      "old_count": 0,
+      "new_count": 10,
+      "delta": 10
+    },
+    {
+      "bucket": "P",
+      "old_count": 0,
+      "new_count": 17,
+      "delta": 17
+    },
+    {
+      "bucket": "R",
+      "old_count": 0,
+      "new_count": 15,
+      "delta": 15
+    },
+    {
+      "bucket": "S",
+      "old_count": 0,
+      "new_count": 19,
+      "delta": 19
+    },
+    {
+      "bucket": "T",
+      "old_count": 0,
+      "new_count": 11,
+      "delta": 11
+    },
+    {
+      "bucket": "U",
+      "old_count": 0,
+      "new_count": 1,
+      "delta": 1
+    },
+    {
+      "bucket": "V",
+      "old_count": 0,
+      "new_count": 10,
+      "delta": 10
+    },
+    {
+      "bucket": "W",
+      "old_count": 0,
+      "new_count": 9,
+      "delta": 9
+    },
+    {
+      "bucket": "X",
+      "old_count": 0,
+      "new_count": 1,
+      "delta": 1
+    },
+    {
+      "bucket": "Z",
+      "old_count": 0,
+      "new_count": 2,
+      "delta": 2
+    }
+  ]
+}

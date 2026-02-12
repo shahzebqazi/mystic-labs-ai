@@ -1,7 +1,7 @@
 # Collection Review
 
-- Scan root: `/Volumes/X4-SD/My Books`
-- Scanned at: `2026-02-12T04:03:22+00:00`
+- Scan root: `/Volumes/X4-SD/Author Letter Bucket Collection`
+- Scanned at: `2026-02-12T04:10:14+00:00`
 - Total files: `231`
 
 ## Format Counts

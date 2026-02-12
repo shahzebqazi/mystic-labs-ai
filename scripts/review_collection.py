@@ -13,6 +13,17 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 DEFAULT_FORMATS = ".epub,.pdf,.mobi,.azw,.azw3,.txt"
+CANDIDATE_ROOTS = [
+    "/Volumes/X4-SD/Author Letter Bucket Collection",
+    "/Volumes/X4-SD/My Books",
+]
+
+
+def default_root() -> str:
+    for candidate in CANDIDATE_ROOTS:
+        if Path(candidate).exists():
+            return candidate
+    return CANDIDATE_ROOTS[0]
 
 
 @dataclass(frozen=True)
@@ -31,7 +42,7 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "--root",
-        default="/Volumes/X4-SD/My Books",
+        default=default_root(),
         help="Root folder to scan",
     )
     parser.add_argument(

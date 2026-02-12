@@ -13,6 +13,8 @@ Use this schema to store library knowledge with minimal token cost.
 - `references/seed-catalog.jsonl`: curated starter records.
 - `reports/collection-summary.json`: local scan summary.
 - `reports/token-cards.jsonl`: compact cards emitted from local scans.
+- `reports/letter-bucket-counts.json`: per-letter counts for top-level A-Z buckets.
+- `reports/letter-bucket-state.json`: last known counts used for change detection.
 
 ## Record Types
 
@@ -113,6 +115,31 @@ Purpose: summarize a local folder scan.
     {
       "work_key": "the-upanishads|paramananda",
       "count": 2
+    }
+  ]
+}
+```
+
+### 6) BucketCountSnapshot
+
+Purpose: track total books and per-letter deltas after new files are added.
+
+```json
+{
+  "scan_root": "/Volumes/X4-SD/Author Letter Bucket Collection",
+  "scanned_at": "2026-02-12T00:00:00Z",
+  "total_books": 231,
+  "by_bucket": {
+    "A": 13,
+    "B": 14,
+    "C": 12
+  },
+  "changed_buckets": [
+    {
+      "bucket": "R",
+      "old_count": 14,
+      "new_count": 15,
+      "delta": 1
     }
   ]
 }
