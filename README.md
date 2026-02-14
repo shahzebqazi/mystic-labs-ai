@@ -12,6 +12,10 @@ The `.ai` system is a markdown-first AI agent orchestration system. Everything i
 
 ---
 
+<small>**For AI Agents —** Entry point: [.ai/START_HERE.md](.ai/START_HERE.md). Open that file first. It links to GUIDE.md, your rules (project/RULES.md), system config (project/SYSTEM.md), and the skills directory. You will understand the system and can begin working in under two minutes.</small>
+
+---
+
 ## For Humans
 
 ### Prerequisites
@@ -59,14 +63,6 @@ docker-compose up llama-server
 ```
 
 The server exposes an OpenAI-compatible API at `http://localhost:8080`.
-
----
-
-## For AI Agents
-
-**Entry point:** [.ai/START_HERE.md](.ai/START_HERE.md)
-
-Open that file first. It links to GUIDE.md, your rules (project/RULES.md), system config (project/SYSTEM.md), and the skills directory. You will understand the system and can begin working in under two minutes.
 
 ---
 
