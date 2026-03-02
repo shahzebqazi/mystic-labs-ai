@@ -1,0 +1,33 @@
+# AI Research & Testing Toolkit — Development Environment
+# LFM2-inspired stack: efficiency, MoE, edge-compatible tooling
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: agi-research:latest
+    container_name: agi-research-app
+    volumes:
+      - .:/app
+    working_dir: /app
+    environment:
+      - PYTHONUNBUFFERED=1
+    stdin_open: true
+    tty: true
+    profiles:
+      - full
+
+  # Optional: Ollama for local LFM2 inference (uncomment to use)
+  # ollama:
+  #   image: ollama/ollama:latest
+  #   container_name: agi-research-ollama
+  #   ports:
+  #     - "11434:11434"
+  #   volumes:
+  #     - ollama_data:/root/.ollama
+  #   profiles:
+  #     - ollama
+
+# volumes:
+#   ollama_data:

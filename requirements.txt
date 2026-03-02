@@ -1,0 +1,6 @@
+# AI Research & Testing Toolkit — Core deps (research branch)
+# Optional: uncomment for full stack
+# transformers>=4.40.0
+# accelerate>=0.33.0
+# peft>=0.11.0
+# kaggle>=1.6.0
