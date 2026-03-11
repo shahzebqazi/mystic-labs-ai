@@ -1,41 +1,124 @@
-# AGI Research & Testing Toolkit
+# Libra AI Library & Librarian
 
-**Executive Summary**
+> Maintainers: Before any change, check [[prompt]].
 
-An AI Research & Testing Toolkit inspired by the [LFM2 (Liquid Foundation Model)](https://arxiv.org/abs/2511.23404) architecture—prioritizing efficiency, hybrid MoE (Mixture of Experts), and edge-compatibility. This repository supports **Learning**, **Research**, and **Testing** workflows with a 2-month scope for initial delivery.
+This is an Obsidian-first, AI-assisted personal library. The library stores metadata and notes; large media files are ignored by default via `.jjignore`.
 
-## Scope (2 Months)
+## Index
+- [[README]] — this file
+- [[prompt]] — versioned prompt, TODO, MCP mental map
+- [[Books]] — style guide, librarian tasks, customization
 
-| Phase   | Focus                          | Deliverables                          |
-|--------|----------------------------------|----------------------------------------|
-| **Learning**  | LFM2 hardware-in-the-loop methodology, MoE scaling, agent memory | Docs, playbooks, verified ref links |
-| **Research**  | Ref-Agent link verification, academic synthesis, benchmarking APIs | Playbook, Project_Management, PRD, Research, REFERENCES |
-| **Testing**   | Docker/venv dev environment, GitHub Pages deployment, license audit | Repo structure, CI-ready baseline |
+## Structure (on-demand)
+- Authors/ — each author has a folder (created when adding first work)
+  - Authors/Last, First/ — author root
+    - _Author.md — evolving author summary and bibliography
+    - <Book Title>/ — one folder per work
+      - _Book.md — book note (summary, insights, metadata, links)
+      - media/ — user media (epub/pdf/audio/video); ignored by VCS
+- Categories/ — only created when first used (topics, series, courses)
+- .jjignore — excludes user media by default
 
-Methodology is aligned with LFM2’s hardware-in-the-loop search: iterative, efficiency-focused, and suitable for edge and on-device deployment (e.g. [LFM2-8B MoE](https://www.liquid.ai/blog/lfm2-8b-a1b-an-efficient-on-device-mixture-of-experts)).
+## Conventions
+- Each new book creates `Authors/<Author>/_Author.md` if missing, and `<Book Title>/_Book.md`
+- Do not commit media; store links in `_Book.md` and place files in `media/`
+- Keep author summary updated in `_Author.md` as you read more
 
-## Branch Structure
+## Open in Obsidian
+- This repository is an Obsidian vault. In Obsidian, choose “Open folder as vault” and select this directory.
+- Wikilinks like [[prompt]] and [[Books]] resolve within Obsidian.
+- Keep large media in `media/` folders; they're ignored by VCS.
 
-- **main** — Production/stable
-- **research** — Primary working branch for docs and tools (current)
-- **development** — Feature staging
-- **training** — Model training scripts
-- **benchmarking** — Evaluation suites
+## GitHub
+Remote: https://github.com/Shahzebqazi/Libra-AI-Library-Librarian.git
 
-## Quick Start
+## Add a new book (one‑shot)
+Copy, edit variables, and run in zsh:
 
-1. Clone and checkout `research`: `git checkout research`
-2. Create venv: `python -m venv venv` then `source venv/bin/activate` (or `venv\Scripts\activate` on Windows)
-3. Run stack: `docker compose --profile full up` (see [Playbook.md](Playbook.md))
+```bash
+# zsh
+AUTHOR="Last, First"
+BOOK="Book Title"
+YEAR="2025"
+PUBLISHER="Publisher"
+ISBN=""
+EDITION=""
+SOURCE="epub"   # epub|pdf|torrent|webpage
+LINK=""         # URL to source or local media path
 
-## Documentation
+AUTHOR_DIR="Authors/${AUTHOR}"
+BOOK_DIR="${AUTHOR_DIR}/${BOOK}"
+MEDIA_DIR="${BOOK_DIR}/media"
+AUTHOR_MD="${AUTHOR_DIR}/_Author.md"
+BOOK_MD="${BOOK_DIR}/_Book.md"
 
-- [Playbook.md](Playbook.md) — Docker, venv, GitHub Pages deployment
-- [Project_Management.md](Project_Management.md) — Critical path, onboarding, Apache 2.0 licensing
-- [PRD.md](PRD.md) — Harnessed Agent Swarm goals (context scaling, multi-modal, guardrails)
-- [Research.md](Research.md) — Academic review: Liquid FMs, MoE scaling, agent memory
-- [REFERENCES.md](REFERENCES.md) — Verified URLs used across the repo
+mkdir -p "$MEDIA_DIR"
 
-## License
+# Derive display name "First Last" if AUTHOR is "Last, First"
+DISPLAY="$AUTHOR"
+if [[ "$AUTHOR" == *","* ]]; then
+  DISPLAY="$(echo "$AUTHOR" | awk -F',' '{gsub(/^ /,"",$2); gsub(/ $/,"",$1); print $2" "$1}')"
+fi
 
-Apache 2.0. See [Project_Management.md](Project_Management.md) for licensing strategy.
+# Create author file if missing
+if [[ ! -f "$AUTHOR_MD" ]]; then
+  cat > "$AUTHOR_MD" <<EOF
+---
+name: $AUTHOR
+display: $DISPLAY
+aka: []
+links: []
+summary: |
+  Short evolving summary of author’s themes and significance.
+bibliography: []
+---
+EOF
+fi
+
+# Append book entry to bibliography (simple insert after "bibliography:")
+if grep -q '^bibliography:' "$AUTHOR_MD"; then
+  awk '1; /^bibliography:/ {print "  - '"$BOOK"' ("'"$YEAR"')"}' "$AUTHOR_MD" > "$AUTHOR_MD.tmp" && mv "$AUTHOR_MD.tmp" "$AUTHOR_MD"
+fi
+
+# Create per-book note
+cat > "$BOOK_MD" <<EOF
+---
+title: $BOOK
+author: $AUTHOR
+publisher: $PUBLISHER
+isbn: $ISBN
+edition: $EDITION
+year: $YEAR
+source: $SOURCE
+source_link: $LINK
+notes_link: [[${AUTHOR}/${BOOK}/_Book]]
+status: not-started
+---
+
+## Summary
+Key insights, arguments, and takeaways.
+
+## Historical Context
+Relevant context and timelines.
+
+## Key Insights
+- 
+
+## Quotes
+- "Quote" — page
+
+## References
+- citation keys, DOIs, etc.
+
+## Links
+- media: ${AUTHOR}/${BOOK}/media/ (ignored by VCS)
+EOF
+
+# Optional: record the doc changes with jj
+jj describe --reset-author -m "docs: add $BOOK by $AUTHOR ($YEAR)"
+```
+
+Notes:
+- Media files go in `media/` and are ignored by `.jjignore`.
+- Update `_Author.md` summary over time as you read more by the author.
+- Use [[Books]] for full templates and style guide.
