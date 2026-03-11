@@ -4,7 +4,7 @@
 <!-- PREFERENCES (edit for your project): -->
 <!-- (none) -->
 
-Thanks for your interest in the .ai system (this base repo). This guide explains how the repo works as a base and how humans and AI agents can contribute.
+Thanks for your interest in the .ai system. This guide explains how the repository works in both **template repo** and **plugin repo** modes, and how humans and AI agents can contribute.
 
 ## Branch model and workflow
 
@@ -25,15 +25,22 @@ Before merging your feature or contributor branch into `development`:
    - **Keep** distinct logical steps as separate commits where it helps readability.
 3. **Branch protection** — Do not push directly to `Production`. All changes reach Production via `development` after review/promotion.
 
-## Adding this base repo to your project
+## Repository modes
 
-This repository is a **base repo**: a template and shared foundation you can add to any project. When you add it (e.g. by cloning, copying the `.ai/` tree, or using it as a template):
+- **Template repo mode** — Create a new project from this repository, then customize it.
+- **Plugin repo mode** — Embed the `.ai` system into an existing repository while keeping the host project structure.
 
-- Your project gets the full **.ai** system: markdown-first agent orchestration, skills, rules, and local GGUF inference.
+## Adding this repo to your project
+
+When you add this repository (by cloning, copying the `.ai/` tree, or using it as a template):
+
+- Your project gets the **.ai** system: markdown-first agent orchestration, skills, rules, and local GGUF inference.
 - AI agents that work in your repo read the START_HERE (or equivalent) in your chosen AI operation directory and use the same conventions (skills, config).
 - You can customize per project via `config/local/`, `project/RULES.md`, and your own PRDs under `project/`.
 
 No protocol servers or cloud APIs are required—just the AI operation directory and (optionally) Docker for local models. See [README — AI operation directory](README.md#ai-operation-directory) for supported directory names and how to specify a custom path.
+
+For template mode, preserve branch policy and docs. For plugin mode, keep AI files isolated to the chosen operation directory so host-project boundaries stay clear.
 
 ### AI directory compatibility
 
@@ -79,7 +86,7 @@ So: add this base repo to your project, point your AI agent at `.ai/START_HERE.m
 
 - **Code and docs** — Open a pull request from a branch. Prefer small, focused PRs.
 - **Bugs and ideas** — Open a [GitHub issue](https://github.com/shahzebqazi/Codex/issues). Use the issue templates if present (e.g. bug report, feature suggestion).
-- **Base repo changes** — Keep backward compatibility in mind; this repo is a template and foundation for other projects. See `.ai/project/BASE_REPO_GUIDELINES.md` for design principles.
+- **Template/plugin compatibility** — Keep changes backward compatible across both template mode and plugin mode. Document assumptions if a change affects embedding behavior.
 
 ## How to contribute (AI agents)
 
