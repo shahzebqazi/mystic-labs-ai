@@ -1,6 +1,6 @@
 # .ai
 
-**An intuitive AI agent tool.** Deploy AI into any project with markdown and local inference — no protocol servers, no cloud APIs.
+**An intuitive AI agent tool.** Deploy AI into any project with markdown and local inference — no protocol servers, no cloud APIs. This reduces the attack surface of AI applications and allows a declaritive agentic workflow.
 
 This repository is designed to be used in two modes:
 
@@ -52,8 +52,9 @@ When multiple of these exist, tools should resolve them in a deterministic order
 
 ## Docs
 
-- [CONTRIBUTING](CONTRIBUTING.md) — Branch model, rebase policy, install/embed, AI directory compatibility, intake workflow.
-- [docs/TAXONOMY.md](docs/TAXONOMY.md) — Taxonomy for compiling research and scaffold findings (components, prompts, workflows, patterns, templates).
+- [NEW_USER_GUIDE.md](NEW_USER_GUIDE.md) — **New here?** Concepts: AI, LLM, agents, scaffolds, guardrails, harnesses, MCP, and how they fit this repo.
+- [CONTRIBUTING](CONTRIBUTING.md) — Branch model, rebase policy, install/embed, AI directory compatibility, [research policy](CONTRIBUTING.md#research-policy), [Cursor config repo](CONTRIBUTING.md#cursor-config-repo), intake workflow.
+- [TAXONOMY.md](TAXONOMY.md) — Taxonomy for compiling research and scaffold findings (components, prompts, workflows, patterns, templates).
 
 ## Positioning
 
