@@ -8,7 +8,7 @@ Thanks for your interest in the .ai system. This guide explains how the reposito
 
 ## Branch model and workflow
 
-- **main** — Docs and process only (README, CONTRIBUTING, LICENSE, docs). Default branch for landing and documentation.
+- **main** — Docs and process only (README, CONTRIBUTING, LICENSE, and root .md docs). Default branch for landing and documentation.
 - **development** — Nightly builds and active development. Feature and contributor branches merge here.
 - **Production** — Releases. Promoted from `development` when stable; do not commit directly to Production.
 
@@ -58,13 +58,38 @@ Supported names for the AI operation root (single directory per project, or use 
 
 **Precedence when multiple exist:** use explicit user-specified path if set; otherwise tools may auto-detect using a deterministic order (e.g. `.ai/` then `Project/Ai/` then `dotai` then `.AI/` then `AI` then `ai`). Document the chosen order in your tool’s docs so behavior is predictable.
 
+## Research policy {#research-policy}
+
+AI research is **not** done in this repo (Codex). Use the dedicated research repository instead.
+
+- **Use:** [agi-research](https://github.com/shahzebqazi/agi-research)
+- **Do not use:** this repo for research capture, literature review, or research artifacts.
+
+agi-research is the canonical place for: Learning (LFM2, MoE, agent memory), Research (Ref-Agent, academic synthesis, benchmarking), and Testing (Docker/venv, GitHub Pages, license audit). See agi-research's README, Playbook.md, Research.md, and REFERENCES.md.
+
+**Approval before push:** Before pushing any research-related files (in agi-research or anywhere), the agent must (1) **review** the changes (summary of what was added/changed), (2) **get your explicit approval** before running `git push` or opening a PR that would push, (3) never do automated or unapproved pushes of research content. This applies to all workspaces that contain your AI research (e.g. dotai, my-dotfiles, Cursor/dotcursor, skills-cursor). When in doubt, ask for approval before pushing.
+
+**Relation:** Codex = .ai orchestration, template/plugin, docs, and process (e.g. TAXONOMY for scaffold findings). agi-research = all substantive AI/AGI research, playbooks, and references. Cross-link when useful, but keep research artifacts and commits in agi-research.
+
+## Cursor config repo {#cursor-config-repo}
+
+This repo (Codex) is **not** used for Cursor-specific work. All Cursor-specific tasks use the **Cursor config repo**.
+
+The **Cursor config repo** is the canonical place for: Cursor plugins and extensions; rules, skills, and project conventions for Cursor; MCP servers and other Cursor integrations; Cursor IDE config, dotfiles, and settings. **Agents and users:** when the task is Cursor-specific (plugins, rules, tools, integrations, config), use the Cursor config repo—not Codex.
+
+**Cursor config repo:** [shahzebqazi/my-cursor-config](https://github.com/shahzebqazi/my-cursor-config). We recommend users also look at the maintainer's Cursor config repo for the full Cursor setup. Codex works with Cursor (e.g. the `.ai` system runs inside Cursor), but Cursor-specific content lives in the config repo.
+
+**List or count Cursor-related repos** (after `gh auth login`): `gh repo list --limit 500 | grep -i cursor` and `gh repo list --limit 500 | grep -i cursor | wc -l`.
+
+**Relation:** Codex = .ai layer and workflow. Cursor config repo = Cursor IDE–specific tasks and setup.
+
 ## AI intake agent workflow
 
 When an AI agent is helping you capture iterations and research:
 
-1. **Intake loop** — The agent prompts you to place iteration artifacts (prompt files, scaffold snippets, component docs, findings notes) into a **recognized operation directory** (any of the names above, e.g. `.ai/`, `Project/Ai/`, or your custom path).
+1. **Intake loop** — The agent prompts you to place iteration artifacts (prompt files, scaffold snippets, component docs, findings notes) into a **recognized operation directory** (any of the names above, e.g. `.ai/`, `Project/Ai/`, or your custom path). For **research** artifacts, use agi-research; do not use this repo (Codex) for research.
 2. **Expected artifact types** — Prompt files (e.g. `.md`), scaffold snippets, component documentation, and short findings notes. The agent may suggest subdirectories (e.g. `inbox/`, `prompts/`, `findings/`) for organization.
-3. **Repeatable cycle** — Collect artifacts into that directory → classify and normalize names → summarize (e.g. in a taxonomy or index) → commit with intention-rich messages. The agent should ask you to add files to the chosen directory when it needs more input or when compiling research.
+3. **Repeatable cycle** — Collect artifacts into that directory → classify and normalize names → summarize (e.g. in a taxonomy or index) → commit with intention-rich messages. The agent should ask you to add files to the chosen directory when it needs more input or when compiling research. **Before pushing**, the agent must get your approval (see [Research policy](#research-policy)).
 
 ## Prompt and commit conventions
 
