@@ -3,8 +3,8 @@ import { motion, AnimatePresence } from 'motion/react';
 import { ChevronLeft, ChevronRight, Menu, Settings, User, Paperclip, Mic, Target, ChevronDown, Circle, PanelLeft, PanelRight, PanelBottom, X, Terminal, FileCode, Wrench, Cpu, Zap, Shield, Database, Code2, Layers, Activity, Bug, GitCommit, FolderOpen, File, Files, Puzzle, GitBranch, Search, ChevronRight as ChevronRightIcon, Folder, MessageCircle, Network, Globe, Image as ImageIcon, LayoutList, Bot, MoreVertical } from 'lucide-react';
 import { ThreadGraph3D, type ThreadNode, type ThreadLink } from './components/ThreadGraph3D';
 
-// Koi pond background (Unsplash, free to use) — animated with light blur for mockup
-const KOI_POND_BG = 'https://images.unsplash.com/photo-1582794543139-8ac9cb0f7b11?w=1920&q=80';
+// Flowers background (Unsplash, free to use) — static for mockup
+const FLOWERS_BG = 'https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=1920&q=80';
 
 // 1440p laptop: 2560×1440 logical pixels (mimics QHD high-DPI laptop screen)
 const MOCKUP_WIDTH = 2560;
@@ -55,21 +55,21 @@ export default function App() {
 
   return (
     <div className="min-h-screen overflow-hidden relative">
-      {/* Animated koi pond background (home tab only); black fallback */}
+      {/* Flowers background (home tab only); black fallback */}
       <div className="absolute inset-0 overflow-hidden bg-black">
         {activeTab === 'home' && (
           <div
-            className="absolute inset-0 bg-cover bg-center animate-koi-drift"
+            className="absolute inset-0 bg-cover bg-center"
             style={{
-              backgroundImage: `url(${KOI_POND_BG})`,
+              backgroundImage: `url(${FLOWERS_BG})`,
               filter: 'blur(4px) saturate(1.2) contrast(0.95) brightness(0.7)',
             }}
           />
         )}
       </div>
 
-      {/* Floating mockup window — fixed 1440p size; scale only from resize, not from content */}
-      <div className="relative min-h-screen flex items-center justify-center p-8">
+      {/* Floating mockup window — fixed 1440p size; scale to fit viewport, no scroll */}
+      <div className="absolute inset-0 flex items-center justify-center p-4 sm:p-6">
         <div
           className="origin-center"
           style={{
