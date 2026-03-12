@@ -11,10 +11,11 @@ This repository is designed to be used in two modes:
 
 **For the full project** — orchestration, Documents, Extensions, harness, START_HERE, skills, and all project content — **use the nightly branch: `desktop-app`.**
 
-- **main** — docs and process only (this page and a few root files)
-- **desktop-app** — **nightly:** full project (Orchestration, Documents, Extensions, START_HERE.md, skills, rules, local model config). Use this branch for the desktop app and all in-repo content.
-- **development** — legacy development branch
-- **Production** — release snapshots when used
+<small>**For AI Agents —** Entry point: [.ai/START_HERE.md](.ai/START_HERE.md). Open that file first. It links to GUIDE.md, your rules (project/RULES.md), system config (project/SYSTEM.md), and the skills directory. You will understand the system and can begin working in under two minutes.</small>
+
+---
+
+## For Humans
 
 See [LICENSE](LICENSE) and [CONTRIBUTING](CONTRIBUTING.md).
 
@@ -39,19 +40,7 @@ git checkout desktop-app   # nightly branch — full project, START_HERE.md, Orc
 
 ## AI operation directory
 
-The system supports multiple directory names for the AI operation root. You can use any of the following, or specify a custom path in your tooling:
-
-- `Project/` (used on `desktop-app`)
-- `.ai/`
-- `dotai`, `.AI/`, `AI`, `ai`
-- A custom path you specify (e.g. via config or environment)
-
-On the **desktop-app** branch, the AI content lives under `Project/` (Orchestration, Documents, Extensions, START_HERE.md). When multiple directory names exist, tools should resolve them in a deterministic order (see [CONTRIBUTING](CONTRIBUTING.md)#ai-directory-compatibility).
-
-## Docs
-
-- [NEW_USER_GUIDE.md](NEW_USER_GUIDE.md) — **New here?** Concepts: AI, LLM, agents, scaffolds, guardrails, harnesses, MCP, and how they fit this repo.
-- [CONTRIBUTING](CONTRIBUTING.md) — Branch model, rebase policy, install/embed, AI directory compatibility, research policy, Cursor config repo, intake workflow.
+## License
 
 ## Positioning
 

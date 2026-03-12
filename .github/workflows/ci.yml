@@ -1,0 +1,66 @@
+# CI: lint and unit tests. DRY — single workflow for PR and push.
+name: CI
+
+on:
+  push:
+    branches: [main, production]
+  pull_request:
+    branches: [main, production]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Install dependencies
+        run: |
+          if [ -f "Orchestration/Tasks/SWE/api/package-lock.json" ]; then
+            npm ci --prefix Orchestration/Tasks/SWE/api
+          else
+            echo "Skipping install: Orchestration/Tasks/SWE/api/package-lock.json not found."
+          fi
+      - name: Lint
+        run: |
+          if [ -f "Orchestration/Tasks/SWE/api/package-lock.json" ]; then
+            npm run lint --prefix Orchestration/Tasks/SWE/api
+          else
+            echo "Skipping lint: API package not present on this branch."
+          fi
+
+  test:
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Install dependencies
+        run: |
+          if [ -f "Orchestration/Tasks/SWE/api/package-lock.json" ]; then
+            npm ci --prefix Orchestration/Tasks/SWE/api
+          else
+            echo "Skipping install: Orchestration/Tasks/SWE/api/package-lock.json not found."
+          fi
+      - name: Unit tests
+        run: |
+          if [ -f "Orchestration/Tasks/SWE/api/package-lock.json" ]; then
+            npm test --prefix Orchestration/Tasks/SWE/api
+          else
+            echo "Skipping unit tests: API package not present on this branch."
+          fi
+
+  validate-infra:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate docker-compose
+        run: |
+          if [ -f "Orchestration/Tasks/INFRA/docker-compose.yml" ]; then
+            docker compose -f Orchestration/Tasks/INFRA/docker-compose.yml config --quiet
+          else
+            echo "Skipping infra validation: compose file not present on this branch."
+          fi
