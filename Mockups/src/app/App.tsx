@@ -1,14 +1,45 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { ChevronLeft, ChevronRight, Menu, User, Paperclip, Mic, Target, ChevronDown, Circle, PanelLeft, PanelRight, PanelBottom, X, Terminal, FileCode, Cpu, Zap, Shield, Database, Code2, Layers, Activity, Bug, GitCommit, FolderOpen, File, Files, Puzzle, GitBranch, Search, ChevronRight as ChevronRightIcon, Folder, MessageCircle, Network, Globe, Image as ImageIcon, LayoutList, Bot, MoreVertical, SlidersHorizontal, Percent, DollarSign, ZoomIn, ZoomOut, RotateCcw, Filter, Plus, HandMetal } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Menu, User, Paperclip, Mic, Target, ChevronDown, Circle, PanelLeft, PanelRight, PanelBottom, X, Terminal, FileCode, Cpu, Zap, Shield, Database, Code2, Layers, Activity, Bug, GitCommit, FolderOpen, File, Files, Puzzle, GitBranch, Search, ChevronRight as ChevronRightIcon, Folder, MessageCircle, Network, Globe, Image as ImageIcon, LayoutList, Bot, MoreVertical, SlidersHorizontal, Percent, DollarSign, ZoomIn, ZoomOut, RotateCcw, Filter, Plus, HandMetal, Home, Settings, FileText, Scale } from 'lucide-react';
 import { ThreadGraph3D, type ThreadNode, type ThreadLink } from './components/ThreadGraph3D';
 import { MiniBtop } from './components/MiniBtop';
 import {
-  ContextMenu,
-  ContextMenuContent,
-  ContextMenuItem,
-  ContextMenuTrigger,
-} from './components/ui/context-menu';
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from './components/ui/dropdown-menu';
+
+// File-type tagging: derive tag from name (and isDir) for consistent icon + color
+export type FileTag = 'dir' | 'md' | 'txt' | 'js' | 'ts' | 'tsx' | 'json' | 'license' | 'default';
+
+export function getFileTag(name: string, isDir: boolean): FileTag {
+  if (isDir) return 'dir';
+  const lower = name.toLowerCase();
+  if (/^license(\.[a-z]+)?$/i.test(lower) || lower === 'copying') return 'license';
+  const ext = lower.includes('.') ? lower.slice(lower.lastIndexOf('.') + 1) : '';
+  switch (ext) {
+    case 'md': return 'md';
+    case 'txt': return 'txt';
+    case 'js': case 'mjs': case 'cjs': return 'js';
+    case 'ts': return 'ts';
+    case 'tsx': case 'jsx': return 'tsx';
+    case 'json': case 'jsonc': return 'json';
+    default: return 'default';
+  }
+}
+
+const FILE_TAG_STYLES: Record<FileTag, { color: string; Icon: React.ComponentType<{ className?: string }> }> = {
+  dir:    { color: '#9ca3af', Icon: Folder },
+  md:     { color: '#79c0ff', Icon: FileText },
+  txt:    { color: '#e6edf3', Icon: FileText },
+  js:     { color: '#7ee787', Icon: FileCode },
+  ts:     { color: '#79c0ff', Icon: FileCode },
+  tsx:    { color: '#79c0ff', Icon: FileCode },
+  json:   { color: '#f0d77e', Icon: FileCode },
+  license: { color: '#f472b6', Icon: Scale },
+  default: { color: '#e5e5e5', Icon: File },
+};
 
 // Flowers background (Unsplash, free to use) — static for mockup
 const FLOWERS_BG = 'https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=1920&q=80';
@@ -133,66 +164,76 @@ export default function App() {
             className="rounded-xl overflow-hidden shadow-2xl border border-[#333333]/80 bg-[#0a0a0a] flex flex-col"
             style={{ width: MOCKUP_WIDTH, height: MOCKUP_HEIGHT }}
           >
-            {/* Single top bar: macOS window controls + tabs + new tab button (right-click for pane menu) */}
-            <ContextMenu>
-              <ContextMenuTrigger asChild>
-                <div className="flex items-center gap-2 border-b border-[#1A1A1A] bg-[#0A0A0A] px-2 py-1.5 shrink-0 min-h-[36px]">
-                  <div className="flex items-center gap-1.5 shrink-0 pointer-events-none">
-                    <div className="w-3 h-3 rounded-full bg-[#FF5F57]" />
-                    <div className="w-3 h-3 rounded-full bg-[#FEBC2E]" />
-                    <div className="w-3 h-3 rounded-full bg-[#28C840]" />
-                  </div>
-                  <div className="flex items-center gap-0.5 flex-1 min-w-0">
-                    {tabs.map((tab) => (
-                      <button
-                        key={tab.id}
-                        onClick={() => setActiveTabId(tab.id)}
-                        className={`px-3 py-2 rounded-t text-sm font-mono flex items-center gap-1.5 shrink-0 ${activeTabId === tab.id ? 'bg-[#0a0a0a] text-[#E5E5E5] border border-[#1A1A1A] border-b-transparent -mb-px' : 'text-[#666666] hover:text-[#E5E5E5]'}`}
+            {/* Single top bar: macOS window controls + tabs + new tab button (click opens tab menu) */}
+            <div className="flex items-center gap-2 border-b border-[#1A1A1A] bg-[#0A0A0A] px-2 py-1.5 shrink-0 min-h-[36px]">
+              <div className="flex items-center gap-1.5 shrink-0 pointer-events-none">
+                <div className="w-3 h-3 rounded-full bg-[#FF5F57]" />
+                <div className="w-3 h-3 rounded-full bg-[#FEBC2E]" />
+                <div className="w-3 h-3 rounded-full bg-[#28C840]" />
+              </div>
+              <div className="flex items-center gap-0.5 flex-1 min-w-0">
+                {tabs.map((tab) => (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTabId(tab.id)}
+                    className={`px-3 py-2 rounded-t text-sm font-mono flex items-center gap-1.5 shrink-0 ${activeTabId === tab.id ? 'bg-[#0a0a0a] text-[#E5E5E5] border border-[#1A1A1A] border-b-transparent -mb-px' : 'text-[#666666] hover:text-[#E5E5E5]'}`}
+                  >
+                    {TAB_LABELS[tab.kind]}
+                    {tabs.length > 1 && (
+                      <span
+                        className="opacity-70 hover:opacity-100 rounded p-0.5 hover:bg-[#333]"
+                        onClick={(e) => { e.stopPropagation(); closeTab(tab.id); }}
+                        aria-label="Close tab"
                       >
-                        {TAB_LABELS[tab.kind]}
-                        {tabs.length > 1 && (
-                          <span
-                            className="opacity-70 hover:opacity-100 rounded p-0.5 hover:bg-[#333]"
-                            onClick={(e) => { e.stopPropagation(); closeTab(tab.id); }}
-                            aria-label="Close tab"
-                          >
-                            <X className="w-3 h-3" />
-                          </span>
-                        )}
-                      </button>
-                    ))}
+                        <X className="w-3 h-3" />
+                      </span>
+                    )}
+                  </button>
+                ))}
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
                     <button
-                      onClick={() => addTab('home')}
+                      type="button"
                       className="p-2 rounded-t text-sm font-mono text-[#666666] hover:text-[#E5E5E5] hover:bg-[#1A1A1A] shrink-0"
                       title="New tab"
                       aria-label="New tab"
                     >
                       <Plus className="w-4 h-4" />
                     </button>
-                  </div>
-                </div>
-              </ContextMenuTrigger>
-              <ContextMenuContent className="min-w-[10rem] bg-[#161b22] border-[#30363d] text-[#e6edf3]">
-                <ContextMenuItem className="focus:bg-[#30363d] focus:text-[#e6edf3]" onClick={() => addTab('editor')}>
-                  <FileCode className="w-4 h-4 mr-2" /> Editor
-                </ContextMenuItem>
-                <ContextMenuItem className="focus:bg-[#30363d] focus:text-[#e6edf3]" onClick={() => addTab('terminal')}>
-                  <Terminal className="w-4 h-4 mr-2" /> Terminal
-                </ContextMenuItem>
-                <ContextMenuItem className="focus:bg-[#30363d] focus:text-[#e6edf3]" onClick={() => addTab('agent')}>
-                  <Bot className="w-4 h-4 mr-2" /> Agent
-                </ContextMenuItem>
-                <ContextMenuItem className="focus:bg-[#30363d] focus:text-[#e6edf3]" onClick={() => addTab('planner')}>
-                  <LayoutList className="w-4 h-4 mr-2" /> Planner
-                </ContextMenuItem>
-                <ContextMenuItem className="focus:bg-[#30363d] focus:text-[#e6edf3]" onClick={() => addTab('chat')}>
-                  <MessageCircle className="w-4 h-4 mr-2" /> Chat
-                </ContextMenuItem>
-                <ContextMenuItem className="focus:bg-[#30363d] focus:text-[#e6edf3]" onClick={() => addTab('assistant')}>
-                  <Zap className="w-4 h-4 mr-2" /> Assistant
-                </ContextMenuItem>
-              </ContextMenuContent>
-            </ContextMenu>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent
+                    align="end"
+                    sideOffset={4}
+                    className="min-w-[11rem] bg-[#161b22] border-[#30363d] text-[#e6edf3] p-1 rounded-md shadow-lg"
+                  >
+                    <DropdownMenuItem className="focus:bg-[#30363d] focus:text-[#e6edf3] cursor-pointer rounded px-2 py-1.5 text-sm font-mono flex items-center gap-2" onSelect={() => addTab('home')}>
+                      <Home className="w-4 h-4" /> Home
+                    </DropdownMenuItem>
+                    <DropdownMenuItem className="focus:bg-[#30363d] focus:text-[#e6edf3] cursor-pointer rounded px-2 py-1.5 text-sm font-mono flex items-center gap-2" onSelect={() => addTab('settings')}>
+                      <Settings className="w-4 h-4" /> .config
+                    </DropdownMenuItem>
+                    <DropdownMenuItem className="focus:bg-[#30363d] focus:text-[#e6edf3] cursor-pointer rounded px-2 py-1.5 text-sm font-mono flex items-center gap-2" onSelect={() => addTab('editor')}>
+                      <FileCode className="w-4 h-4" /> Editor
+                    </DropdownMenuItem>
+                    <DropdownMenuItem className="focus:bg-[#30363d] focus:text-[#e6edf3] cursor-pointer rounded px-2 py-1.5 text-sm font-mono flex items-center gap-2" onSelect={() => addTab('terminal')}>
+                      <Terminal className="w-4 h-4" /> Terminal
+                    </DropdownMenuItem>
+                    <DropdownMenuItem className="focus:bg-[#30363d] focus:text-[#e6edf3] cursor-pointer rounded px-2 py-1.5 text-sm font-mono flex items-center gap-2" onSelect={() => addTab('agent')}>
+                      <Bot className="w-4 h-4" /> Agent
+                    </DropdownMenuItem>
+                    <DropdownMenuItem className="focus:bg-[#30363d] focus:text-[#e6edf3] cursor-pointer rounded px-2 py-1.5 text-sm font-mono flex items-center gap-2" onSelect={() => addTab('planner')}>
+                      <LayoutList className="w-4 h-4" /> Planner
+                    </DropdownMenuItem>
+                    <DropdownMenuItem className="focus:bg-[#30363d] focus:text-[#e6edf3] cursor-pointer rounded px-2 py-1.5 text-sm font-mono flex items-center gap-2" onSelect={() => addTab('chat')}>
+                      <MessageCircle className="w-4 h-4" /> Chat
+                    </DropdownMenuItem>
+                    <DropdownMenuItem className="focus:bg-[#30363d] focus:text-[#e6edf3] cursor-pointer rounded px-2 py-1.5 text-sm font-mono flex items-center gap-2" onSelect={() => addTab('assistant')}>
+                      <Zap className="w-4 h-4" /> Assistant
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+            </div>
             <div className="flex-1 min-h-0 overflow-hidden">
               {activeTab.kind === 'home' && (
                 <MainChatView
