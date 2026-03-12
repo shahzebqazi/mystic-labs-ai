@@ -11,8 +11,10 @@ const MOCKUP_WIDTH = 2560;
 const MOCKUP_HEIGHT = 1440;
 const MOCKUP_PADDING = 128;
 
+type AppTab = 'home' | 'settings' | 'mods';
+
 export default function App() {
-  const [showSettings, setShowSettings] = useState(false);
+  const [activeTab, setActiveTab] = useState<AppTab>('home');
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [scale, setScale] = useState(1);
 
@@ -32,9 +34,9 @@ export default function App() {
 
   return (
     <div className="min-h-screen overflow-hidden relative">
-      {/* Animated koi pond background (home page only); black fallback */}
+      {/* Animated koi pond background (home tab only); black fallback */}
       <div className="absolute inset-0 overflow-hidden bg-black">
-        {!showSettings && (
+        {activeTab === 'home' && (
           <div
             className="absolute inset-0 bg-cover bg-center animate-koi-drift"
             style={{
@@ -45,7 +47,7 @@ export default function App() {
         )}
       </div>
 
-      {/* Floating mockup window — 1440p size, scaled to fit viewport */}
+      {/* Floating mockup window — true tabs: only one tab content visible at a time */}
       <div className="relative min-h-screen flex items-center justify-center p-8">
         <div
           className="origin-center shrink-0"
@@ -58,19 +60,25 @@ export default function App() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="w-full h-full rounded-xl overflow-hidden shadow-2xl border border-[#333333]/80 bg-[#0a0a0a]"
+            className="w-full h-full rounded-xl overflow-hidden shadow-2xl border border-[#333333]/80 bg-[#0a0a0a] flex flex-col"
           >
-          {showSettings ? (
-            <>
-              <SettingsView onBack={() => setShowSettings(false)} />
-            </>
-          ) : (
-            <MainChatView
-              sidebarOpen={sidebarOpen}
-              setSidebarOpen={setSidebarOpen}
-              onOpenSettings={() => setShowSettings(true)}
-            />
-          )}
+            {/* Tab bar: Home | Settings | Mods — no stacking, single content area */}
+            <div className="flex items-center gap-0.5 border-b border-[#1A1A1A] bg-[#0A0A0A] px-2 py-1 shrink-0">
+              <button onClick={() => setActiveTab('home')} className={`px-3 py-2 rounded-t text-sm font-mono ${activeTab === 'home' ? 'bg-[#0a0a0a] text-[#E5E5E5] border border-[#1A1A1A] border-b-transparent -mb-px' : 'text-[#666666] hover:text-[#E5E5E5]'}`}>Home</button>
+              <button onClick={() => setActiveTab('settings')} className={`px-3 py-2 rounded-t text-sm font-mono ${activeTab === 'settings' ? 'bg-[#0a0a0a] text-[#E5E5E5] border border-[#1A1A1A] border-b-transparent -mb-px' : 'text-[#666666] hover:text-[#E5E5E5]'}`}>Settings</button>
+              <button onClick={() => setActiveTab('mods')} className={`px-3 py-2 rounded-t text-sm font-mono ${activeTab === 'mods' ? 'bg-[#0a0a0a] text-[#E5E5E5] border border-[#1A1A1A] border-b-transparent -mb-px' : 'text-[#666666] hover:text-[#E5E5E5]'}`}>Mods</button>
+            </div>
+            <div className="flex-1 min-h-0 overflow-hidden">
+              {activeTab === 'home' && (
+                <MainChatView
+                  sidebarOpen={sidebarOpen}
+                  setSidebarOpen={setSidebarOpen}
+                  onOpenSettings={() => setActiveTab('settings')}
+                />
+              )}
+              {activeTab === 'settings' && <SettingsView onBack={() => setActiveTab('home')} />}
+              {activeTab === 'mods' && <ModsView />}
+            </div>
           </motion.div>
         </div>
       </div>
@@ -94,7 +102,54 @@ const MOCK_CALENDAR_EVENTS = [
   { id: 'c4', title: 'Retro', date: 'Mar 16', time: '11:00' },
 ];
 
-type MainViewMode = 'list' | 'kanban' | 'calendar';
+type MainViewMode = 'list' | 'kanban' | 'calendar' | 'graph';
+
+// Mock thread graph structures (nodes = messages/turns, links = reply flow) for 3D view
+const MOCK_THREAD_GRAPHS: Record<string, { nodes: ThreadNode[]; links: ThreadLink[] }> = {
+  general: {
+    nodes: [
+      { id: '1', name: 'User: Can you draft a jj commit?', role: 'user' },
+      { id: '2', name: 'dotAi: Here is the commit...', role: 'assistant' },
+      { id: '3', name: 'User: Add docs to scope', role: 'user' },
+      { id: '4', name: 'dotAi: Updated commit...', role: 'assistant' },
+      { id: '5', name: 'User: Confirm', role: 'user' },
+      { id: '6', name: 'System: Commit created', role: 'system' },
+    ],
+    links: [
+      { source: '1', target: '2' },
+      { source: '2', target: '3' },
+      { source: '3', target: '4' },
+      { source: '4', target: '5' },
+      { source: '5', target: '6' },
+    ],
+  },
+  'MVP PRD': {
+    nodes: [
+      { id: 'a', name: 'User: Outline MVP PRD', role: 'user' },
+      { id: 'b', name: 'dotAi: PRD structure...', role: 'assistant' },
+      { id: 'c', name: 'User: Add auth section', role: 'user' },
+      { id: 'd', name: 'dotAi: Auth requirements...', role: 'assistant' },
+      { id: 'e', name: 'User: LGTM', role: 'user' },
+    ],
+    links: [
+      { source: 'a', target: 'b' },
+      { source: 'b', target: 'c' },
+      { source: 'c', target: 'd' },
+      { source: 'd', target: 'e' },
+    ],
+  },
+  docs: {
+    nodes: [
+      { id: 'x', name: 'User: Generate docs', role: 'user' },
+      { id: 'y', name: 'dotAi: Documentation plan...', role: 'assistant' },
+      { id: 'z', name: 'User: Add API section', role: 'user' },
+    ],
+    links: [
+      { source: 'x', target: 'y' },
+      { source: 'y', target: 'z' },
+    ],
+  },
+};
 
 function MainChatView(
   { sidebarOpen, setSidebarOpen, onOpenSettings }: { sidebarOpen: boolean; setSidebarOpen: (open: boolean) => void; onOpenSettings: () => void }
@@ -103,9 +158,12 @@ function MainChatView(
   const [rightSidebarOpen, setRightSidebarOpen] = useState(true);
   const [activeSidebarTab, setActiveSidebarTab] = useState<'files' | 'search' | 'git' | 'extensions'>('files');
   const [mainViewMode, setMainViewMode] = useState<MainViewMode>('list');
+  const [selectedThreadId, setSelectedThreadId] = useState<string>('general');
   const [terminalOpen, setTerminalOpen] = useState(false);
   const [expandedFolders, setExpandedFolders] = useState<string[]>(['Orchestration']);
   const [menuOpen, setMenuOpen] = useState<string | null>(null);
+
+  const threadGraphData = MOCK_THREAD_GRAPHS[selectedThreadId] ?? MOCK_THREAD_GRAPHS.general;
 
   const toggleFolder = (folder: string) => {
     setExpandedFolders(prev =>
