@@ -62,11 +62,18 @@ export default function App() {
             animate={{ opacity: 1, y: 0 }}
             className="w-full h-full rounded-xl overflow-hidden shadow-2xl border border-[#333333]/80 bg-[#0a0a0a] flex flex-col"
           >
-            {/* Tab bar: Home | Settings | Mods — no stacking, single content area */}
-            <div className="flex items-center gap-0.5 border-b border-[#1A1A1A] bg-[#0A0A0A] px-2 py-1 shrink-0">
-              <button onClick={() => setActiveTab('home')} className={`px-3 py-2 rounded-t text-sm font-mono ${activeTab === 'home' ? 'bg-[#0a0a0a] text-[#E5E5E5] border border-[#1A1A1A] border-b-transparent -mb-px' : 'text-[#666666] hover:text-[#E5E5E5]'}`}>Home</button>
-              <button onClick={() => setActiveTab('settings')} className={`px-3 py-2 rounded-t text-sm font-mono ${activeTab === 'settings' ? 'bg-[#0a0a0a] text-[#E5E5E5] border border-[#1A1A1A] border-b-transparent -mb-px' : 'text-[#666666] hover:text-[#E5E5E5]'}`}>Settings</button>
-              <button onClick={() => setActiveTab('mods')} className={`px-3 py-2 rounded-t text-sm font-mono ${activeTab === 'mods' ? 'bg-[#0a0a0a] text-[#E5E5E5] border border-[#1A1A1A] border-b-transparent -mb-px' : 'text-[#666666] hover:text-[#E5E5E5]'}`}>Mods</button>
+            {/* Single top bar: macOS window controls + tabs (Home | Settings | Mods) */}
+            <div className="flex items-center gap-2 border-b border-[#1A1A1A] bg-[#0A0A0A] px-2 py-1.5 shrink-0 min-h-[36px]">
+              <div className="flex items-center gap-1.5 shrink-0 pointer-events-none">
+                <div className="w-3 h-3 rounded-full bg-[#FF5F57]" />
+                <div className="w-3 h-3 rounded-full bg-[#FEBC2E]" />
+                <div className="w-3 h-3 rounded-full bg-[#28C840]" />
+              </div>
+              <div className="flex items-center gap-0.5">
+                <button onClick={() => setActiveTab('home')} className={`px-3 py-2 rounded-t text-sm font-mono ${activeTab === 'home' ? 'bg-[#0a0a0a] text-[#E5E5E5] border border-[#1A1A1A] border-b-transparent -mb-px' : 'text-[#666666] hover:text-[#E5E5E5]'}`}>Home</button>
+                <button onClick={() => setActiveTab('settings')} className={`px-3 py-2 rounded-t text-sm font-mono ${activeTab === 'settings' ? 'bg-[#0a0a0a] text-[#E5E5E5] border border-[#1A1A1A] border-b-transparent -mb-px' : 'text-[#666666] hover:text-[#E5E5E5]'}`}>Settings</button>
+                <button onClick={() => setActiveTab('mods')} className={`px-3 py-2 rounded-t text-sm font-mono ${activeTab === 'mods' ? 'bg-[#0a0a0a] text-[#E5E5E5] border border-[#1A1A1A] border-b-transparent -mb-px' : 'text-[#666666] hover:text-[#E5E5E5]'}`}>Mods</button>
+              </div>
             </div>
             <div className="flex-1 min-h-0 overflow-hidden">
               {activeTab === 'home' && (
@@ -161,7 +168,6 @@ function MainChatView(
   const [selectedThreadId, setSelectedThreadId] = useState<string>('general');
   const [terminalOpen, setTerminalOpen] = useState(false);
   const [expandedFolders, setExpandedFolders] = useState<string[]>(['Orchestration']);
-  const [menuOpen, setMenuOpen] = useState<string | null>(null);
 
   const threadGraphData = MOCK_THREAD_GRAPHS[selectedThreadId] ?? MOCK_THREAD_GRAPHS.general;
 
@@ -171,63 +177,9 @@ function MainChatView(
     );
   };
 
-  const menuItems = [
-    { name: 'File', sub: [{ label: 'Settings', onClick: onOpenSettings }] },
-    { name: 'Edit', sub: [] },
-    { name: 'Selection', sub: [] },
-    { name: 'Window', sub: [] },
-    { name: 'Go', sub: [] },
-    { name: 'Run', sub: [] },
-    { name: 'Help', sub: [] },
-  ];
-
-  useEffect(() => {
-    if (!menuOpen) return;
-    const close = () => setMenuOpen(null);
-    const t = setTimeout(() => document.addEventListener('click', close), 0);
-    return () => {
-      clearTimeout(t);
-      document.removeEventListener('click', close);
-    };
-  }, [menuOpen]);
-
   return (
     <div className="bg-[#0a0a0a] overflow-hidden flex flex-col h-full min-h-0">
-      {/* Single top bar: window icons + menu + title */}
-      <div className="bg-[#0A0A0A] border-b border-[#1A1A1A] px-2 py-1.5 flex items-center gap-2 min-h-[36px]">
-        <div className="flex items-center gap-1.5 shrink-0">
-          <div className="w-3 h-3 rounded-full bg-[#FF5F57]" />
-          <div className="w-3 h-3 rounded-full bg-[#FEBC2E]" />
-          <div className="w-3 h-3 rounded-full bg-[#28C840]" />
-        </div>
-        <div className="flex items-center gap-0.5 shrink-0">
-          {menuItems.map((m) => (
-            <div key={m.name} className="relative">
-              <button
-                onClick={() => setMenuOpen(menuOpen === m.name ? null : m.name)}
-                className="px-3 py-1.5 rounded text-sm text-[#E5E5E5] hover:bg-[#1A1A1A]"
-              >
-                {m.name}
-              </button>
-              {menuOpen === m.name && m.sub.length > 0 && (
-                <div className="absolute left-0 top-full mt-0.5 bg-[#1A1A1A] border border-[#333333] rounded-md shadow-xl py-1 z-50 min-w-[160px]">
-                  {m.sub.map((s) => (
-                    <button key={s.label} onClick={() => { s.onClick?.(); setMenuOpen(null); }} className="w-full text-left px-3 py-1.5 text-sm text-[#E5E5E5] hover:bg-[#333333]">
-                      {s.label}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-        <div className="flex-1 flex justify-center min-w-0 px-2">
-          <span className="text-xs text-[#666666] font-mono truncate">dotAi — Local Desktop Chat</span>
-        </div>
-        <div className="w-8 shrink-0" aria-hidden />
-      </div>
-
-      {/* Main Content Area: left sidebar | center | right sidebar — fills 1440p frame */}
+      {/* Main Content Area: left sidebar | center | right sidebar — fills 1440p frame (single top bar is in App) */}
       <div className="flex flex-col flex-1 min-h-0">
         <div className="flex flex-1 min-h-0">
           {/* Left Sidebar - Explorer, Search, Git, Extensions (toggle via status bar) */}
@@ -364,6 +316,7 @@ function MainChatView(
                 <button onClick={() => setMainViewMode('list')} className={`px-2 py-1 rounded text-xs font-mono ${mainViewMode === 'list' ? 'bg-[#E5E5E5]/15 text-[#E5E5E5]' : 'text-[#666666] hover:text-[#E5E5E5]'}`}>List</button>
                 <button onClick={() => setMainViewMode('kanban')} className={`px-2 py-1 rounded text-xs font-mono ${mainViewMode === 'kanban' ? 'bg-[#E5E5E5]/15 text-[#E5E5E5]' : 'text-[#666666] hover:text-[#E5E5E5]'}`}>Kanban</button>
                 <button onClick={() => setMainViewMode('calendar')} className={`px-2 py-1 rounded text-xs font-mono ${mainViewMode === 'calendar' ? 'bg-[#E5E5E5]/15 text-[#E5E5E5]' : 'text-[#666666] hover:text-[#E5E5E5]'}`}>Calendar</button>
+                <button onClick={() => setMainViewMode('graph')} className={`px-2 py-1 rounded text-xs font-mono flex items-center gap-1 ${mainViewMode === 'graph' ? 'bg-[#E5E5E5]/15 text-[#E5E5E5]' : 'text-[#666666] hover:text-[#E5E5E5]'}`} title="3D thread graph"><Network className="w-3.5 h-3.5" /> Graph</button>
               </div>
               <div className="flex-1 overflow-auto p-3 min-h-0 bg-[#0a0a0a]">
                 {mainViewMode === 'list' && (
@@ -412,6 +365,20 @@ function MainChatView(
                     })}
                   </div>
                 )}
+                {mainViewMode === 'graph' && (
+                  <div className="flex flex-col h-full min-h-0 p-3 gap-2">
+                    <div className="text-[10px] font-mono text-[#8b949e] shrink-0">Thread: #{selectedThreadId} — drag to rotate, scroll to zoom</div>
+                    <div className="flex-1 min-h-[320px] flex items-center justify-center">
+                      <ThreadGraph3D
+                        nodes={threadGraphData.nodes}
+                        links={threadGraphData.links}
+                        width={Math.min(640, window.innerWidth - 400)}
+                        height={360}
+                        backgroundColor="#0d1117"
+                      />
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -449,9 +416,15 @@ function MainChatView(
               </div>
               <div className="flex-1 overflow-y-auto p-2">
                 <div className="space-y-0.5">
-                  <div className="px-2 py-1.5 rounded text-sm text-[#E5E5E5] bg-[#E5E5E5]/5 cursor-pointer"># general</div>
-                  <div className="px-2 py-1.5 rounded text-sm text-[#666666] hover:bg-[#1A1A1A] cursor-pointer"># MVP PRD</div>
-                  <div className="px-2 py-1.5 rounded text-sm text-[#666666] hover:bg-[#1A1A1A] cursor-pointer"># docs</div>
+                  {(['general', 'MVP PRD', 'docs'] as const).map((tid) => (
+                    <button
+                      key={tid}
+                      onClick={() => setSelectedThreadId(tid)}
+                      className={`w-full text-left px-2 py-1.5 rounded text-sm cursor-pointer transition-colors ${selectedThreadId === tid ? 'text-[#E5E5E5] bg-[#E5E5E5]/10' : 'text-[#666666] hover:bg-[#1A1A1A] hover:text-[#E5E5E5]'}`}
+                    >
+                      #{tid}
+                    </button>
+                  ))}
                 </div>
               </div>
             </div>
