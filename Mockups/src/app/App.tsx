@@ -29,7 +29,7 @@ export function getFileTag(name: string, isDir: boolean): FileTag {
   }
 }
 
-const FILE_TAG_STYLES: Record<FileTag, { color: string; Icon: React.ComponentType<{ className?: string }> }> = {
+const FILE_TAG_STYLES: Record<FileTag, { color: string; Icon: React.ComponentType<{ className?: string; style?: React.CSSProperties }> }> = {
   dir:    { color: '#9ca3af', Icon: Folder },
   md:     { color: '#79c0ff', Icon: FileText },
   txt:    { color: '#e6edf3', Icon: FileText },
@@ -497,27 +497,37 @@ function MainChatView(
                       className="w-full flex items-center gap-1 px-2 py-1 hover:bg-[#1A1A1A] rounded text-sm transition-colors"
                     >
                       <ChevronRightIcon className={`w-3 h-3 transition-transform ${expandedFolders.includes('Orchestration') ? 'rotate-90' : ''}`} />
-                      <Folder className="w-4 h-4 text-[#E5E5E5]" />
-                      <span className="text-[#E5E5E5]">Orchestration</span>
+                      {(() => {
+                        const { color, Icon } = FILE_TAG_STYLES.dir;
+                        return <Icon className="w-4 h-4 shrink-0" style={{ color }} />;
+                      })()}
+                      <span style={{ color: FILE_TAG_STYLES.dir.color }}>Orchestration</span>
                     </button>
                     {expandedFolders.includes('Orchestration') && (
                       <div className="ml-4 space-y-0.5">
-                        <div className="flex items-center gap-1 px-2 py-1 hover:bg-[#1A1A1A] rounded text-sm cursor-pointer transition-colors">
-                          <Folder className="w-4 h-4 text-[#E5E5E5]" />
-                          <span className="text-[#E5E5E5]">Agents</span>
-                        </div>
-                        <div className="flex items-center gap-1 px-2 py-1 hover:bg-[#1A1A1A] rounded text-sm cursor-pointer transition-colors">
-                          <Folder className="w-4 h-4 text-[#E5E5E5]" />
-                          <span className="text-[#E5E5E5]">Memories</span>
-                        </div>
-                        <div className="flex items-center gap-1 px-2 py-1 hover:bg-[#1A1A1A] rounded text-sm cursor-pointer bg-[#E5E5E5]/5 transition-colors">
-                          <FileCode className="w-4 h-4 text-[#F59E0B]" />
-                          <span className="text-[#E5E5E5]">MVP_PRD.md</span>
-                        </div>
-                        <div className="flex items-center gap-1 px-2 py-1 hover:bg-[#1A1A1A] rounded text-sm cursor-pointer transition-colors">
-                          <FileCode className="w-4 h-4 text-[#F59E0B]" />
-                          <span className="text-[#E5E5E5]">CHATBOT.md</span>
-                        </div>
+                        {[
+                          { name: 'Agents', isDir: true },
+                          { name: 'Memories', isDir: true },
+                          { name: 'MVP_PRD.md', isDir: false },
+                          { name: 'CHATBOT.md', isDir: false },
+                          { name: 'README.md', isDir: false },
+                          { name: 'notes.txt', isDir: false },
+                          { name: 'index.js', isDir: false },
+                          { name: 'LICENSE', isDir: false },
+                        ].map(({ name, isDir }) => {
+                          const tag = getFileTag(name, isDir);
+                          const { color, Icon } = FILE_TAG_STYLES[tag];
+                          const isSelected = name === 'MVP_PRD.md';
+                          return (
+                            <div
+                              key={name}
+                              className={`flex items-center gap-1 px-2 py-1 rounded text-sm cursor-pointer transition-colors ${isSelected ? 'bg-[#E5E5E5]/5' : 'hover:bg-[#1A1A1A]'}`}
+                            >
+                              <Icon className="w-4 h-4 shrink-0" style={{ color }} />
+                              <span style={{ color }}>{name}</span>
+                            </div>
+                          );
+                        })}
                       </div>
                     )}
                   </div>
@@ -531,11 +541,11 @@ function MainChatView(
                     <div className="space-y-1 text-sm">
                       <div className="flex items-center gap-2 px-2 py-1 hover:bg-[#1A1A1A] rounded cursor-pointer transition-colors">
                         <span className="text-[#10B981]">M</span>
-                        <span className="text-[#E5E5E5]">MVP_PRD.md</span>
+                        <span style={{ color: FILE_TAG_STYLES[getFileTag('MVP_PRD.md', false)].color }}>MVP_PRD.md</span>
                       </div>
                       <div className="flex items-center gap-2 px-2 py-1 hover:bg-[#1A1A1A] rounded cursor-pointer transition-colors">
                         <span className="text-[#F59E0B]">A</span>
-                        <span className="text-[#E5E5E5]">FEATURES.md</span>
+                        <span style={{ color: FILE_TAG_STYLES[getFileTag('FEATURES.md', false)].color }}>FEATURES.md</span>
                       </div>
                     </div>
                   </div>
