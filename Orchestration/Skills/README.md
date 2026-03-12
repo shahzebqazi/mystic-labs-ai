@@ -14,10 +14,11 @@ Skills are **user-typed commands or keywords** that trigger **deterministic beha
 |-----------|--------|
 | **summarize** | Summarize the current context window of the chat so the user can copy-paste it or start a new agent with that summary. No file output unless the user explicitly asks to save. |
 | **generate**  | Produce the requested text on screen only. Do not create or overwrite files unless the user explicitly asks for a persisted artifact. |
+| **swarm**     | Generate an agent swarm plan for one PRD or all PRDs in parallel. Uses mixture-of-experts/model routing and sub-agent capabilities. See [Project/Orchestration/Skills/Swarm/README.md](../../Project/Orchestration/Skills/Swarm/README.md). |
 
 ## Adding a new skill
 
-1. Add a short spec under `Orchestration/Skills/` (e.g. `COMMAND_NAME.md` or a script).
+1. Add a short spec under `Orchestration/Skills/` (e.g. `COMMAND_NAME.md` or a script). For multi-file skills, use a subdirectory (e.g. `Project/Orchestration/Skills/Swarm/`).
 2. Define: trigger keyword(s), exact effect, and whether output is in-chat only or may write files.
 3. Document the command in this README.
 4. (Future) Prefer a tool call, script, or small program over a markdown spec so the harness can execute it deterministically.

@@ -53,6 +53,30 @@ todos:
   - id: feature-48
     content: "Config path override: optional path to SETTINGS.json or config directory"
     status: pending
+  - id: feature-49
+    content: "Agent hierarchies: parent/child agent roles, delegation, escalation, and policy inheritance"
+    status: pending
+  - id: feature-50
+    content: "Ancient quorums: configurable quorum approvals for high-risk agent actions and multi-agent decisions"
+    status: pending
+  - id: feature-51
+    content: "Agent/task sandboxing: isolation boundaries for filesystem, network, and command execution"
+    status: pending
+  - id: feature-52
+    content: "Per-agent/per-task virtual environments for isolated dependencies and reproducible execution"
+    status: pending
+  - id: feature-53
+    content: "JJ failure-event schema and startup handoff so new agents inherit unresolved failures and validated lessons"
+    status: pending
+  - id: feature-54
+    content: "Hybrid memory pipeline: short-term JJ signals with curated promotion into long-term project memory"
+    status: pending
+  - id: feature-55
+    content: "Strict Ancient Quorum gate for promoting lessons into durable memory (supermajority with critical-path rules)"
+    status: pending
+  - id: feature-56
+    content: "Harness performance optimization from failure learning: avoidance hits, rework reduction, recovery-time metrics"
+    status: pending
 isProject: false
 ---
 
@@ -202,6 +226,24 @@ The following **settings (41–48)** are first-class features in this PRD; see t
 47. **Session restore on reopen** — **On app reopen:** restore last session (open chats, sidebar state, selected Personality) or **always start fresh**. Persist preference and state.
 48. **Config path override** — **Optional:** Path to **SETTINGS.json** or config directory for profile/project-specific config (power users, multi-project, CI/headless).
 
+The following **settings (49–52)** add agent governance and execution isolation as first-class requirements.
+
+### Settings Menu Features 49–52
+
+49. **Agent hierarchies** — Support hierarchical agent structures (e.g. lead agent, specialist agents, worker agents) with explicit parent/child relationships, delegation rules, escalation paths, and inherited policy constraints.
+50. **Ancient quorums** — Add configurable quorum policies for sensitive or high-impact actions (e.g. destructive file changes, broad refactors, release actions), including quorum size, voter set, timeout, and tie/deny behavior. Preserve the term **Ancient Quorums** as a named governance mode for compatibility with project language.
+51. **Sandboxing for agents and tasks** — Run agents/tasks in constrained sandboxes with scoped filesystem access, network policy, process controls, and command restrictions; surface sandbox profile selection in settings and per-task overrides where permitted.
+52. **Virtual environments for isolation** — Support per-agent and per-task virtual environments (e.g. Python `venv`, Node tool/runtime isolation) to prevent dependency leakage, improve reproducibility, and reduce cross-task side effects.
+
+The following **settings (53–56)** define failure-aware coordination and learning optimization for multi-agent runtime quality.
+
+### Settings Menu Features 53–56
+
+53. **Failure-aware JJ handoff** — Define a compact failure-event schema in jj commit messages and require new agents to load unresolved failures plus validated lessons at startup.
+54. **Hybrid memory pipeline (short-term + long-term)** — Use jj as short-term active memory and promote validated patterns into durable project memory (`MENTAL_MAP.md` and curated docs).
+55. **Strict Ancient Quorum promotion gate** — Promotion to long-term memory must pass a stricter Ancient Quorum policy (default supermajority, with critical-path 3/3 requirement) to avoid polluting durable guidance.
+56. **Failure-learning performance optimization** — Track and optimize harness outcomes using metrics such as repeat-failure reduction, avoidance hits, time-to-recovery, and token/cycle savings from reusing verified lessons.
+
 ---
 
 ## Executive
@@ -247,10 +289,15 @@ The following **settings (41–48)** are first-class features in this PRD; see t
 - Logging: Options for logging types (level, destination, format); local-only, no telemetry.
 - Budget/rate limits and self-update: deferred; for now local-only (no cost), recommend nightly branch.
 - Personas: temperature/sampling and streaming integrated into Personas; Personality = persona + skillset (see § Settings 13–14 and § Personality).
-- **Full settings menu:** Features 1–48 (see § Settings Menu and § Critical settings review). Features 41–48: settings persistence & config source, backend URL, max output tokens, confirm before destructive actions, default Personality on startup, local-only (user-facing), session restore, config path override.
+- **Full settings menu:** Features 1–56 (see § Settings Menu and § Critical settings review). Features 41–48: settings persistence & config source, backend URL, max output tokens, confirm before destructive actions, default Personality on startup, local-only (user-facing), session restore, config path override. Features 49–52: agent hierarchies, Ancient Quorums, sandboxing, and virtual environments for agent/task isolation. Features 53–56: failure-aware jj handoff, hybrid memory promotion, strict Ancient Quorum promotion gate, and failure-learning performance optimization.
 
 ### Non-functional (performance, security, guard rails)
 - [To be populated by AI agent]
+- Isolation by default: agent/task execution must honor selected sandbox profile and deny disallowed filesystem/network/process actions.
+- Reproducibility: task runs should be replayable with deterministic environment setup using selected virtual environment strategy.
+- Governance: high-risk actions should support quorum approval flow with auditable decision records (including Ancient Quorums mode).
+- Knowledge integrity: only quorum-approved lessons may enter durable memory; unverifiable or low-confidence lessons remain short-term.
+- Anti-propagation: new agents must consume unresolved-failure context before edits to reduce repeated mistakes and overcorrections.
 
 ---
 

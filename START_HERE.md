@@ -38,6 +38,7 @@ When the user types a **skill keyword**, apply the corresponding deterministic e
 
 - **summarize** — Summarize the context window so the user can copy-paste or start a new agent; output in-chat only unless the user asks to save. See `Orchestration/Skills/summarize.md`.
 - **generate** — Produce requested text on screen only; do not create or edit files unless the user explicitly asks for a persisted artifact. See `Orchestration/Skills/generate.md`.
+- **swarm** — Generate an agent swarm for one PRD or all PRDs in parallel (MoE/model routing, sub-agents). See `Orchestration/Skills/Swarm/README.md` or `Project/Orchestration/Skills/Swarm/README.md`.
 
 Full list and conventions: [Orchestration/Skills/README.md](Orchestration/Skills/README.md).
 
@@ -118,6 +119,15 @@ Defaults: [Orchestration/Memories/DEFAULTS.md](Orchestration/Memories/DEFAULTS.m
 Machine-readable settings: [Orchestration/Memories/SETTINGS.json](Orchestration/Memories/SETTINGS.json)
 
 Includes: agent email, execution level, model endpoint, GitHub integration flags, budget parameters, self-update settings.
+
+## Priorities
+
+**Routing and tiered AI (research reminder):**
+
+- **Routing research** — Understand how to route various AIs over networks and, locally, how a single chat input can be classified into tiers of AIs so the user does not need to switch models or worry about choosing lower- vs higher-cost AIs per task.
+- **Classification** — Use a classification algorithm or classifier model to determine which AI/model is best suited for the task at hand (e.g. simple vs complex, cost vs capability).
+- **AI swarms** — Swarms should be able to use multiple LLMs (multi-model coordination and handoff).
+- **Harness for non-swarm AIs** — AIs that do not have native agent swarms should use a shared harness for headless operation: spawn sub-agents and processes on demand and close them when done, so single-agent systems can behave like swarms without built-in swarm support.
 
 ## Current Tasks
 
