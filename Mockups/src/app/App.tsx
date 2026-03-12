@@ -648,8 +648,51 @@ function MainChatView(
             <div className="w-1/2 min-w-0 flex flex-col shrink-0 border-l border-[#1A1A1A] bg-[#0a0a0a]">
               {/* Chat: messages area + input at bottom with icons */}
               <div className="flex-1 min-h-0 flex flex-col border-b border-[#1A1A1A] bg-[#0a0a0a] overflow-hidden">
-                <div className="flex-1 min-h-0 overflow-auto p-2 text-[#666666] text-xs font-mono">
-                  <div className="text-[#8b949e]">Chat messages (mock)</div>
+                <div className="flex-1 min-h-0 overflow-auto p-2 space-y-3 font-mono text-xs">
+                  <div className="flex flex-col gap-1">
+                    <span className="text-[#8b949e]">User</span>
+                    <div className="rounded bg-[#161b22] border border-[#30363d] px-2.5 py-2 text-[#e6edf3]">
+                      How do I install Arch Linux with ZFS as the root filesystem? I have a single NVMe and want encryption.
+                    </div>
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <span className="text-[#8b949e]">dotAi</span>
+                    <div className="rounded bg-[#0d1117] border border-[#30363d] px-2.5 py-2 text-[#e6edf3] space-y-1.5">
+                      <p>High-level steps:</p>
+                      <ol className="list-decimal list-inside space-y-0.5 text-[#8b949e]">
+                        <li>Boot the Arch ISO and load ZFS modules: <code className="text-[#7ee787]">zfs</code>, <code className="text-[#7ee787]">zfs_arc_max</code> if needed.</li>
+                        <li>Create a ZFS pool (e.g. <code className="text-[#7ee787]">zpool create -f -O encryption=aes-256-gcm -O keyformat=passphrase rpool /dev/nvme0n1</code>).</li>
+                        <li>Create datasets: <code className="text-[#7ee787]">root</code>, <code className="text-[#7ee787]">root/var</code>, maybe <code className="text-[#7ee787]">home</code>.</li>
+                        <li>Install base system into the pool, chroot, install <code className="text-[#7ee787]">zfs-dkms</code> + hooks, set up mkinitcpio and bootloader (e.g. systemd-boot) to load ZFS and unlock the pool.</li>
+                      </ol>
+                      <p className="text-[#8b949e]">I can give you exact commands for your layout (single disk, encryption) if you want.</p>
+                    </div>
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <span className="text-[#8b949e]">User</span>
+                    <div className="rounded bg-[#161b22] border border-[#30363d] px-2.5 py-2 text-[#e6edf3]">
+                      Yes, single NVMe, LUKS-style encryption. And use systemd-boot.
+                    </div>
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <span className="text-[#8b949e]">dotAi</span>
+                    <div className="rounded bg-[#0d1117] border border-[#30363d] px-2.5 py-2 text-[#e6edf3] space-y-1.5">
+                      <p>Here’s a minimal flow (single NVMe, ZFS native encryption, systemd-boot):</p>
+                      <pre className="text-[#7ee787] overflow-x-auto text-[10px] whitespace-pre">{`# Load ZFS
+modprobe zfs
+
+# Create encrypted pool (replace nvme0n1 with your block device)
+zpool create -f -o ashift=12 -O encryption=aes-256-gcm \\
+  -O keyformat=passphrase -O keylocation=prompt -O mountpoint=none rpool /dev/nvme0n1
+
+# Datasets
+zfs create -o mountpoint=/ -o canmount=noauto rpool/root
+zfs create rpool/root/arch
+zfs create -o mountpoint=/home rpool/home
+zfs mount rpool/root/arch`}</pre>
+                      <p className="text-[#8b949e]">Then <code className="text-[#7ee787]">pacstrap</code>, chroot, install <code className="text-[#7ee787]">zfs-dkms linux linux-headers</code>, add <code className="text-[#7ee787]">zfs</code> to mkinitcpio hooks and to the bootloader cmdline. I can spell out the chroot + systemd-boot steps next.</p>
+                    </div>
+                  </div>
                 </div>
                 <div className="shrink-0 border-t border-[#1A1A1A] p-2 bg-[#0a0a0a]">
                   <div className="flex items-center gap-1.5 mb-1.5">
