@@ -12,19 +12,19 @@ A short guide to the ideas and terms you’ll see in this repo and in AI-assiste
 
 ## LLM (Large Language Model)
 
-An **LLM** is a model trained on huge amounts of text so it can predict and generate language. You give it a **prompt** (instructions plus context); it returns text (answers, code, summaries). Examples: OpenAI’s GPT series, Anthropic’s Claude, open models (Llama, Mistral, etc.). Many can run **locally** (e.g. via GGUF) for privacy or offline use. In Codex, the full `.ai` setup on the `development` or `Production` branch can use local GGUF models; the `main` branch is docs and process only.
+An **LLM** is a model trained on huge amounts of text so it can predict and generate language. You give it a **prompt** (instructions plus context); it returns text (answers, code, summaries). Examples: OpenAI’s GPT series, Anthropic’s Claude, open models (Llama, Mistral, etc.). Many can run **locally** (e.g. via GGUF) for privacy or offline use. In Codex, the full project and local GGUF setup live on the **`desktop-app`** (nightly) branch; the `main` branch is docs and process only.
 
 ---
 
 ## Agents
 
-An **agent** is an AI system that doesn’t just answer one question—it can **take multiple steps**: read files, run tools, search, edit code, and loop until a goal is met. In practice, “agent” often means an LLM plus **tools** (e.g. run a command, read a file, call an API) and **instructions** (rules, skills, project context). Codex is built so that when you point an agent at your repo (e.g. at `.ai/START_HERE.md` on `development`), it follows the same conventions: skills, rules, and the AI operation directory.
+An **agent** is an AI system that doesn’t just answer one question—it can **take multiple steps**: read files, run tools, search, edit code, and loop until a goal is met. In practice, “agent” often means an LLM plus **tools** (e.g. run a command, read a file, call an API) and **instructions** (rules, skills, project context). Codex is built so that when you point an agent at your repo (e.g. at `Project/START_HERE.md` on the **`desktop-app`** nightly branch), it follows the same conventions: skills, rules, and the AI operation directory.
 
 ---
 
 ## Scaffolds
 
-A **scaffold** is a reusable structure for a task: a prompt template, a workflow, or a small “skeleton” of steps (e.g. “intake → classify → summarize → commit”). Iterating on scaffolds means you refine prompts, components, and workflows over time and capture the good versions. The [TAXONOMY](TAXONOMY.md) in this repo is for classifying scaffolds and related artifacts (components, prompts, workflows, patterns, templates) as you compile them from iterations.
+A **scaffold** is a reusable structure for a task: a prompt template, a workflow, or a small “skeleton” of steps (e.g. “intake → classify → summarize → commit”). Iterating on scaffolds means you refine prompts, components, and workflows over time and capture the good versions. On the **`desktop-app`** (nightly) branch you’ll find project structure and intake workflow for classifying scaffolds and related artifacts (components, prompts, workflows, patterns, templates).
 
 ---
 
@@ -57,9 +57,9 @@ A **harness** is a framework or environment that **wraps** and **controls** how 
 | Concept   | In Codex / .ai |
 |----------|------------------|
 | **AI**   | The .ai system: markdown-first orchestration, optional local inference. |
-| **LLM**  | Used by agents; optional local GGUF on `development` / `Production`. |
-| **Agents** | Designed to be pointed at `.ai/START_HERE.md` and to follow CONTRIBUTING and project rules. |
-| **Scaffolds** | Captured and classified in [TAXONOMY](TAXONOMY.md); intake workflow in [CONTRIBUTING](CONTRIBUTING.md#ai-intake-agent-workflow). |
+| **LLM**  | Used by agents; optional local GGUF on the **`desktop-app`** (nightly) branch. |
+| **Agents** | Designed to be pointed at `Project/START_HERE.md` on **`desktop-app`** and to follow CONTRIBUTING and project rules. |
+| **Scaffolds** | Intake workflow in [CONTRIBUTING](CONTRIBUTING.md#ai-intake-agent-workflow); full project on **`desktop-app`**. |
 | **Guardrails** | [Research policy](CONTRIBUTING.md#research-policy), approval-before-push, and contribution conventions. |
 | **Harnesses** | Research and benchmarking live in [agi-research](https://github.com/shahzebqazi/agi-research). |
 | **MCP**  | Use the [Cursor config repo](CONTRIBUTING.md#cursor-config-repo) for Cursor-specific tools and MCP integrations. |
@@ -72,5 +72,5 @@ A **harness** is a framework or environment that **wraps** and **controls** how 
 - **[CONTRIBUTING](CONTRIBUTING.md)** — Branch model, AI intake workflow, how to contribute.
 - **[Research policy](CONTRIBUTING.md#research-policy)** — Where research lives (agi-research) and approval before push.
 - **[Cursor config repo](CONTRIBUTING.md#cursor-config-repo)** — Cursor-specific config, plugins, and MCP.
-- **[TAXONOMY](TAXONOMY.md)** — Classifying prompts, components, and workflows.
+- **`desktop-app` (nightly) branch** — Full project, Orchestration, Documents, START_HERE; use this branch for the desktop app.
 - **agi-research** — [github.com/shahzebqazi/agi-research](https://github.com/shahzebqazi/agi-research) for learning, research, and testing (LFM2, MoE, benchmarking, etc.).

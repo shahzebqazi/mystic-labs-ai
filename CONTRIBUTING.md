@@ -8,22 +8,23 @@ Thanks for your interest in the .ai system. This guide explains how the reposito
 
 ## Branch model and workflow
 
-- **main** — Docs and process only (README, CONTRIBUTING, LICENSE, and root .md docs). Default branch for landing and documentation.
-- **development** — Nightly builds and active development. Feature and contributor branches merge here.
-- **Production** — Releases. Promoted from `development` when stable; do not commit directly to Production.
+- **main** — User-facing docs only (README, CONTRIBUTING, LICENSE, NEW_USER_GUIDE). Kept minimal on purpose; no full project content here.
+- **desktop-app** — **Nightly:** full project (Orchestration, Documents, Extensions, START_HERE.md, skills, rules, harness). **Use this branch for the desktop app and all in-repo content.**
+- **development** — Legacy development branch.
+- **Production** — Releases when used; promoted from development/desktop-app; do not commit directly to Production.
 
-Flow: open a feature or contributor branch from `development`, do work, then merge (or open a PR) into `development`. Releases are promoted from `development` to `Production`.
+**Users:** For the full project and desktop app, use the **`desktop-app`** (nightly) branch. Flow: open feature or contributor branches from `desktop-app`, do work, then merge (or open a PR) into `desktop-app`.
 
-## Interactive rebase before merging into development
+## Interactive rebase before merging into desktop-app
 
-Before merging your feature or contributor branch into `development`:
+Before merging your feature or contributor branch into `desktop-app`:
 
-1. **Rebase onto development** — `git fetch origin development && git rebase origin/development` (or equivalent).
-2. **Use interactive rebase to clean history** — `git rebase -i origin/development` (or squash onto a single commit if preferred). During the rebase:
+1. **Rebase onto desktop-app** — `git fetch origin desktop-app && git rebase origin/desktop-app` (or equivalent).
+2. **Use interactive rebase to clean history** — `git rebase -i origin/desktop-app` (or squash onto a single commit if preferred). During the rebase:
    - **Squash** fixup and WIP commits into logical steps.
    - **Reword** commit messages so they are intention-rich and useful for future AI-assisted evolution (what changed and why).
    - **Keep** distinct logical steps as separate commits where it helps readability.
-3. **Branch protection** — Do not push directly to `Production`. All changes reach Production via `development` after review/promotion.
+3. **Branch protection** — Do not push directly to `Production`. All changes reach Production via `desktop-app` or `development` after review/promotion.
 
 ## Repository modes
 
