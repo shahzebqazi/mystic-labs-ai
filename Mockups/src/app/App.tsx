@@ -10,6 +10,9 @@ const KOI_POND_BG = 'https://images.unsplash.com/photo-1582794543139-8ac9cb0f7b1
 const MOCKUP_WIDTH = 2560;
 const MOCKUP_HEIGHT = 1440;
 const MOCKUP_PADDING = 128;
+const SCALE_MIN = 0.2;
+const SCALE_MAX = 2;
+const SCALE_STEP = 0.15;
 
 type AppTab = 'home' | 'settings' | 'mods';
 
@@ -18,18 +21,36 @@ export default function App() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [scale, setScale] = useState(1);
 
+  // Fit mockup to viewport on load and resize
   useEffect(() => {
-    const updateScale = () => {
+    const updateScaleToFit = () => {
       const s = Math.min(
         (window.innerWidth - MOCKUP_PADDING) / MOCKUP_WIDTH,
         (window.innerHeight - MOCKUP_PADDING) / MOCKUP_HEIGHT,
         1
       );
-      setScale(Math.max(0.2, s));
+      setScale(Math.max(SCALE_MIN, s));
     };
-    updateScale();
-    window.addEventListener('resize', updateScale);
-    return () => window.removeEventListener('resize', updateScale);
+    updateScaleToFit();
+    window.addEventListener('resize', updateScaleToFit);
+    return () => window.removeEventListener('resize', updateScaleToFit);
+  }, []);
+
+  // Cmd/Ctrl +/- zoom the mockup (app), not the page — prevent browser zoom
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (!e.metaKey && !e.ctrlKey) return;
+      const zoomIn = e.key === '=' || e.key === '+';
+      const zoomOut = e.key === '-';
+      if (!zoomIn && !zoomOut) return;
+      e.preventDefault();
+      setScale((s) => {
+        const next = zoomIn ? s + SCALE_STEP : s - SCALE_STEP;
+        return Math.max(SCALE_MIN, Math.min(SCALE_MAX, next));
+      });
+    };
+    window.addEventListener('keydown', onKeyDown, { capture: true });
+    return () => window.removeEventListener('keydown', onKeyDown, { capture: true });
   }, []);
 
   return (
@@ -386,14 +407,16 @@ function MainChatView(
               </div>
             </div>
 
-            {/* Right column: AI chat pane (top) + btop diagnostics (bottom) */}
-            <div className="w-[280px] flex flex-col shrink-0 border-l border-[#1A1A1A] bg-[#0a0a0a]">
-              <div className="border-b border-[#1A1A1A] p-2 shrink-0 bg-[#0a0a0a]">
-                <input type="text" placeholder="Ask dotAi..." className="w-full bg-[#0A0A0A] border border-[#1A1A1A] rounded px-2 py-2 text-xs text-[#E5E5E5] placeholder:text-[#666666] outline-none focus:border-[#333333]" />
+            {/* Right column: 1/2 width — two quarters stacked (AI chat top, btop bottom) */}
+            <div className="w-1/2 min-w-0 flex flex-col shrink-0 border-l border-[#1A1A1A] bg-[#0a0a0a]">
+              <div className="flex-1 min-h-0 flex flex-col border-b border-[#1A1A1A] bg-[#0a0a0a] overflow-hidden">
+                <div className="p-2 shrink-0 bg-[#0a0a0a]">
+                  <input type="text" placeholder="Ask dotAi..." className="w-full bg-[#0A0A0A] border border-[#1A1A1A] rounded px-2 py-2 text-xs text-[#E5E5E5] placeholder:text-[#666666] outline-none focus:border-[#333333]" />
+                </div>
               </div>
               <div className="flex-1 min-h-0 overflow-hidden flex flex-col bg-[#0d1117]">
-                <div className="px-2 py-1 border-b border-[#30363d] text-[10px] font-mono text-[#8b949e]">btop — system</div>
-                <div className="flex-1 overflow-auto p-2 font-mono text-[10px] text-[#7ee787] space-y-0.5">
+                <div className="px-2 py-1 border-b border-[#30363d] text-[10px] font-mono text-[#8b949e] shrink-0">btop — system</div>
+                <div className="flex-1 overflow-auto p-2 font-mono text-[10px] text-[#7ee787] space-y-0.5 min-h-0">
                   <div className="flex justify-between text-[#8b949e]"><span>CPU</span><span>12%</span></div>
                   <div className="h-1.5 bg-[#21262d] rounded overflow-hidden"><div className="h-full bg-[#10B981] rounded" style={{ width: '12%' }} /></div>
                   <div className="flex justify-between text-[#8b949e]"><span>Mem</span><span>4.2G / 16G</span></div>
