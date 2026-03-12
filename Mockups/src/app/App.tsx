@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { ChevronLeft, ChevronRight, Menu, Settings, User, Paperclip, Mic, Target, ChevronDown, Circle, PanelLeft, PanelRight, PanelBottom, X, Terminal, FileCode, Cpu, Zap, Shield, Database, Code2, Layers, Activity, Bug, GitCommit, FolderOpen, File, Files, Puzzle, GitBranch, Search, ChevronRight as ChevronRightIcon, Folder, MessageCircle, Network, Globe, Image as ImageIcon, LayoutList, Bot, MoreVertical, SlidersHorizontal, Percent, DollarSign, ZoomIn, ZoomOut, RotateCcw, Filter, Plus, HandMetal } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Menu, User, Paperclip, Mic, Target, ChevronDown, Circle, PanelLeft, PanelRight, PanelBottom, X, Terminal, FileCode, Cpu, Zap, Shield, Database, Code2, Layers, Activity, Bug, GitCommit, FolderOpen, File, Files, Puzzle, GitBranch, Search, ChevronRight as ChevronRightIcon, Folder, MessageCircle, Network, Globe, Image as ImageIcon, LayoutList, Bot, MoreVertical, SlidersHorizontal, Percent, DollarSign, ZoomIn, ZoomOut, RotateCcw, Filter, Plus, HandMetal } from 'lucide-react';
 import { ThreadGraph3D, type ThreadNode, type ThreadLink } from './components/ThreadGraph3D';
 import { MiniBtop } from './components/MiniBtop';
 import {
@@ -26,7 +26,7 @@ type Tab = { id: string; kind: TabKind };
 
 const TAB_LABELS: Record<TabKind, string> = {
   home: 'Home',
-  settings: 'Settings',
+  settings: '.config',
   editor: 'Editor',
   terminal: 'Terminal',
   agent: 'Agent',
@@ -201,7 +201,7 @@ export default function App() {
                   onOpenSettings={() => addTab('settings')}
                 />
               )}
-              {activeTab.kind === 'settings' && <SettingsView onBack={() => setActiveTabId(tabs[0]?.id ?? activeTabId)} />}
+              {activeTab.kind === 'settings' && <ConfigFileView onBack={() => setActiveTabId(tabs[0]?.id ?? activeTabId)} />}
               {activeTab.kind === 'editor' && <EditorPaneMock />}
               {activeTab.kind === 'terminal' && <TerminalPaneMock />}
               {activeTab.kind === 'agent' && <AgentPaneMock />}
@@ -890,107 +890,45 @@ function ImagePaneMock() {
   );
 }
 
-function SettingsView({ onBack }: { onBack: () => void }) {
+/** NixOS-style config file: edit this file to configure the application (no GUI settings). */
+const MOCK_CONFIG_PATH = '~/.config/dotai/config.nix';
+
+const MOCK_CONFIG_CONTENT = `# dotAi application configuration (NixOS-style)
+# Edit this file to change behaviour. Restart or run :reload to apply.
+
+{ config, pkgs, ... }:
+
+{
+  # Backend & model
+  dotai.backend = "llama-server";
+  dotai.endpoint = "http://localhost:11434";
+  dotai.strictlyLocal = true;
+
+  # Security & execution
+  dotai.executionLevel = "ask";  # ask | auto-safe | always-ask
+
+  # Session
+  dotai.restoreSession = true;
+}
+`;
+
+function ConfigFileView({ onBack }: { onBack: () => void }) {
   return (
     <div className="bg-[#000000] overflow-hidden flex flex-col h-full min-h-0">
-      {/* Header */}
-      <div className="bg-[#0A0A0A] border-b border-[#1A1A1A] px-6 py-4 flex items-center justify-between shrink-0">
-        <button onClick={onBack} className="flex items-center gap-2 text-sm text-[#666666] hover:text-white transition-colors">
+      <div className="bg-[#0A0A0A] border-b border-[#1A1A1A] px-4 py-2 flex items-center justify-between shrink-0">
+        <button onClick={onBack} className="flex items-center gap-2 text-sm text-[#666666] hover:text-[#E5E5E5] transition-colors">
           <ChevronLeft className="w-4 h-4" />
-          <span>Back to Chat</span>
+          <span>Back</span>
         </button>
-        <div className="text-lg font-medium flex items-center gap-2">
-          <Settings className="w-5 h-5 text-[#0EA5E9]" />
-          Settings
-        </div>
-        <div className="w-20" />
+        <span className="text-xs font-mono text-[#8b949e]">Edit config file to change settings</span>
       </div>
-
-      {/* Settings Content — fills remaining space so tab area does not shrink */}
-      <div className="p-8 space-y-8 flex-1 min-h-0 overflow-y-auto">
-        {/* Config Path */}
-        <div>
-          <div className="text-xs text-[#666666] mb-2 font-mono flex items-center gap-2">
-            <FileCode className="w-3 h-3" />
-            Configuration Path
-          </div>
-          <div className="bg-[#000000] rounded-md px-4 py-3 font-mono text-xs text-[#E5E5E5] border border-[#1A1A1A]">
-            ~/Project/Orchestration/Memories/SETTINGS.json
-          </div>
-        </div>
-
-        {/* Backend & Routing */}
-        <div>
-          <div className="text-sm font-medium mb-4 text-[#E5E5E5] flex items-center gap-2">
-            <Database className="w-4 h-4 text-[#0EA5E9]" />
-            Backend & Routing
-          </div>
-          <div className="space-y-3">
-            <label className="flex items-center gap-3 p-3 rounded-md hover:bg-[#0A0A0A] cursor-pointer transition-colors border border-[#1A1A1A]">
-              <input type="radio" name="backend" defaultChecked className="w-4 h-4 accent-[#0EA5E9]" />
-              <div className="flex-1">
-                <div className="text-sm text-[#E5E5E5]">Local Default</div>
-                <div className="text-xs text-[#666666] font-mono">http://localhost:11434</div>
-              </div>
-            </label>
-            
-            <label className="flex items-center gap-3 p-3 rounded-md hover:bg-[#0A0A0A] cursor-pointer transition-colors border border-transparent">
-              <input type="radio" name="backend" className="w-4 h-4 accent-[#0EA5E9]" />
-              <div className="flex-1">
-                <div className="text-sm text-[#E5E5E5]">Custom Llama-Server</div>
-                <div className="text-xs text-[#666666] font-mono">http://localhost:8080</div>
-              </div>
-            </label>
-            
-            <label className="flex items-center gap-3 p-3 rounded-md bg-[#0EA5E9]/10 border border-[#0EA5E9]/30 cursor-pointer">
-              <input type="checkbox" defaultChecked className="w-4 h-4 accent-[#0EA5E9]" />
-              <div className="flex-1">
-                <div className="text-sm text-[#E5E5E5] flex items-center gap-2">
-                  <Shield className="w-3.5 h-3.5 text-[#0EA5E9]" />
-                  Strictly Local-Only
-                </div>
-                <div className="text-xs text-[#666666]">Disable external API fallback</div>
-              </div>
-            </label>
-          </div>
-        </div>
-
-        {/* Security & Execution */}
-        <div>
-          <div className="text-sm font-medium mb-4 text-[#E5E5E5] flex items-center gap-2">
-            <Shield className="w-4 h-4 text-[#0EA5E9]" />
-            Security & Execution
-          </div>
-          <div className="space-y-3">
-            <div>
-              <label className="text-xs text-[#666666] block mb-2 font-mono">Execution Level</label>
-              <select className="w-full bg-[#000000] border border-[#1A1A1A] rounded-md px-4 py-2.5 text-sm text-[#E5E5E5] outline-none focus:border-[#0EA5E9]/50 transition-colors font-mono">
-                <option>Ask for Confirmation</option>
-                <option>Auto-execute Safe Commands</option>
-                <option>Always Ask</option>
-              </select>
-              <div className="text-xs text-[#666666] mt-1.5 font-mono">Confirm all jj / destructive actions</div>
-            </div>
-          </div>
-        </div>
-
-        {/* Session Management */}
-        <div>
-          <div className="text-sm font-medium mb-4 text-[#E5E5E5] flex items-center gap-2">
-            <Activity className="w-4 h-4 text-[#0EA5E9]" />
-            Session Management
-          </div>
-          <div className="space-y-3">
-            <label className="flex items-center gap-3 p-3 rounded-md hover:bg-[#0A0A0A] cursor-pointer transition-colors border border-transparent">
-              <input type="checkbox" defaultChecked className="w-4 h-4 accent-[#0EA5E9]" />
-              <div className="text-sm text-[#E5E5E5]">Restore last session on app start</div>
-            </label>
-            
-            <button className="w-full px-4 py-2.5 bg-[#0A0A0A] hover:bg-[#1A1A1A] rounded-md text-sm text-[#E5E5E5] transition-colors border border-[#1A1A1A]">
-              Start Fresh Session
-            </button>
-          </div>
-        </div>
+      <div className="px-4 py-2 border-b border-[#1A1A1A] bg-[#0A0A0A]/50 shrink-0">
+        <div className="font-mono text-xs text-[#79c0ff]">{MOCK_CONFIG_PATH}</div>
+      </div>
+      <div className="flex-1 min-h-0 overflow-auto p-4">
+        <pre className="font-mono text-xs text-[#e6edf3] whitespace-pre leading-relaxed bg-[#0d1117] border border-[#30363d] rounded-lg p-4">
+          <code>{MOCK_CONFIG_CONTENT}</code>
+        </pre>
       </div>
     </div>
   );
