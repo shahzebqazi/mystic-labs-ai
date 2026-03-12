@@ -1,9 +1,11 @@
 # Build Mockups app and deploy to GitHub Pages
+# Required: Settings > Pages > Build and deployment > Source = "GitHub Actions"
+# (Not "Deploy from a branch" — this workflow builds and deploys the artifact.)
 name: Deploy Mockups to GitHub Pages
 
 on:
   push:
-    branches: [main]
+    branches: [main, docs/documentation-reorg]
     paths:
       - 'Mockups/**'
       - '.github/workflows/deploy-mockups-pages.yml'

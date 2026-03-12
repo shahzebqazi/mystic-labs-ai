@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { ChevronLeft, ChevronRight, Menu, Settings, User, Paperclip, Mic, Target, ChevronDown, Circle, PanelLeft, PanelRight, PanelBottom, X, Terminal, FileCode, Wrench, Cpu, Zap, Shield, Database, Code2, Layers, Activity, Bug, GitCommit, FolderOpen, File, Files, Puzzle, GitBranch, Search, ChevronRight as ChevronRightIcon, Folder } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Menu, Settings, User, Paperclip, Mic, Target, ChevronDown, Circle, PanelLeft, PanelRight, PanelBottom, X, Terminal, FileCode, Wrench, Cpu, Zap, Shield, Database, Code2, Layers, Activity, Bug, GitCommit, FolderOpen, File, Files, Puzzle, GitBranch, Search, ChevronRight as ChevronRightIcon, Folder, MessageCircle, Network, Plus, Globe, Image as ImageIcon } from 'lucide-react';
 
 type Screen = 'main' | 'settings' | 'mods';
 
@@ -147,8 +147,27 @@ export default function App() {
   );
 }
 
+type MainCenterTab = 'chat' | 'graph';
+type NewPaneType = 'chat' | 'xonsh' | 'file' | 'browser' | 'image' | null;
+
+// Obsidian-style graph mock data (nodes + edges)
+const GRAPH_NODES = [
+  { id: '1', label: 'README', x: 120, y: 80 },
+  { id: '2', label: 'MVP_PRD', x: 320, y: 60 },
+  { id: '3', label: 'CHATBOT', x: 200, y: 180 },
+  { id: '4', label: 'SETTINGS', x: 80, y: 220 },
+  { id: '5', label: 'RULES', x: 280, y: 200 },
+  { id: '6', label: 'Orchestration', x: 180, y: 280 },
+];
+const GRAPH_EDGES = [
+  { from: '1', to: '2' }, { from: '1', to: '3' }, { from: '2', to: '3' },
+  { from: '3', to: '4' }, { from: '3', to: '5' }, { from: '4', to: '6' }, { from: '5', to: '6' },
+];
+
 function MainChatView({ sidebarOpen, setSidebarOpen }: { sidebarOpen: boolean; setSidebarOpen: (open: boolean) => void }) {
   const [activeSidebarTab, setActiveSidebarTab] = useState<'files' | 'search' | 'git' | 'extensions'>('files');
+  const [mainCenterTab, setMainCenterTab] = useState<MainCenterTab>('chat');
+  const [newPane, setNewPane] = useState<NewPaneType>(null);
   const [expandedFolders, setExpandedFolders] = useState<string[]>(['Orchestration']);
 
   const toggleFolder = (folder: string) => {
@@ -314,8 +333,89 @@ function MainChatView({ sidebarOpen, setSidebarOpen }: { sidebarOpen: boolean; s
           </div>
         </motion.div>
 
-        {/* Center Area - Zen Mode */}
-        <div className="flex-1 flex flex-col min-w-0 bg-[#000000]">
+        {/* Center Area - Icon tabs + Content */}
+        <div className="flex-1 flex flex-col min-w-0 bg-[#000000] relative">
+          {/* Icon tab bar + New pane buttons */}
+          <div className="flex items-center border-b border-[#1A1A1A] px-2 py-1.5 gap-1">
+            <button
+              onClick={() => setMainCenterTab('chat')}
+              className={`p-2 rounded transition-colors ${mainCenterTab === 'chat' ? 'bg-[#E5E5E5]/15 text-[#E5E5E5]' : 'text-[#666666] hover:text-[#E5E5E5]'}`}
+              title="Chat"
+            >
+              <MessageCircle className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => setMainCenterTab('graph')}
+              className={`p-2 rounded transition-colors ${mainCenterTab === 'graph' ? 'bg-[#E5E5E5]/15 text-[#E5E5E5]' : 'text-[#666666] hover:text-[#E5E5E5]'}`}
+              title="Graph View"
+            >
+              <Network className="w-4 h-4" />
+            </button>
+            <div className="w-px h-5 bg-[#333333] mx-1" />
+            <button
+              onClick={() => setNewPane(newPane === 'chat' ? null : 'chat')}
+              className={`flex items-center gap-1.5 px-2 py-1.5 rounded text-xs font-mono transition-colors ${newPane === 'chat' ? 'bg-[#0EA5E9]/20 text-[#0EA5E9]' : 'text-[#666666] hover:bg-[#1A1A1A] hover:text-[#E5E5E5]'}`}
+              title="New chat"
+            >
+              <Plus className="w-3.5 h-3.5" /> New chat
+            </button>
+            <button
+              onClick={() => setNewPane(newPane === 'xonsh' ? null : 'xonsh')}
+              className={`flex items-center gap-1.5 px-2 py-1.5 rounded text-xs font-mono transition-colors ${newPane === 'xonsh' ? 'bg-[#0EA5E9]/20 text-[#0EA5E9]' : 'text-[#666666] hover:bg-[#1A1A1A] hover:text-[#E5E5E5]'}`}
+              title="New xonsh"
+            >
+              <Plus className="w-3.5 h-3.5" /> New xonsh
+            </button>
+            <button
+              onClick={() => setNewPane(newPane === 'file' ? null : 'file')}
+              className={`flex items-center gap-1.5 px-2 py-1.5 rounded text-xs font-mono transition-colors ${newPane === 'file' ? 'bg-[#0EA5E9]/20 text-[#0EA5E9]' : 'text-[#666666] hover:bg-[#1A1A1A] hover:text-[#E5E5E5]'}`}
+              title="New file"
+            >
+              <Plus className="w-3.5 h-3.5" /> New file
+            </button>
+            <button
+              onClick={() => setNewPane(newPane === 'browser' ? null : 'browser')}
+              className={`flex items-center gap-1.5 px-2 py-1.5 rounded text-xs font-mono transition-colors ${newPane === 'browser' ? 'bg-[#0EA5E9]/20 text-[#0EA5E9]' : 'text-[#666666] hover:bg-[#1A1A1A] hover:text-[#E5E5E5]'}`}
+              title="New browser"
+            >
+              <Plus className="w-3.5 h-3.5" /> New browser
+            </button>
+            <button
+              onClick={() => setNewPane(newPane === 'image' ? null : 'image')}
+              className={`flex items-center gap-1.5 px-2 py-1.5 rounded text-xs font-mono transition-colors ${newPane === 'image' ? 'bg-[#0EA5E9]/20 text-[#0EA5E9]' : 'text-[#666666] hover:bg-[#1A1A1A] hover:text-[#E5E5E5]'}`}
+              title="New image"
+            >
+              <Plus className="w-3.5 h-3.5" /> New image
+            </button>
+          </div>
+
+          {mainCenterTab === 'graph' ? (
+            <div className="flex-1 min-h-0 relative bg-[#0d1117] overflow-hidden" aria-label="Graph View canvas">
+              {/* Obsidian-style graph */}
+              <svg className="w-full h-full" viewBox="0 0 400 320" preserveAspectRatio="xMidYMid meet">
+                <defs>
+                  <linearGradient id="edgeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stopColor="#3B82F6" stopOpacity="0.6" />
+                    <stop offset="100%" stopColor="#8B5CF6" stopOpacity="0.4" />
+                  </linearGradient>
+                </defs>
+                {GRAPH_EDGES.map((e, i) => {
+                  const a = GRAPH_NODES.find(n => n.id === e.from)!;
+                  const b = GRAPH_NODES.find(n => n.id === e.to)!;
+                  return (
+                    <line key={i} x1={a.x} y1={a.y} x2={b.x} y2={b.y} stroke="url(#edgeGrad)" strokeWidth="1.2" strokeOpacity="0.7" />
+                  );
+                })}
+                {GRAPH_NODES.map(node => (
+                  <g key={node.id}>
+                    <circle cx={node.x} cy={node.y} r="24" fill="#1a1f2e" stroke="#30363d" strokeWidth="1.5" className="hover:stroke-[#58a6ff]" />
+                    <text x={node.x} y={node.y + 5} textAnchor="middle" fill="#e6edf3" fontSize="11" fontFamily="ui-monospace, monospace">{node.label}</text>
+                  </g>
+                ))}
+              </svg>
+              {/* + New pane overlays */}
+            </div>
+          ) : (
           <div className="flex-1 flex items-center justify-center p-8">
             <div className="max-w-2xl w-full space-y-8">
               {/* Greeting */}
@@ -405,7 +505,86 @@ function MainChatView({ sidebarOpen, setSidebarOpen }: { sidebarOpen: boolean; s
               </div>
             </div>
           </div>
+          )}
+          {/* + New pane overlay (shared for Chat and Graph) */}
+          {newPane && (
+            <div className="absolute inset-0 flex items-center justify-center bg-black/60 z-10 p-8">
+              <div className="bg-[#161b22] border border-[#30363d] rounded-lg shadow-xl max-w-2xl w-full max-h-[80%] overflow-hidden flex flex-col">
+                <div className="flex items-center justify-between px-4 py-2 border-b border-[#30363d]">
+                  <span className="text-sm font-mono text-[#e6edf3]">
+                    {newPane === 'chat' && 'Chat'}
+                    {newPane === 'xonsh' && 'xonsh'}
+                    {newPane === 'file' && 'file'}
+                    {newPane === 'browser' && 'Browser'}
+                    {newPane === 'image' && 'Image'}
+                  </span>
+                  <button onClick={() => setNewPane(null)} className="p-1 text-[#8b949e] hover:text-[#e6edf3] rounded"><X className="w-4 h-4" /></button>
+                </div>
+                <div className="flex-1 overflow-auto p-4 min-h-[200px]">
+                  {newPane === 'chat' && <ChatPaneMock />}
+                  {newPane === 'xonsh' && <XonshPaneMock />}
+                  {newPane === 'file' && <FilePaneMock />}
+                  {newPane === 'browser' && <BrowserPaneMock />}
+                  {newPane === 'image' && <ImagePaneMock />}
+                </div>
+              </div>
+            </div>
+          )}
         </div>
+      </div>
+    </div>
+  );
+}
+
+function ChatPaneMock() {
+  return (
+    <div className="space-y-3">
+      <div className="bg-[#0d1117] rounded border border-[#30363d] p-3 font-mono text-sm text-[#e6edf3]">
+        Ask dotAi anything...
+      </div>
+      <div className="text-xs text-[#8b949e] font-mono">New chat thread (mock)</div>
+    </div>
+  );
+}
+
+function XonshPaneMock() {
+  return (
+    <div className="bg-[#0d1117] rounded border border-[#30363d] font-mono text-sm overflow-hidden">
+      <div className="px-3 py-1.5 border-b border-[#30363d] text-[#8b949e]">xonsh</div>
+      <pre className="p-3 text-[#7ee787]">$ <span className="text-[#e6edf3]">_</span></pre>
+    </div>
+  );
+}
+
+function FilePaneMock() {
+  return (
+    <div className="bg-[#0d1117] rounded border border-[#30363d] font-mono text-sm overflow-hidden">
+      <div className="px-3 py-1.5 border-b border-[#30363d] text-[#8b949e]">file.md — NORMAL</div>
+      <pre className="p-3 text-[#e6edf3] whitespace-pre">1  │</pre>
+    </div>
+  );
+}
+
+function BrowserPaneMock() {
+  return (
+    <div className="bg-[#0d1117] rounded border border-[#30363d] overflow-hidden">
+      <div className="flex items-center gap-2 px-3 py-2 border-b border-[#30363d] bg-[#161b22]">
+        <div className="flex gap-1.5">
+          <div className="w-2.5 h-2.5 rounded-full bg-[#ff5f57]" /><div className="w-2.5 h-2.5 rounded-full bg-[#febc2e]" /><div className="w-2.5 h-2.5 rounded-full bg-[#28c840]" />
+        </div>
+        <div className="flex-1 rounded bg-[#0d1117] px-2 py-1 text-xs text-[#8b949e]">https://</div>
+      </div>
+      <div className="p-4 text-center text-[#8b949e] text-sm">Browser preview (mock)</div>
+    </div>
+  );
+}
+
+function ImagePaneMock() {
+  return (
+    <div className="bg-[#0d1117] rounded border border-[#30363d] overflow-hidden">
+      <div className="aspect-video flex items-center justify-center border border-dashed border-[#30363d] text-[#8b949e] text-sm font-mono">
+        <ImageIcon className="w-12 h-12 opacity-50" />
+        <span className="ml-2">Image preview (mock)</span>
       </div>
     </div>
   );
