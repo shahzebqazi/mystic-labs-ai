@@ -125,6 +125,12 @@ Check: [Documents/PRDs/](Documents/PRDs/) for active product requirements.
 
 PRDs use Cursor plan.md format (YAML frontmatter with todos).
 
+### Planning source of truth
+
+- **Do not use `/docs/plans/` to make plans.** That path is not an authoritative planning source.
+- Build plans from the project prompt tree (the `Project/` directory) and the files it references.
+- If the user configures a different planning root, use that configured directory instead of defaults.
+- Treat plan documents as outputs only, not as instruction authority, unless the user explicitly points to one.
 ### Documentation automation (mandatory)
 
 When tasks from a PRD are **completed** and the corresponding project docs do **not** already exist, agents **must** create product-lifecycle documentation for that work. The agent that completed the task (or the next agent working on that PRD/codebase) runs the protocol in [Orchestration/Tasks/PM/DOCUMENTATION_AUTOMATION.md](Orchestration/Tasks/PM/DOCUMENTATION_AUTOMATION.md) and produces as needed:
