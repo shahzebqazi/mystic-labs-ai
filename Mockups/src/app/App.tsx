@@ -1,15 +1,20 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { ChevronLeft, ChevronRight, Menu, User, Paperclip, Mic, Target, ChevronDown, Circle, PanelLeft, PanelRight, PanelBottom, X, Terminal, FileCode, Cpu, Zap, Shield, Database, Code2, Layers, Activity, Bug, GitCommit, FolderOpen, File, Files, Puzzle, GitBranch, Search, ChevronRight as ChevronRightIcon, Folder, MessageCircle, Network, Globe, Image as ImageIcon, LayoutList, Bot, MoreVertical, SlidersHorizontal, Percent, DollarSign, ZoomIn, ZoomOut, RotateCcw, Filter, Plus, HandMetal, Home, FileText, Scale, Columns3, Calendar } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Menu, User, Paperclip, Mic, Target, ChevronDown, Circle, PanelLeft, PanelRight, PanelBottom, X, Terminal, FileCode, Cpu, Zap, Shield, Database, Code2, Layers, Activity, Bug, GitCommit, FolderOpen, File, Files, Puzzle, GitBranch, Search, ChevronRight as ChevronRightIcon, Folder, MessageCircle, Network, Globe, Image as ImageIcon, LayoutList, Bot, MoreVertical, SlidersHorizontal, Percent, DollarSign, ZoomIn, ZoomOut, RotateCcw, Filter, Plus, HandMetal, Home, FileText, Scale, Columns3, Calendar, Settings, Wrench, LogOut, Lock, LockOpen } from 'lucide-react';
 import { ThreadGraph3D, type ThreadNode, type ThreadLink } from './components/ThreadGraph3D';
-import { MiniBtop } from './components/MiniBtop';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from './components/ui/dropdown-menu';
+import { WidgetGrid, WIDGET_REGISTRY, DEFAULT_WIDGETS } from './components/MiniBtop';
 import { useIsNarrowViewport } from './components/ui/use-mobile';
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuSeparator,
+  ContextMenuTrigger,
+  ContextMenuSub,
+  ContextMenuSubTrigger,
+  ContextMenuSubContent,
+  ContextMenuCheckboxItem,
+} from './components/ui/context-menu';
 
 // File-type tagging: derive tag from name (and isDir) for consistent icon + color
 export type FileTag = 'dir' | 'md' | 'txt' | 'js' | 'ts' | 'tsx' | 'json' | 'license' | 'default';
@@ -85,7 +90,33 @@ export default function App() {
   const [leftSidebarOpen, setLeftSidebarOpen] = useState(!isNarrow);
   const [rightSidebarOpen, setRightSidebarOpen] = useState(!isNarrow);
   const [terminalOpen, setTerminalOpen] = useState(false);
+  const [bottomPanelHeight, setBottomPanelHeight] = useState(() => {
+    const stored = localStorage.getItem('mystic-bottom-panel-height');
+    return stored ? Number(stored) : 40;
+  });
   const [scale, setScale] = useState(1);
+  const [activeWidgets, setActiveWidgets] = useState<string[]>(() => {
+    const stored = localStorage.getItem('mystic-active-widgets');
+    return stored ? JSON.parse(stored) : DEFAULT_WIDGETS;
+  });
+
+  useEffect(() => {
+    localStorage.setItem('mystic-active-widgets', JSON.stringify(activeWidgets));
+  }, [activeWidgets]);
+
+  const toggleWidget = (id: string) => {
+    setActiveWidgets(prev =>
+      prev.includes(id) ? prev.filter(w => w !== id) : [...prev, id]
+    );
+  };
+
+  const [homeScreenLocked, setHomeScreenLocked] = useState(() => {
+    return localStorage.getItem('mystic-home-locked') === 'true';
+  });
+
+  useEffect(() => {
+    localStorage.setItem('mystic-home-locked', String(homeScreenLocked));
+  }, [homeScreenLocked]);
 
   const activeTab = tabs.find((t) => t.id === activeTabId) ?? tabs[0];
 
@@ -142,6 +173,7 @@ export default function App() {
   }, [isNarrow]);
 
   const tabBar = (
+    <>
     <div className="flex items-center gap-2 border-b border-[#1A1A1A] bg-[#0A0A0A] px-2 py-1.5 shrink-0 min-h-[36px]">
       {!isNarrow && (
         <div className="flex items-center gap-1.5 shrink-0 pointer-events-none">
@@ -153,80 +185,147 @@ export default function App() {
       <div className="flex items-center gap-0.5 flex-1 min-w-0 overflow-x-auto scrollbar-hide">
         {tabs.map((tab) => {
           const isHome = tab.kind === 'home';
+          const tabClasses = `px-3 py-2 rounded-t text-sm font-mono flex items-center gap-1.5 shrink-0 ${activeTabId === tab.id ? (isHome ? 'bg-[#0a0a0a] text-[#E5E5E5] border border-transparent hover:border-[#1A1A1A] hover:border-b-transparent -mb-px' : 'bg-[#0a0a0a] text-[#E5E5E5] border border-[#1A1A1A] border-b-transparent -mb-px') : 'text-[#666666] hover:text-[#E5E5E5]'}`;
+
+          if (isHome) {
+            return (
+              <ContextMenu key={tab.id}>
+                <ContextMenuTrigger asChild>
+                  <button
+                    onClick={() => setActiveTabId(tab.id)}
+                    className={tabClasses}
+                  >
+                    <img src={`${basePath}brand/pixel-icon-64.png`} alt="Mystic" width={14} height={14} style={{ imageRendering: 'pixelated' }} />
+                  </button>
+                </ContextMenuTrigger>
+                <ContextMenuContent className="min-w-[10rem] bg-[#161b22] border-[#30363d] text-[#e6edf3] p-1 rounded-md shadow-lg">
+                  <ContextMenuItem className="focus:bg-[#30363d] focus:text-[#e6edf3] cursor-pointer rounded px-2 py-1.5 text-sm font-mono flex items-center gap-2">
+                    <Settings className="w-4 h-4" /> Config
+                  </ContextMenuItem>
+                  <ContextMenuItem className="focus:bg-[#30363d] focus:text-[#e6edf3] cursor-pointer rounded px-2 py-1.5 text-sm font-mono flex items-center gap-2">
+                    <Wrench className="w-4 h-4" /> Gizmos
+                  </ContextMenuItem>
+                  <ContextMenuSub>
+                    <ContextMenuSubTrigger className="focus:bg-[#30363d] focus:text-[#e6edf3] cursor-pointer rounded px-2 py-1.5 text-sm font-mono flex items-center gap-2">
+                      <Layers className="w-4 h-4" /> Widgets
+                    </ContextMenuSubTrigger>
+                    <ContextMenuSubContent className="min-w-[11rem] bg-[#161b22] border-[#30363d] text-[#e6edf3] p-1 rounded-md shadow-lg">
+                      {WIDGET_REGISTRY.map(w => (
+                        <ContextMenuCheckboxItem
+                          key={w.id}
+                          checked={activeWidgets.includes(w.id)}
+                          onCheckedChange={() => toggleWidget(w.id)}
+                          className="focus:bg-[#30363d] focus:text-[#e6edf3] cursor-pointer rounded px-2 py-1.5 text-sm font-mono"
+                        >
+                          {w.label}
+                        </ContextMenuCheckboxItem>
+                      ))}
+                    </ContextMenuSubContent>
+                  </ContextMenuSub>
+                  <ContextMenuItem className="focus:bg-[#30363d] focus:text-[#e6edf3] cursor-pointer rounded px-2 py-1.5 text-sm font-mono flex items-center gap-2">
+                    <User className="w-4 h-4" /> User
+                  </ContextMenuItem>
+                  <ContextMenuSeparator className="my-1 h-px bg-[#30363d]" />
+                  <ContextMenuItem
+                    className="focus:bg-[#30363d] focus:text-[#e6edf3] cursor-pointer rounded px-2 py-1.5 text-sm font-mono flex items-center gap-2"
+                    onSelect={() => setHomeScreenLocked(prev => !prev)}
+                  >
+                    {homeScreenLocked ? <LockOpen className="w-4 h-4" /> : <Lock className="w-4 h-4" />}
+                    {homeScreenLocked ? 'Unlock Home Screen' : 'Lock Home Screen'}
+                  </ContextMenuItem>
+                  <ContextMenuSeparator className="my-1 h-px bg-[#30363d]" />
+                  <ContextMenuItem className="focus:bg-[#30363d] focus:text-[#e6edf3] cursor-pointer rounded px-2 py-1.5 text-sm font-mono flex items-center gap-2 text-[#E8728A]">
+                    <LogOut className="w-4 h-4" /> Log Out
+                  </ContextMenuItem>
+                </ContextMenuContent>
+              </ContextMenu>
+            );
+          }
+
           return (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTabId(tab.id)}
-            className={`px-3 py-2 rounded-t text-sm font-mono flex items-center gap-1.5 shrink-0 ${activeTabId === tab.id ? (isHome ? 'bg-[#0a0a0a] text-[#E5E5E5] border border-transparent hover:border-[#1A1A1A] hover:border-b-transparent -mb-px' : 'bg-[#0a0a0a] text-[#E5E5E5] border border-[#1A1A1A] border-b-transparent -mb-px') : 'text-[#666666] hover:text-[#E5E5E5]'}`}
-          >
-            {isHome ? (
-              <img src={`${basePath}brand/pixel-icon-64.png`} alt="Mystic" width={14} height={14} style={{ imageRendering: 'pixelated' }} />
-            ) : (
-              TAB_LABELS[tab.kind]
-            )}
-            {!isHome && tabs.length > 1 && (
-              <span
-                className="opacity-70 hover:opacity-100 rounded p-0.5 hover:bg-[#333]"
-                onClick={(e) => { e.stopPropagation(); closeTab(tab.id); }}
-                aria-label="Close tab"
-              >
-                <X className="w-3 h-3" />
-              </span>
-            )}
-          </button>
+            <button
+              key={tab.id}
+              onClick={() => setActiveTabId(tab.id)}
+              className={tabClasses}
+            >
+              {TAB_LABELS[tab.kind]}
+              {tabs.length > 1 && (
+                <span
+                  className="opacity-70 hover:opacity-100 rounded p-0.5 hover:bg-[#333]"
+                  onClick={(e) => { e.stopPropagation(); closeTab(tab.id); }}
+                  aria-label="Close tab"
+                >
+                  <X className="w-3 h-3" />
+                </span>
+              )}
+            </button>
           );
         })}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
+        <ContextMenu>
+          <ContextMenuTrigger asChild>
             <button
               type="button"
               className="p-2 rounded-t text-sm font-mono text-[#666666] hover:text-[#E5E5E5] hover:bg-[#1A1A1A] shrink-0"
-              title="New tab"
+              title="New tab (right-click for menu)"
               aria-label="New tab"
+              onClick={() => addTab('editor')}
+              onTouchStart={(e) => {
+                const timer = setTimeout(() => {
+                  e.currentTarget.dataset.longPress = 'true';
+                  e.currentTarget.dispatchEvent(new MouseEvent('contextmenu', { bubbles: true }));
+                }, 500);
+                e.currentTarget.dataset.longPressTimer = String(timer);
+              }}
+              onTouchEnd={(e) => {
+                clearTimeout(Number(e.currentTarget.dataset.longPressTimer));
+                if (e.currentTarget.dataset.longPress === 'true') {
+                  e.preventDefault();
+                  e.currentTarget.dataset.longPress = '';
+                }
+              }}
             >
               <Plus className="w-4 h-4" />
             </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent
-            align="end"
-            sideOffset={4}
+          </ContextMenuTrigger>
+          <ContextMenuContent
+            alignOffset={4}
             className="min-w-[11rem] bg-[#161b22] border-[#30363d] text-[#e6edf3] p-1 rounded-md shadow-lg"
           >
-            <DropdownMenuItem className="focus:bg-[#30363d] focus:text-[#e6edf3] cursor-pointer rounded px-2 py-1.5 text-sm font-mono flex items-center gap-2" onSelect={() => addTab('home')}>
+            <ContextMenuItem className="focus:bg-[#30363d] focus:text-[#e6edf3] cursor-pointer rounded px-2 py-1.5 text-sm font-mono flex items-center gap-2" onSelect={() => addTab('home')}>
               <Home className="w-4 h-4" /> Home
-            </DropdownMenuItem>
-            <DropdownMenuItem className="focus:bg-[#30363d] focus:text-[#e6edf3] cursor-pointer rounded px-2 py-1.5 text-sm font-mono flex items-center gap-2" onSelect={() => addTab('list')}>
+            </ContextMenuItem>
+            <ContextMenuItem className="focus:bg-[#30363d] focus:text-[#e6edf3] cursor-pointer rounded px-2 py-1.5 text-sm font-mono flex items-center gap-2" onSelect={() => addTab('list')}>
               <LayoutList className="w-4 h-4" /> List
-            </DropdownMenuItem>
-            <DropdownMenuItem className="focus:bg-[#30363d] focus:text-[#e6edf3] cursor-pointer rounded px-2 py-1.5 text-sm font-mono flex items-center gap-2" onSelect={() => addTab('kanban')}>
+            </ContextMenuItem>
+            <ContextMenuItem className="focus:bg-[#30363d] focus:text-[#e6edf3] cursor-pointer rounded px-2 py-1.5 text-sm font-mono flex items-center gap-2" onSelect={() => addTab('kanban')}>
               <Columns3 className="w-4 h-4" /> Kanban
-            </DropdownMenuItem>
-            <DropdownMenuItem className="focus:bg-[#30363d] focus:text-[#e6edf3] cursor-pointer rounded px-2 py-1.5 text-sm font-mono flex items-center gap-2" onSelect={() => addTab('calendar')}>
+            </ContextMenuItem>
+            <ContextMenuItem className="focus:bg-[#30363d] focus:text-[#e6edf3] cursor-pointer rounded px-2 py-1.5 text-sm font-mono flex items-center gap-2" onSelect={() => addTab('calendar')}>
               <Calendar className="w-4 h-4" /> Calendar
-            </DropdownMenuItem>
-            <DropdownMenuItem className="focus:bg-[#30363d] focus:text-[#e6edf3] cursor-pointer rounded px-2 py-1.5 text-sm font-mono flex items-center gap-2" onSelect={() => addTab('graph')}>
+            </ContextMenuItem>
+            <ContextMenuItem className="focus:bg-[#30363d] focus:text-[#e6edf3] cursor-pointer rounded px-2 py-1.5 text-sm font-mono flex items-center gap-2" onSelect={() => addTab('graph')}>
               <Network className="w-4 h-4" /> Graph
-            </DropdownMenuItem>
-            <DropdownMenuItem className="focus:bg-[#30363d] focus:text-[#e6edf3] cursor-pointer rounded px-2 py-1.5 text-sm font-mono flex items-center gap-2" onSelect={() => addTab('editor')}>
+            </ContextMenuItem>
+            <ContextMenuItem className="focus:bg-[#30363d] focus:text-[#e6edf3] cursor-pointer rounded px-2 py-1.5 text-sm font-mono flex items-center gap-2" onSelect={() => addTab('editor')}>
               <FileCode className="w-4 h-4" /> Editor
-            </DropdownMenuItem>
-            <DropdownMenuItem className="focus:bg-[#30363d] focus:text-[#e6edf3] cursor-pointer rounded px-2 py-1.5 text-sm font-mono flex items-center gap-2" onSelect={() => addTab('terminal')}>
+            </ContextMenuItem>
+            <ContextMenuItem className="focus:bg-[#30363d] focus:text-[#e6edf3] cursor-pointer rounded px-2 py-1.5 text-sm font-mono flex items-center gap-2" onSelect={() => addTab('terminal')}>
               <Terminal className="w-4 h-4" /> Terminal
-            </DropdownMenuItem>
-            <DropdownMenuItem className="focus:bg-[#30363d] focus:text-[#e6edf3] cursor-pointer rounded px-2 py-1.5 text-sm font-mono flex items-center gap-2" onSelect={() => addTab('agent')}>
+            </ContextMenuItem>
+            <ContextMenuItem className="focus:bg-[#30363d] focus:text-[#e6edf3] cursor-pointer rounded px-2 py-1.5 text-sm font-mono flex items-center gap-2" onSelect={() => addTab('agent')}>
               <Bot className="w-4 h-4" /> Agent
-            </DropdownMenuItem>
-            <DropdownMenuItem className="focus:bg-[#30363d] focus:text-[#e6edf3] cursor-pointer rounded px-2 py-1.5 text-sm font-mono flex items-center gap-2" onSelect={() => addTab('planner')}>
+            </ContextMenuItem>
+            <ContextMenuItem className="focus:bg-[#30363d] focus:text-[#e6edf3] cursor-pointer rounded px-2 py-1.5 text-sm font-mono flex items-center gap-2" onSelect={() => addTab('planner')}>
               <LayoutList className="w-4 h-4" /> Planner
-            </DropdownMenuItem>
-            <DropdownMenuItem className="focus:bg-[#30363d] focus:text-[#e6edf3] cursor-pointer rounded px-2 py-1.5 text-sm font-mono flex items-center gap-2" onSelect={() => addTab('chat')}>
+            </ContextMenuItem>
+            <ContextMenuItem className="focus:bg-[#30363d] focus:text-[#e6edf3] cursor-pointer rounded px-2 py-1.5 text-sm font-mono flex items-center gap-2" onSelect={() => addTab('chat')}>
               <MessageCircle className="w-4 h-4" /> Chat
-            </DropdownMenuItem>
-            <DropdownMenuItem className="focus:bg-[#30363d] focus:text-[#e6edf3] cursor-pointer rounded px-2 py-1.5 text-sm font-mono flex items-center gap-2" onSelect={() => addTab('assistant')}>
+            </ContextMenuItem>
+            <ContextMenuItem className="focus:bg-[#30363d] focus:text-[#e6edf3] cursor-pointer rounded px-2 py-1.5 text-sm font-mono flex items-center gap-2" onSelect={() => addTab('assistant')}>
               <Zap className="w-4 h-4" /> Assistant
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+            </ContextMenuItem>
+          </ContextMenuContent>
+        </ContextMenu>
       </div>
       <div className="flex items-center gap-0.5 shrink-0 text-[#666666]">
         <button onClick={() => setLeftSidebarOpen(!leftSidebarOpen)} className={`p-1.5 rounded ${leftSidebarOpen ? 'bg-[#E5E5E5]/10 text-[#E5E5E5]' : 'hover:bg-[#1A1A1A] hover:text-[#E5E5E5]'}`} title="Toggle left sidebar"><PanelLeft className="w-3.5 h-3.5" /></button>
@@ -234,6 +333,10 @@ export default function App() {
         <button onClick={() => setRightSidebarOpen(!rightSidebarOpen)} className={`p-1.5 rounded ${rightSidebarOpen ? 'bg-[#E5E5E5]/10 text-[#E5E5E5]' : 'hover:bg-[#1A1A1A] hover:text-[#E5E5E5]'}`} title="Toggle right sidebar"><PanelRight className="w-3.5 h-3.5" /></button>
       </div>
     </div>
+    <div className="flex items-center border-b border-[#1A1A1A] bg-[#111113] px-3 py-1 shrink-0">
+      <span className="text-xs font-mono text-[#A1A1AA]">noob mode</span>
+    </div>
+    </>
   );
 
   const paneContent = (
@@ -249,6 +352,9 @@ export default function App() {
           setRightSidebarOpen={setRightSidebarOpen}
           terminalOpen={terminalOpen}
           setTerminalOpen={setTerminalOpen}
+          bottomPanelHeight={bottomPanelHeight}
+          setBottomPanelHeight={setBottomPanelHeight}
+          activeWidgets={activeWidgets}
             onOpenSettings={() => {}}        />
       )}
       {activeTab.kind === 'editor' && <EditorPaneMock />}
@@ -514,11 +620,62 @@ function GraphView({
 }
 
 function MainChatView(
-  { narrow = false, sidebarOpen, setSidebarOpen, leftSidebarOpen, setLeftSidebarOpen, rightSidebarOpen, setRightSidebarOpen, terminalOpen, setTerminalOpen, onOpenSettings }: { narrow?: boolean; sidebarOpen: boolean; setSidebarOpen: (open: boolean) => void; leftSidebarOpen: boolean; setLeftSidebarOpen: (open: boolean) => void; rightSidebarOpen: boolean; setRightSidebarOpen: (open: boolean) => void; terminalOpen: boolean; setTerminalOpen: (open: boolean) => void; onOpenSettings: () => void }
+  { narrow = false, sidebarOpen, setSidebarOpen, leftSidebarOpen, setLeftSidebarOpen, rightSidebarOpen, setRightSidebarOpen, terminalOpen, setTerminalOpen, bottomPanelHeight, setBottomPanelHeight, activeWidgets, onOpenSettings }: { narrow?: boolean; sidebarOpen: boolean; setSidebarOpen: (open: boolean) => void; leftSidebarOpen: boolean; setLeftSidebarOpen: (open: boolean) => void; rightSidebarOpen: boolean; setRightSidebarOpen: (open: boolean) => void; terminalOpen: boolean; setTerminalOpen: (open: boolean) => void; bottomPanelHeight: number; setBottomPanelHeight: (h: number) => void; activeWidgets: string[]; onOpenSettings: () => void }
 ) {
   const [activeSidebarTab, setActiveSidebarTab] = useState<'files' | 'search' | 'git' | 'extensions'>('files');
   const [selectedThreadId, setSelectedThreadId] = useState<string>('general');
   const [expandedFolders, setExpandedFolders] = useState<string[]>(['Orchestration']);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const lastPanelHeightRef = useRef<number>(bottomPanelHeight);
+
+  const PANEL_MAX = 95;
+
+  const toggleMaximizePanel = () => {
+    if (bottomPanelHeight >= PANEL_MAX - 1) {
+      setBottomPanelHeight(lastPanelHeightRef.current);
+    } else {
+      lastPanelHeightRef.current = bottomPanelHeight;
+      setBottomPanelHeight(PANEL_MAX);
+    }
+  };
+
+  const startResize = (e: React.MouseEvent | React.TouchEvent) => {
+    e.preventDefault();
+    const container = containerRef.current;
+    if (!container) return;
+    const containerRect = container.getBoundingClientRect();
+    const getY = (ev: MouseEvent | TouchEvent) =>
+      'touches' in ev ? ev.touches[0].clientY : (ev as MouseEvent).clientY;
+    const startY = 'touches' in e.nativeEvent ? e.nativeEvent.touches[0].clientY : (e.nativeEvent as MouseEvent).clientY;
+    const startHeight = bottomPanelHeight;
+
+    const onMove = (ev: MouseEvent | TouchEvent) => {
+      const dy = startY - getY(ev);
+      const containerH = containerRect.height;
+      const newPct = Math.min(80, Math.max(10, startHeight + (dy / containerH) * 100));
+      setBottomPanelHeight(newPct);
+    };
+
+    const onUp = () => {
+      document.removeEventListener('mousemove', onMove);
+      document.removeEventListener('mouseup', onUp);
+      document.removeEventListener('touchmove', onMove);
+      document.removeEventListener('touchend', onUp);
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    };
+
+    document.body.style.cursor = 'row-resize';
+    document.body.style.userSelect = 'none';
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onUp);
+    document.addEventListener('touchmove', onMove, { passive: false });
+    document.addEventListener('touchend', onUp);
+  };
+
+  useEffect(() => {
+    localStorage.setItem('mystic-bottom-panel-height', String(bottomPanelHeight));
+  }, [bottomPanelHeight]);
 
   const threadGraphData = MOCK_THREAD_GRAPHS[selectedThreadId] ?? MOCK_THREAD_GRAPHS.general;
 
@@ -662,7 +819,7 @@ function MainChatView(
   // Mobile/narrow: single scrollable column so all sections + status bar are reachable
   if (narrow) {
     return (
-      <div className="bg-[#0a0a0a] flex flex-col h-full min-h-0 overflow-hidden">
+      <div ref={containerRef} className="bg-[#0a0a0a] flex flex-col h-full min-h-0 overflow-hidden">
         {/* Overlay drawers for sidebars */}
         <AnimatePresence>
           {leftSidebarOpen && (
@@ -739,25 +896,33 @@ function MainChatView(
             </div>
           </section>
 
-          {/* Section: Diagnostics (btop) */}
-          <section className="border-b border-[#1A1A1A] bg-[#0a0a0a]">
-            <div className="px-3 py-2 border-b border-[#1A1A1A] text-xs font-mono text-[#666666]">Diagnostics</div>
-            <div className="min-h-[200px] p-2">
-              <MiniBtop />
-            </div>
-          </section>
+          {/* Section: Widgets */}
+          {activeWidgets.length > 0 && (
+            <section className="border-b border-[#1A1A1A] bg-[#0a0a0a]">
+              <div className="px-3 py-2 border-b border-[#1A1A1A] text-xs font-mono text-[#666666]">Widgets</div>
+              <WidgetGrid activeWidgets={activeWidgets} />
+            </section>
+          )}
         </div>
 
         <AnimatePresence>
           {terminalOpen && (
             <motion.div
               initial={{ height: 0, opacity: 0 }}
-              animate={{ height: '40%', opacity: 1 }}
+              animate={{ height: `${bottomPanelHeight}%`, opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
               transition={{ type: 'tween', duration: 0.2 }}
               className="absolute bottom-0 left-0 right-0 border-t border-[#1A1A1A] bg-[#0d1117] flex flex-col overflow-hidden z-50"
               style={{ minHeight: 0 }}
             >
+              <div
+                className="h-1.5 cursor-row-resize shrink-0 group flex items-center justify-center hover:bg-[#30363d]/50 active:bg-[#30363d]"
+                onMouseDown={startResize}
+                onTouchStart={startResize}
+                onDoubleClick={toggleMaximizePanel}
+              >
+                <div className="w-8 h-0.5 rounded-full bg-[#30363d] group-hover:bg-[#8b949e] transition-colors" />
+              </div>
               <div className="flex items-center justify-between px-2 py-2 border-b border-[#30363d] shrink-0 bg-[#161b22]">
                 <span className="text-xs font-mono text-[#8b949e]">xonsh — Terminal</span>
                 <button onClick={() => setTerminalOpen(false)} className="p-2 text-[#8b949e] hover:text-[#e6edf3] rounded touch-manipulation"><X className="w-4 h-4" /></button>
@@ -774,7 +939,7 @@ function MainChatView(
 
   // Desktop layout
   return (
-    <div className="bg-[#0a0a0a] overflow-hidden flex flex-col h-full min-h-0">
+    <div ref={containerRef} className="bg-[#0a0a0a] overflow-hidden flex flex-col h-full min-h-0">
       <div className="flex flex-col flex-1 min-h-0">
         <div className="flex flex-1 min-h-0">
           {/* Left Sidebar */}
@@ -853,9 +1018,9 @@ zfs mount rpool/root/arch`}</pre>
                   </div>
                 </div>
               </div>
-              {/* Diagnostics: btop fills entire section */}
-              <div className="flex-1 min-h-0 overflow-hidden flex flex-col">
-                <MiniBtop />
+              {/* Widgets grid */}
+              <div className="flex-1 min-h-0 overflow-auto flex flex-col">
+                <WidgetGrid activeWidgets={activeWidgets} />
               </div>
             </div>
           </div>
@@ -900,12 +1065,20 @@ zfs mount rpool/root/arch`}</pre>
         {terminalOpen && (
           <motion.div
             initial={{ height: 0, opacity: 0 }}
-            animate={{ height: '40%', opacity: 1 }}
+            animate={{ height: `${bottomPanelHeight}%`, opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ type: 'tween', duration: 0.2 }}
             className="absolute bottom-0 left-0 right-0 border-t border-[#1A1A1A] bg-[#0d1117] flex flex-col overflow-hidden z-50"
             style={{ minHeight: 0 }}
           >
+            <div
+              className="h-1.5 cursor-row-resize shrink-0 group flex items-center justify-center hover:bg-[#30363d]/50 active:bg-[#30363d]"
+              onMouseDown={startResize}
+              onTouchStart={startResize}
+              onDoubleClick={toggleMaximizePanel}
+            >
+              <div className="w-8 h-0.5 rounded-full bg-[#30363d] group-hover:bg-[#8b949e] transition-colors" />
+            </div>
             <div className="flex items-center justify-between px-2 py-1.5 border-b border-[#30363d] shrink-0 bg-[#161b22]">
               <span className="text-xs font-mono text-[#8b949e]">xonsh — Terminal</span>
               <button onClick={() => setTerminalOpen(false)} className="p-1 text-[#8b949e] hover:text-[#e6edf3] rounded"><X className="w-4 h-4" /></button>
