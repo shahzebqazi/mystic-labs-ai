@@ -143,7 +143,7 @@ export default function App() {
           <div className="w-3 h-3 rounded-full bg-[#28C840]" />
         </div>
       )}
-      <div className="flex items-center gap-0.5 flex-1 min-w-0 overflow-x-auto">
+      <div className="flex items-center gap-0.5 flex-1 min-w-0 overflow-x-auto scrollbar-hide">
         {tabs.map((tab) => {
           const isHome = tab.kind === 'home';
           return (
