@@ -153,7 +153,7 @@ export default function App() {
           <button
             key={tab.id}
             onClick={() => setActiveTabId(tab.id)}
-            className={`px-3 py-2 rounded-t text-sm font-mono flex items-center gap-1.5 shrink-0 ${activeTabId === tab.id ? 'bg-[#0a0a0a] text-[#E5E5E5] border border-[#1A1A1A] border-b-transparent -mb-px' : 'text-[#666666] hover:text-[#E5E5E5]'}`}
+            className={`px-3 py-2 rounded-t text-sm font-mono flex items-center gap-1.5 shrink-0 ${activeTabId === tab.id ? (isHome ? 'bg-[#0a0a0a] text-[#E5E5E5] border border-transparent hover:border-[#1A1A1A] hover:border-b-transparent -mb-px' : 'bg-[#0a0a0a] text-[#E5E5E5] border border-[#1A1A1A] border-b-transparent -mb-px') : 'text-[#666666] hover:text-[#E5E5E5]'}`}
           >
             {isHome ? (
               <img src={`${basePath}brand/pixel-icon-64.png`} alt="Mystic" width={14} height={14} style={{ imageRendering: 'pixelated' }} />
