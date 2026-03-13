@@ -273,17 +273,17 @@ export function TitlePage({ onStart }: TitlePageProps) {
           </p>
           <p>
             We believe machines need human beings to know what is true and what
-            is wrong. Please use AI responsibly and with a conscience.
-          </p>
-          <p
-            className="font-medium cursor-pointer mt-6"
-            style={{ color: '#5EC4AB' }}
-            onClick={() => {
-              markTitleSeen();
-              onStart();
-            }}
-          >
-            Enter Mystic.
+            is wrong. Please use AI responsibly and with a conscience.{' '}
+            <span
+              className="font-medium cursor-pointer"
+              style={{ color: '#5EC4AB' }}
+              onClick={() => {
+                markTitleSeen();
+                onStart();
+              }}
+            >
+              Enter Mystic.
+            </span>
           </p>
         </motion.div>
       </motion.main>
