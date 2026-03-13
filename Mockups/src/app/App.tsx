@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { ChevronLeft, ChevronRight, Menu, User, Paperclip, Mic, Target, ChevronDown, Circle, PanelLeft, PanelRight, PanelBottom, X, Terminal, FileCode, Cpu, Zap, Shield, Database, Code2, Layers, Activity, Bug, GitCommit, FolderOpen, File, Files, Puzzle, GitBranch, Search, ChevronRight as ChevronRightIcon, Folder, MessageCircle, Network, Globe, Image as ImageIcon, LayoutList, Bot, MoreVertical, SlidersHorizontal, Percent, DollarSign, ZoomIn, ZoomOut, RotateCcw, Filter, Plus, HandMetal, Home, Settings, FileText, Scale } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Menu, User, Paperclip, Mic, Target, ChevronDown, Circle, PanelLeft, PanelRight, PanelBottom, X, Terminal, FileCode, Cpu, Zap, Shield, Database, Code2, Layers, Activity, Bug, GitCommit, FolderOpen, File, Files, Puzzle, GitBranch, Search, ChevronRight as ChevronRightIcon, Folder, MessageCircle, Network, Globe, Image as ImageIcon, LayoutList, Bot, MoreVertical, SlidersHorizontal, Percent, DollarSign, ZoomIn, ZoomOut, RotateCcw, Filter, Plus, HandMetal, Home, FileText, Scale } from 'lucide-react';
 import { ThreadGraph3D, type ThreadNode, type ThreadLink } from './components/ThreadGraph3D';
 import { MiniBtop } from './components/MiniBtop';
 import {
@@ -53,12 +53,11 @@ const SCALE_MIN = 0.2;
 const SCALE_MAX = 2;
 const SCALE_STEP = 0.15;
 
-type TabKind = 'home' | 'settings' | 'editor' | 'terminal' | 'agent' | 'planner' | 'chat' | 'assistant';
+type TabKind = 'home' | 'editor' | 'terminal' | 'agent' | 'planner' | 'chat' | 'assistant';
 type Tab = { id: string; kind: TabKind };
 
 const TAB_LABELS: Record<TabKind, string> = {
   home: 'Home',
-  settings: '.config',
   editor: 'Editor',
   terminal: 'Terminal',
   agent: 'Agent',
@@ -76,7 +75,6 @@ export default function App() {
   const basePath = import.meta.env?.BASE_URL ?? '/';
   const [tabs, setTabs] = useState<Tab[]>([
     { id: 'tab-home', kind: 'home' },
-    { id: 'tab-settings', kind: 'settings' },
   ]);
   const [activeTabId, setActiveTabId] = useState<string>('tab-home');
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -190,9 +188,6 @@ export default function App() {
             <DropdownMenuItem className="focus:bg-[#30363d] focus:text-[#e6edf3] cursor-pointer rounded px-2 py-1.5 text-sm font-mono flex items-center gap-2" onSelect={() => addTab('home')}>
               <Home className="w-4 h-4" /> Home
             </DropdownMenuItem>
-            <DropdownMenuItem className="focus:bg-[#30363d] focus:text-[#e6edf3] cursor-pointer rounded px-2 py-1.5 text-sm font-mono flex items-center gap-2" onSelect={() => addTab('settings')}>
-              <Settings className="w-4 h-4" /> .config
-            </DropdownMenuItem>
             <DropdownMenuItem className="focus:bg-[#30363d] focus:text-[#e6edf3] cursor-pointer rounded px-2 py-1.5 text-sm font-mono flex items-center gap-2" onSelect={() => addTab('editor')}>
               <FileCode className="w-4 h-4" /> Editor
             </DropdownMenuItem>
@@ -224,10 +219,9 @@ export default function App() {
           narrow={isNarrow}
           sidebarOpen={sidebarOpen}
           setSidebarOpen={setSidebarOpen}
-          onOpenSettings={() => addTab('settings')}
+          onOpenSettings={() => {}}
         />
       )}
-      {activeTab.kind === 'settings' && <ConfigFileView onBack={() => setActiveTabId(tabs[0]?.id ?? activeTabId)} />}
       {activeTab.kind === 'editor' && <EditorPaneMock />}
       {activeTab.kind === 'terminal' && <TerminalPaneMock />}
       {activeTab.kind === 'agent' && <AgentPaneMock />}
@@ -1168,46 +1162,3 @@ function ImagePaneMock() {
   );
 }
 
-/** NixOS-style config file: edit this file to configure the application (no GUI settings). */
-const MOCK_CONFIG_PATH = '~/.config/dotai/config.nix';
-
-const MOCK_CONFIG_CONTENT = `# dotAi application configuration (NixOS-style)
-# Edit this file to change behaviour. Restart or run :reload to apply.
-
-{ config, pkgs, ... }:
-
-{
-  # Backend & model
-  dotai.backend = "llama-server";
-  dotai.endpoint = "http://localhost:11434";
-  dotai.strictlyLocal = true;
-
-  # Security & execution
-  dotai.executionLevel = "ask";  # ask | auto-safe | always-ask
-
-  # Session
-  dotai.restoreSession = true;
-}
-`;
-
-function ConfigFileView({ onBack }: { onBack: () => void }) {
-  return (
-    <div className="bg-[#000000] overflow-hidden flex flex-col h-full min-h-0">
-      <div className="bg-[#0A0A0A] border-b border-[#1A1A1A] px-4 py-2 flex items-center justify-between shrink-0">
-        <button onClick={onBack} className="flex items-center gap-2 text-sm text-[#666666] hover:text-[#E5E5E5] transition-colors">
-          <ChevronLeft className="w-4 h-4" />
-          <span>Back</span>
-        </button>
-        <span className="text-xs font-mono text-[#8b949e]">Edit config file to change settings</span>
-      </div>
-      <div className="px-4 py-2 border-b border-[#1A1A1A] bg-[#0A0A0A]/50 shrink-0">
-        <div className="font-mono text-xs text-[#79c0ff]">{MOCK_CONFIG_PATH}</div>
-      </div>
-      <div className="flex-1 min-h-0 overflow-auto p-4">
-        <pre className="font-mono text-xs text-[#e6edf3] whitespace-pre leading-relaxed bg-[#0d1117] border border-[#30363d] rounded-lg p-4">
-          <code>{MOCK_CONFIG_CONTENT}</code>
-        </pre>
-      </div>
-    </div>
-  );
-}
