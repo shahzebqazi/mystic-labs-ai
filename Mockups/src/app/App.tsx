@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { ChevronLeft, ChevronRight, Menu, User, Paperclip, Mic, Target, ChevronDown, Circle, PanelLeft, PanelRight, PanelBottom, X, Terminal, FileCode, Cpu, Zap, Shield, Database, Code2, Layers, Activity, Bug, GitCommit, FolderOpen, File, Files, Puzzle, GitBranch, Search, ChevronRight as ChevronRightIcon, Folder, MessageCircle, Network, Globe, Image as ImageIcon, LayoutList, Bot, MoreVertical, SlidersHorizontal, Percent, DollarSign, ZoomIn, ZoomOut, RotateCcw, Filter, Plus, HandMetal, Home, FileText, Scale } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Menu, User, Paperclip, Mic, Target, ChevronDown, Circle, PanelLeft, PanelRight, PanelBottom, X, Terminal, FileCode, Cpu, Zap, Shield, Database, Code2, Layers, Activity, Bug, GitCommit, FolderOpen, File, Files, Puzzle, GitBranch, Search, ChevronRight as ChevronRightIcon, Folder, MessageCircle, Network, Globe, Image as ImageIcon, LayoutList, Bot, MoreVertical, SlidersHorizontal, Percent, DollarSign, ZoomIn, ZoomOut, RotateCcw, Filter, Plus, HandMetal, Home, FileText, Scale, Columns3, Calendar } from 'lucide-react';
 import { ThreadGraph3D, type ThreadNode, type ThreadLink } from './components/ThreadGraph3D';
 import { MiniBtop } from './components/MiniBtop';
 import {
@@ -53,11 +53,15 @@ const SCALE_MIN = 0.2;
 const SCALE_MAX = 2;
 const SCALE_STEP = 0.15;
 
-type TabKind = 'home' | 'editor' | 'terminal' | 'agent' | 'planner' | 'chat' | 'assistant';
+type TabKind = 'home' | 'list' | 'kanban' | 'calendar' | 'graph' | 'editor' | 'terminal' | 'agent' | 'planner' | 'chat' | 'assistant';
 type Tab = { id: string; kind: TabKind };
 
 const TAB_LABELS: Record<TabKind, string> = {
   home: 'Home',
+  list: 'List',
+  kanban: 'Kanban',
+  calendar: 'Calendar',
+  graph: 'Graph',
   editor: 'Editor',
   terminal: 'Terminal',
   agent: 'Agent',
@@ -191,6 +195,18 @@ export default function App() {
             <DropdownMenuItem className="focus:bg-[#30363d] focus:text-[#e6edf3] cursor-pointer rounded px-2 py-1.5 text-sm font-mono flex items-center gap-2" onSelect={() => addTab('home')}>
               <Home className="w-4 h-4" /> Home
             </DropdownMenuItem>
+            <DropdownMenuItem className="focus:bg-[#30363d] focus:text-[#e6edf3] cursor-pointer rounded px-2 py-1.5 text-sm font-mono flex items-center gap-2" onSelect={() => addTab('list')}>
+              <LayoutList className="w-4 h-4" /> List
+            </DropdownMenuItem>
+            <DropdownMenuItem className="focus:bg-[#30363d] focus:text-[#e6edf3] cursor-pointer rounded px-2 py-1.5 text-sm font-mono flex items-center gap-2" onSelect={() => addTab('kanban')}>
+              <Columns3 className="w-4 h-4" /> Kanban
+            </DropdownMenuItem>
+            <DropdownMenuItem className="focus:bg-[#30363d] focus:text-[#e6edf3] cursor-pointer rounded px-2 py-1.5 text-sm font-mono flex items-center gap-2" onSelect={() => addTab('calendar')}>
+              <Calendar className="w-4 h-4" /> Calendar
+            </DropdownMenuItem>
+            <DropdownMenuItem className="focus:bg-[#30363d] focus:text-[#e6edf3] cursor-pointer rounded px-2 py-1.5 text-sm font-mono flex items-center gap-2" onSelect={() => addTab('graph')}>
+              <Network className="w-4 h-4" /> Graph
+            </DropdownMenuItem>
             <DropdownMenuItem className="focus:bg-[#30363d] focus:text-[#e6edf3] cursor-pointer rounded px-2 py-1.5 text-sm font-mono flex items-center gap-2" onSelect={() => addTab('editor')}>
               <FileCode className="w-4 h-4" /> Editor
             </DropdownMenuItem>
@@ -236,6 +252,10 @@ export default function App() {
             onOpenSettings={() => {}}        />
       )}
       {activeTab.kind === 'editor' && <EditorPaneMock />}
+      {activeTab.kind === 'list' && <ListPaneMock />}
+      {activeTab.kind === 'kanban' && <KanbanPaneMock />}
+      {activeTab.kind === 'calendar' && <CalendarPaneMock />}
+      {activeTab.kind === 'graph' && <GraphPaneMock />}
       {activeTab.kind === 'terminal' && <TerminalPaneMock />}
       {activeTab.kind === 'agent' && <AgentPaneMock />}
       {activeTab.kind === 'planner' && <PlannerPaneMock />}
@@ -1044,6 +1064,79 @@ zfs mount rpool/root/arch`}</pre>
           </motion.div>
         )}
       </AnimatePresence>
+    </div>
+  );
+}
+
+function ListPaneMock() {
+  return (
+    <div className="bg-[#000000] overflow-auto h-full p-4">
+      <ul className="space-y-2 font-mono text-sm max-w-2xl mx-auto">
+        {MOCK_TASKS.map(t => (
+          <li key={t.id} className="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-3 px-3 py-3 rounded-lg bg-[#0A0A0A] border border-[#1A1A1A]">
+            <span className="text-[#666666] w-4 shrink-0">{t.id}</span>
+            <span className="font-medium text-[#E5E5E5] flex-1">{t.title}</span>
+            <span className={`text-xs ${t.status === 'done' ? 'text-[#7ee787]' : t.status === 'in_progress' ? 'text-[#79c0ff]' : 'text-[#f0d77e]'}`}>{t.status}</span>
+            <span className="text-xs text-[#666666]">{t.assignee}</span>
+            <span className="text-xs text-[#666666]">{t.due}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+function KanbanPaneMock() {
+  return (
+    <div className="bg-[#000000] overflow-auto h-full p-4">
+      <div className="flex gap-4 h-full min-h-[200px] max-w-4xl mx-auto">
+        {(['todo', 'in_progress', 'done'] as const).map(col => (
+          <div key={col} className="flex-1 min-w-[140px] rounded-lg bg-[#0A0A0A] border border-[#1A1A1A] p-4">
+            <div className="text-xs font-mono uppercase text-[#666666] mb-3 tracking-wide">{col.replace('_', ' ')}</div>
+            <div className="space-y-2">
+              {MOCK_TASKS.filter(t => t.status === col).map(t => (
+                <div key={t.id} className={`p-3 rounded-lg border text-sm text-[#0a0a0a] font-medium ${col === 'todo' ? 'bg-[#bfdbfe] border-[#93c5fd]' : col === 'in_progress' ? 'bg-[#fde68a] border-[#fcd34d]' : 'bg-[#bbf7d0] border-[#86efac]'}`}>{t.title}</div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function CalendarPaneMock() {
+  return (
+    <div className="bg-[#000000] overflow-auto h-full p-4">
+      <div className="max-w-2xl mx-auto">
+        <div className="grid grid-cols-7 grid-rows-[auto_1fr_1fr_1fr_1fr_1fr] gap-1.5 min-h-[400px] font-mono text-sm">
+          {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(d => (
+            <div key={d} className="text-center text-[#666666] text-xs py-1">{d}</div>
+          ))}
+          {Array.from({ length: 35 }, (_, i) => {
+            const day = i - 1;
+            const dateStr = `Mar ${day}`;
+            const events = MOCK_CALENDAR_EVENTS.filter(e => e.date === dateStr);
+            return (
+              <div key={i} className="border border-[#1A1A1A] rounded p-1 min-h-[60px] bg-[#0A0A0A]">
+                <div className="text-xs text-[#666666]">{day > 0 && day <= 31 ? day : ''}</div>
+                {events.map(ev => (
+                  <div key={ev.id} className="text-[10px] text-[#79c0ff] mt-1 truncate">{ev.title}</div>
+                ))}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function GraphPaneMock() {
+  const threadGraphData = MOCK_THREAD_GRAPHS.general;
+  return (
+    <div className="bg-[#000000] overflow-hidden h-full flex items-center justify-center">
+      <GraphView selectedThreadId="general" threadGraphData={threadGraphData} threadIds={['general', 'MVP PRD', 'docs']} />
     </div>
   );
 }
