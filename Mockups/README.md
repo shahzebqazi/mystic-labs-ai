@@ -1,6 +1,6 @@
-# dotAi Desktop Chat — Mockups
+# Mystic Desktop — Mockups
 
-UX/UI mockups for the dotAi desktop chat app (see `src/imports/pasted_text/dotai-wireframes.md`).
+UX/UI mockups for the Mystic desktop app (see `src/imports/pasted_text/dotai-wireframes.md`).
 
 ## Local development
 

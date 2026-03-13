@@ -44,10 +44,12 @@ export const ThreadGraph3D = forwardRef<ThreadGraph3DRef, ThreadGraph3DProps>(fu
   );
 
   const nodeColor = useCallback((node: { id: string; name?: string; role?: string }) => {
-    if (node.role === 'user') return '#0EA5E9';
-    if (node.role === 'assistant') return '#10B981';
-    return '#8b949e';
+    if (node.role === 'user') return '#5EC4AB';
+    if (node.role === 'assistant') return '#D4A843';
+    return '#A78BDB';
   }, []);
+
+  const linkColor = useCallback(() => '#3A3A40', []);
 
   if (!nodes.length) {
     return (
@@ -68,7 +70,12 @@ export const ThreadGraph3D = forwardRef<ThreadGraph3DRef, ThreadGraph3DProps>(fu
           graphData={graphData}
           nodeLabel={(node: { id: string; name?: string }) => node.name ?? node.id}
           nodeColor={nodeColor as (node: unknown) => string}
-          linkColor="#333333"
+          linkColor={linkColor as unknown as string}
+          linkWidth={1.5}
+          linkDirectionalArrowLength={4}
+          linkDirectionalArrowRelPos={1}
+          linkDirectionalArrowColor={linkColor as unknown as string}
+          nodeRelSize={6}
           backgroundColor={backgroundColor}
           width={width}
           height={height}

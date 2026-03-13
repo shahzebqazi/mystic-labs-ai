@@ -206,16 +206,22 @@ export default function App() {
                     <Wrench className="w-4 h-4" /> Gizmos
                   </ContextMenuItem>
                   <ContextMenuSub>
-                    <ContextMenuSubTrigger className="focus:bg-[#30363d] focus:text-[#e6edf3] cursor-pointer rounded px-2 py-1.5 text-sm font-mono flex items-center gap-2">
-                      <Layers className="w-4 h-4" /> Widgets
+                    <ContextMenuSubTrigger className={`focus:bg-[#30363d] focus:text-[#e6edf3] rounded px-2 py-1.5 text-sm font-mono flex items-center gap-2 ${homeScreenLocked ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}>
+                      <Layers className="w-4 h-4" /> Widgets {homeScreenLocked && <Lock className="w-3 h-3 text-[#A1A1AA]" />}
                     </ContextMenuSubTrigger>
                     <ContextMenuSubContent className="min-w-[11rem] bg-[#161b22] border-[#30363d] text-[#e6edf3] p-1 rounded-md shadow-lg">
+                      {homeScreenLocked && (
+                        <div className="px-2 py-1.5 text-xs text-[#A1A1AA] font-mono flex items-center gap-1.5">
+                          <Lock className="w-3 h-3" /> Home screen locked
+                        </div>
+                      )}
                       {WIDGET_REGISTRY.map(w => (
                         <ContextMenuCheckboxItem
                           key={w.id}
                           checked={activeWidgets.includes(w.id)}
-                          onCheckedChange={() => toggleWidget(w.id)}
-                          className="focus:bg-[#30363d] focus:text-[#e6edf3] cursor-pointer rounded px-2 py-1.5 text-sm font-mono"
+                          disabled={homeScreenLocked}
+                          onCheckedChange={() => { if (!homeScreenLocked) toggleWidget(w.id); }}
+                          className={`focus:bg-[#30363d] focus:text-[#e6edf3] rounded px-2 py-1.5 text-sm font-mono ${homeScreenLocked ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
                         >
                           {w.label}
                         </ContextMenuCheckboxItem>
@@ -355,7 +361,8 @@ export default function App() {
           bottomPanelHeight={bottomPanelHeight}
           setBottomPanelHeight={setBottomPanelHeight}
           activeWidgets={activeWidgets}
-            onOpenSettings={() => {}}        />
+          homeScreenLocked={homeScreenLocked}
+          onOpenSettings={() => {}}        />
       )}
       {activeTab.kind === 'editor' && <EditorPaneMock />}
       {activeTab.kind === 'list' && <ListPaneMock />}
@@ -454,9 +461,9 @@ const MOCK_THREAD_GRAPHS: Record<string, { nodes: ThreadNode[]; links: ThreadLin
   general: {
     nodes: [
       { id: '1', name: 'User: Can you draft a jj commit?', role: 'user' },
-      { id: '2', name: 'dotAi: Here is the commit...', role: 'assistant' },
+      { id: '2', name: 'Mystic: Here is the commit...', role: 'assistant' },
       { id: '3', name: 'User: Add docs to scope', role: 'user' },
-      { id: '4', name: 'dotAi: Updated commit...', role: 'assistant' },
+      { id: '4', name: 'Mystic: Updated commit...', role: 'assistant' },
       { id: '5', name: 'User: Confirm', role: 'user' },
       { id: '6', name: 'System: Commit created', role: 'system' },
     ],
@@ -471,9 +478,9 @@ const MOCK_THREAD_GRAPHS: Record<string, { nodes: ThreadNode[]; links: ThreadLin
   'MVP PRD': {
     nodes: [
       { id: 'a', name: 'User: Outline MVP PRD', role: 'user' },
-      { id: 'b', name: 'dotAi: PRD structure...', role: 'assistant' },
+      { id: 'b', name: 'Mystic: PRD structure...', role: 'assistant' },
       { id: 'c', name: 'User: Add auth section', role: 'user' },
-      { id: 'd', name: 'dotAi: Auth requirements...', role: 'assistant' },
+      { id: 'd', name: 'Mystic: Auth requirements...', role: 'assistant' },
       { id: 'e', name: 'User: LGTM', role: 'user' },
     ],
     links: [
@@ -486,7 +493,7 @@ const MOCK_THREAD_GRAPHS: Record<string, { nodes: ThreadNode[]; links: ThreadLin
   docs: {
     nodes: [
       { id: 'x', name: 'User: Generate docs', role: 'user' },
-      { id: 'y', name: 'dotAi: Documentation plan...', role: 'assistant' },
+      { id: 'y', name: 'Mystic: Documentation plan...', role: 'assistant' },
       { id: 'z', name: 'User: Add API section', role: 'user' },
     ],
     links: [
@@ -615,12 +622,17 @@ function GraphView({
           backgroundColor={backgroundColor}
         />
       </div>
+      <div className="flex items-center gap-4 text-[10px] font-mono text-[#8b949e] shrink-0">
+        <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[#5EC4AB] inline-block" /> user</span>
+        <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[#D4A843] inline-block" /> assistant</span>
+        <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[#A78BDB] inline-block" /> system</span>
+      </div>
     </div>
   );
 }
 
 function MainChatView(
-  { narrow = false, sidebarOpen, setSidebarOpen, leftSidebarOpen, setLeftSidebarOpen, rightSidebarOpen, setRightSidebarOpen, terminalOpen, setTerminalOpen, bottomPanelHeight, setBottomPanelHeight, activeWidgets, onOpenSettings }: { narrow?: boolean; sidebarOpen: boolean; setSidebarOpen: (open: boolean) => void; leftSidebarOpen: boolean; setLeftSidebarOpen: (open: boolean) => void; rightSidebarOpen: boolean; setRightSidebarOpen: (open: boolean) => void; terminalOpen: boolean; setTerminalOpen: (open: boolean) => void; bottomPanelHeight: number; setBottomPanelHeight: (h: number) => void; activeWidgets: string[]; onOpenSettings: () => void }
+  { narrow = false, sidebarOpen, setSidebarOpen, leftSidebarOpen, setLeftSidebarOpen, rightSidebarOpen, setRightSidebarOpen, terminalOpen, setTerminalOpen, bottomPanelHeight, setBottomPanelHeight, activeWidgets, homeScreenLocked, onOpenSettings }: { narrow?: boolean; sidebarOpen: boolean; setSidebarOpen: (open: boolean) => void; leftSidebarOpen: boolean; setLeftSidebarOpen: (open: boolean) => void; rightSidebarOpen: boolean; setRightSidebarOpen: (open: boolean) => void; terminalOpen: boolean; setTerminalOpen: (open: boolean) => void; bottomPanelHeight: number; setBottomPanelHeight: (h: number) => void; activeWidgets: string[]; homeScreenLocked: boolean; onOpenSettings: () => void }
 ) {
   const [activeSidebarTab, setActiveSidebarTab] = useState<'files' | 'search' | 'git' | 'extensions'>('files');
   const [selectedThreadId, setSelectedThreadId] = useState<string>('general');
@@ -884,13 +896,13 @@ function MainChatView(
                 <div className="rounded bg-[#161b22] border border-[#30363d] px-2.5 py-2 text-[#e6edf3]">How do I install Arch Linux with ZFS as the root filesystem?</div>
               </div>
               <div className="flex flex-col gap-1">
-                <span className="text-[#8b949e]">dotAi</span>
+                <span className="text-[#8b949e]">Mystic</span>
                 <div className="rounded bg-[#0d1117] border border-[#30363d] px-2.5 py-2 text-[#e6edf3]">High-level steps: boot Arch ISO, load ZFS, create pool, datasets, install base, chroot, mkinitcpio, bootloader.</div>
               </div>
             </div>
             <div className="p-2 border-t border-[#1A1A1A] bg-[#0a0a0a]">
               <div className="w-full bg-[#0A0A0A] border border-[#1A1A1A] rounded-xl px-3 py-2.5 flex items-center gap-2 font-mono text-xs text-white touch-manipulation">
-                <span>Ask dotAi...</span>
+                <span>Ask Mystic...</span>
                 <span className="w-2 h-3.5 bg-[#7ee787] animate-cursor-blink flex-shrink-0" aria-hidden />
               </div>
             </div>
@@ -899,7 +911,10 @@ function MainChatView(
           {/* Section: Widgets */}
           {activeWidgets.length > 0 && (
             <section className="border-b border-[#1A1A1A] bg-[#0a0a0a]">
-              <div className="px-3 py-2 border-b border-[#1A1A1A] text-xs font-mono text-[#666666]">Widgets</div>
+              <div className="px-3 py-2 border-b border-[#1A1A1A] text-xs font-mono text-[#666666] flex items-center gap-2">
+                Widgets
+                {homeScreenLocked && <Lock className="w-3 h-3 text-[#A1A1AA]" />}
+              </div>
               <WidgetGrid activeWidgets={activeWidgets} />
             </section>
           )}
@@ -965,7 +980,7 @@ function MainChatView(
                     </div>
                   </div>
                   <div className="flex flex-col gap-1">
-                    <span className="text-[#8b949e]">dotAi</span>
+                    <span className="text-[#8b949e]">Mystic</span>
                     <div className="rounded bg-[#0d1117] border border-[#30363d] px-2.5 py-2 text-[#e6edf3] space-y-1.5">
                       <p>High-level steps:</p>
                       <ol className="list-decimal list-inside space-y-0.5 text-[#8b949e]">
@@ -984,7 +999,7 @@ function MainChatView(
                     </div>
                   </div>
                   <div className="flex flex-col gap-1">
-                    <span className="text-[#8b949e]">dotAi</span>
+                    <span className="text-[#8b949e]">Mystic</span>
                     <div className="rounded bg-[#0d1117] border border-[#30363d] px-2.5 py-2 text-[#e6edf3] space-y-1.5">
                       <p>Here’s a minimal flow (single NVMe, ZFS native encryption, systemd-boot):</p>
                       <pre className="text-[#7ee787] overflow-x-auto text-[10px] whitespace-pre">{`# Load ZFS
@@ -1013,13 +1028,18 @@ zfs mount rpool/root/arch`}</pre>
                     <span className="flex items-center gap-0.5 text-[10px] text-[#666666]" title="Cost"><DollarSign className="w-3 h-3" /> $0.00</span>
                   </div>
                   <div className="w-full bg-[#0A0A0A] border border-[#1A1A1A] rounded-xl px-2.5 py-2 flex items-center gap-0.5 font-mono text-xs text-white">
-                    <span className="text-white">Ask dotAi...</span>
+                    <span className="text-white">Ask Mystic...</span>
                     <span className="inline-block w-2 h-3.5 bg-[#7ee787] animate-cursor-blink flex-shrink-0" aria-hidden />
                   </div>
                 </div>
               </div>
               {/* Widgets grid */}
               <div className="flex-1 min-h-0 overflow-auto flex flex-col">
+                {homeScreenLocked && activeWidgets.length > 0 && (
+                  <div className="flex items-center gap-1.5 px-3 py-1 text-xs font-mono text-[#A1A1AA] border-b border-[#1A1A1A] shrink-0">
+                    <Lock className="w-3 h-3" /> Widgets locked
+                  </div>
+                )}
                 <WidgetGrid activeWidgets={activeWidgets} />
               </div>
             </div>
@@ -1214,7 +1234,7 @@ function ChatPaneMock() {
   return (
     <div className="h-full flex flex-col bg-[#0d1117] border border-[#30363d] overflow-hidden p-4">
       <div className="flex-1 rounded border border-[#30363d] bg-[#161b22] p-3 font-mono text-sm text-[#e6edf3]">
-        Ask dotAi anything...
+        Ask Mystic anything...
       </div>
       <div className="text-xs text-[#8b949e] font-mono mt-2 shrink-0">New chat thread (mock)</div>
     </div>
