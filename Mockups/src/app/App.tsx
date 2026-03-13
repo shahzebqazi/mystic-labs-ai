@@ -342,7 +342,6 @@ const MOCK_CALENDAR_EVENTS = [
   { id: 'c4', title: 'Retro', date: 'Mar 16', time: '11:00' },
 ];
 
-type MainViewMode = 'list' | 'kanban' | 'calendar' | 'graph';
 
 // Mock thread graph structures (nodes = messages/turns, links = reply flow) for 3D view
 const MOCK_THREAD_GRAPHS: Record<string, { nodes: ThreadNode[]; links: ThreadLink[] }> = {
@@ -518,7 +517,6 @@ function MainChatView(
   { narrow = false, sidebarOpen, setSidebarOpen, leftSidebarOpen, setLeftSidebarOpen, rightSidebarOpen, setRightSidebarOpen, terminalOpen, setTerminalOpen, onOpenSettings }: { narrow?: boolean; sidebarOpen: boolean; setSidebarOpen: (open: boolean) => void; leftSidebarOpen: boolean; setLeftSidebarOpen: (open: boolean) => void; rightSidebarOpen: boolean; setRightSidebarOpen: (open: boolean) => void; terminalOpen: boolean; setTerminalOpen: (open: boolean) => void; onOpenSettings: () => void }
 ) {
   const [activeSidebarTab, setActiveSidebarTab] = useState<'files' | 'search' | 'git' | 'extensions'>('files');
-  const [mainViewMode, setMainViewMode] = useState<MainViewMode>('list');
   const [selectedThreadId, setSelectedThreadId] = useState<string>('general');
   const [expandedFolders, setExpandedFolders] = useState<string[]>(['Orchestration']);
 
@@ -663,14 +661,6 @@ function MainChatView(
 
   // Mobile/narrow: single scrollable column so all sections + status bar are reachable
   if (narrow) {
-    const modeTabs = (
-      <div className="flex items-center gap-1 px-2 py-2 border-b border-[#1A1A1A] shrink-0 bg-[#0a0a0a] flex-wrap">
-        <button onClick={() => setMainViewMode('list')} className={`px-3 py-2 rounded text-xs font-mono touch-manipulation ${mainViewMode === 'list' ? 'bg-[#E5E5E5]/15 text-[#E5E5E5]' : 'text-[#666666] hover:text-[#E5E5E5]'}`}>List</button>
-        <button onClick={() => setMainViewMode('kanban')} className={`px-3 py-2 rounded text-xs font-mono touch-manipulation ${mainViewMode === 'kanban' ? 'bg-[#E5E5E5]/15 text-[#E5E5E5]' : 'text-[#666666] hover:text-[#E5E5E5]'}`}>Kanban</button>
-        <button onClick={() => setMainViewMode('calendar')} className={`px-3 py-2 rounded text-xs font-mono touch-manipulation ${mainViewMode === 'calendar' ? 'bg-[#E5E5E5]/15 text-[#E5E5E5]' : 'text-[#666666] hover:text-[#E5E5E5]'}`}>Calendar</button>
-        <button onClick={() => setMainViewMode('graph')} className={`px-3 py-2 rounded text-xs font-mono flex items-center gap-1 touch-manipulation ${mainViewMode === 'graph' ? 'bg-[#E5E5E5]/15 text-[#E5E5E5]' : 'text-[#666666] hover:text-[#E5E5E5]'}`} title="3D thread graph"><Network className="w-3.5 h-3.5" /> Graph</button>
-      </div>
-    );
     return (
       <div className="bg-[#0a0a0a] flex flex-col h-full min-h-0 overflow-hidden">
         {/* Overlay drawers for sidebars */}
@@ -728,60 +718,6 @@ function MainChatView(
 
         {/* Single scrollable column: tasks, chat, btop */}
         <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-contain" style={{ WebkitOverflowScrolling: 'touch' }}>
-          {/* Section: Tasks / List / Kanban / Calendar / Graph */}
-          <section className="border-b border-[#1A1A1A] bg-[#0a0a0a]">
-            {modeTabs}
-            <div className="min-h-[180px] p-3">
-              {mainViewMode === 'list' && (
-                <ul className="space-y-2 font-mono text-sm">
-                  {MOCK_TASKS.map(t => (
-                    <li key={t.id} className="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-3 px-3 py-3 rounded-lg bg-[#0A0A0A] border border-[#1A1A1A]">
-                      <span className="text-[#666666]">{t.id}</span>
-                      <span className="text-[#E5E5E5] flex-1">{t.title}</span>
-                      <span className="text-[#10B981] text-xs">{t.status}</span>
-                      <span className="text-[#666666] text-xs">{t.assignee}</span>
-                      <span className="text-[#666666] text-xs">{t.due}</span>
-                    </li>
-                  ))}
-                </ul>
-              )}
-              {mainViewMode === 'kanban' && (
-                <div className="flex flex-col gap-4 sm:flex-row sm:gap-4">
-                  {(['todo', 'in_progress', 'done'] as const).map(col => (
-                    <div key={col} className="flex-1 min-w-0 rounded-lg bg-[#0A0A0A] border border-[#1A1A1A] p-3">
-                      <div className="text-xs font-mono text-[#666666] uppercase mb-2">{col.replace('_', ' ')}</div>
-                      <div className="space-y-2">
-                        {MOCK_TASKS.filter(t => t.status === col).map(t => (
-                          <div key={t.id} className={`p-3 rounded-lg border text-sm text-[#0a0a0a] font-medium ${col === 'todo' ? 'bg-[#bfdbfe] border-[#93c5fd]' : col === 'in_progress' ? 'bg-[#fde68a] border-[#fcd34d]' : 'bg-[#bbf7d0] border-[#86efac]'}`}>{t.title}</div>
-                        ))}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-              {mainViewMode === 'calendar' && (
-                <div className="grid grid-cols-7 gap-1 font-mono text-xs">
-                  {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((d, i) => <div key={i} className="text-[#666666] text-center py-1">{d}</div>)}
-                  {Array.from({ length: 14 }, (_, i) => {
-                    const day = i + 1;
-                    const events = MOCK_CALENDAR_EVENTS.filter(e => e.date === `Mar ${day}`);
-                    return (
-                      <div key={i} className="p-1.5 rounded bg-[#0A0A0A] border border-[#1A1A1A]">
-                        <span className="text-[#666666]">{day}</span>
-                        {events.slice(0, 2).map(ev => <div key={ev.id} className="text-[10px] text-[#0EA5E9] truncate">{ev.title}</div>)}
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-              {mainViewMode === 'graph' && (
-                <div className="min-h-[240px] rounded border border-[#30363d] overflow-hidden">
-                  <GraphView selectedThreadId={selectedThreadId} threadGraphData={threadGraphData} threadIds={['general', 'MVP PRD', 'docs']} />
-                </div>
-              )}
-            </div>
-          </section>
-
           {/* Section: Chat */}
           <section className="border-b border-[#1A1A1A] bg-[#0a0a0a]">
             <div className="px-3 py-2 border-b border-[#1A1A1A] text-xs font-mono text-[#666666]">Chat</div>
@@ -852,92 +788,8 @@ function MainChatView(
 
           {/* Center + right column */}
           <div className="flex-1 flex min-w-0 bg-[#0a0a0a] relative">
-            <div className="w-1/2 min-w-0 flex flex-col border-r border-[#1A1A1A] bg-[#0a0a0a] shrink-0">
-              <div className="flex items-center gap-1 px-2 py-1.5 border-b border-[#1A1A1A] shrink-0 bg-[#0a0a0a]">
-                <button onClick={() => setMainViewMode('list')} className={`px-2 py-1 rounded text-xs font-mono ${mainViewMode === 'list' ? 'bg-[#E5E5E5]/15 text-[#E5E5E5]' : 'text-[#666666] hover:text-[#E5E5E5]'}`}>List</button>
-                <button onClick={() => setMainViewMode('kanban')} className={`px-2 py-1 rounded text-xs font-mono ${mainViewMode === 'kanban' ? 'bg-[#E5E5E5]/15 text-[#E5E5E5]' : 'text-[#666666] hover:text-[#E5E5E5]'}`}>Kanban</button>
-                <button onClick={() => setMainViewMode('calendar')} className={`px-2 py-1 rounded text-xs font-mono ${mainViewMode === 'calendar' ? 'bg-[#E5E5E5]/15 text-[#E5E5E5]' : 'text-[#666666] hover:text-[#E5E5E5]'}`}>Calendar</button>
-                <button onClick={() => setMainViewMode('graph')} className={`px-2 py-1 rounded text-xs font-mono flex items-center gap-1 ${mainViewMode === 'graph' ? 'bg-[#E5E5E5]/15 text-[#E5E5E5]' : 'text-[#666666] hover:text-[#E5E5E5]'}`} title="3D thread graph"><Network className="w-3.5 h-3.5" /> Graph</button>
-              </div>
-              <div className="flex-1 overflow-auto min-h-0 bg-[#0a0a0a] flex flex-col">
-                {mainViewMode === 'list' && (
-                  <div className="p-4">
-                    <ul className="space-y-2 font-mono text-sm">
-                      {MOCK_TASKS.map(t => (
-                        <li key={t.id} className="flex items-center gap-3 px-4 py-3 rounded bg-[#0A0A0A] border border-[#1A1A1A]">
-                          <span className="text-[#666666] w-6">{t.id}</span>
-                          <span className="text-[#E5E5E5] flex-1">{t.title}</span>
-                          <span className="text-[#10B981] text-xs">{t.status}</span>
-                          <span className="text-[#666666] text-xs">{t.assignee}</span>
-                          <span className="text-[#666666] text-xs">{t.due}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-                {mainViewMode === 'kanban' && (
-                  <div className="flex gap-4 h-full min-h-[200px] p-4">
-                    {(['todo', 'in_progress', 'done'] as const).map(col => (
-                      <div key={col} className="flex-1 min-w-[140px] rounded-lg bg-[#0A0A0A] border border-[#1A1A1A] p-4">
-                        <div className="text-xs font-mono text-[#666666] uppercase mb-3">{col.replace('_', ' ')}</div>
-                        <div className="space-y-3">
-                          {MOCK_TASKS.filter(t => t.status === col).map(t => (
-                            <div
-                              key={t.id}
-                              className={`p-3 rounded-lg border text-sm text-[#0a0a0a] font-medium ${
-                                col === 'todo'
-                                  ? 'bg-[#bfdbfe] border-[#93c5fd]'
-                                  : col === 'in_progress'
-                                    ? 'bg-[#fde68a] border-[#fcd34d]'
-                                    : 'bg-[#bbf7d0] border-[#86efac]'
-                              }`}
-                            >
-                              {t.title}
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-                {mainViewMode === 'calendar' && (
-                  <div className="flex-1 min-h-0 flex flex-col p-4">
-                    <div className="grid grid-cols-7 grid-rows-[auto_1fr_1fr_1fr_1fr_1fr] gap-1.5 flex-1 min-h-0 font-mono text-sm">
-                      {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(d => (
-                        <div key={d} className="text-[#666666] text-xs py-2 px-1 text-center flex items-center justify-center">{d}</div>
-                      ))}
-                      {Array.from({ length: 31 }, (_, i) => {
-                        const day = i + 1;
-                        const events = MOCK_CALENDAR_EVENTS.filter(e => e.date === `Mar ${day}`);
-                        return (
-                          <div key={i} className="min-h-0 p-2 rounded bg-[#0A0A0A] border border-[#1A1A1A] flex flex-col overflow-hidden">
-                            <span className="text-[#666666] text-xs shrink-0">{day}</span>
-                            <div className="flex-1 min-h-0 overflow-hidden space-y-0.5">
-                              {events.slice(0, 3).map(ev => (
-                                <div key={ev.id} className="text-[10px] text-[#0EA5E9] truncate">{ev.title}</div>
-                              ))}
-                            </div>
-                          </div>
-                        );
-                      })}
-                      {Array.from({ length: 4 }, (_, i) => (
-                        <div key={`empty-${i}`} className="min-h-0 p-2 rounded bg-[#0A0A0A]/50 border border-[#1A1A1A]/50" aria-hidden />
-                      ))}
-                    </div>
-                  </div>
-                )}
-                {mainViewMode === 'graph' && (
-                  <GraphView
-                    selectedThreadId={selectedThreadId}
-                    threadGraphData={threadGraphData}
-                    threadIds={['general', 'MVP PRD', 'docs']}
-                  />
-                )}
-              </div>
-            </div>
-
-            {/* Right column — AI chat + btop */}
-            <div className="w-1/2 min-w-0 flex flex-col shrink-0 border-l border-[#1A1A1A] bg-[#0a0a0a]">
+            {/* Chat + btop */}
+            <div className="flex-1 min-w-0 flex flex-col shrink-0 bg-[#0a0a0a]">
               {/* Chat: messages area + input at bottom with icons */}
               <div className="flex-1 min-h-0 flex flex-col border-b border-[#1A1A1A] bg-[#0a0a0a] overflow-hidden">
                 <div className="flex-1 min-h-0 overflow-auto p-2 space-y-3 font-mono text-xs">
