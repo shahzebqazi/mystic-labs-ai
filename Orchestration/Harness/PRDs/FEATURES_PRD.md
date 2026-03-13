@@ -130,6 +130,22 @@ isProject: false
 
 ---
 
+## Platform and LLM strategy
+
+The application targets multiple platforms; each serves an LLM with a local-first approach.
+
+| Platform   | LLM behavior |
+|-----------|----------------|
+| **iPhone** | The iPhone app serves a **small local LLM** on-device (fits in device RAM, client-side inference). |
+| **Android** | The Android app serves an **LLM locally**, client-side. |
+| **Desktop** | The desktop app allows the user to **download various LLMs** and run them **client-side** on the machine. |
+| **Web**     | The client-side web app **serves an LLM** (local/client-side where supported by the browser and environment). |
+
+- **Future:** The application will support **offsite and AI servers** (remote backends, optional cloud).  
+- **MVP:** For the minimum viable product we ship **local AI only**: inference runs **client-side** (mobile, web) or **on the machine** (desktop). No dependency on remote LLM services for MVP.
+
+---
+
 ## Settings Menu (Decisions & Deferred)
 
 Settings control backend, model, execution level, VCS, logging, and updates. Below: current decisions for MVP vs. items deferred to this PRD for refinement.
@@ -509,4 +525,8 @@ Mode is per-session when session-keyed conversations are implemented (see below)
 - [To be populated by AI agent]
 
 ### Platform support
-- [To be populated by AI agent]
+- **iPhone:** Small local LLM on-device (see § Platform and LLM strategy).
+- **Android:** Local LLM client-side (see § Platform and LLM strategy).
+- **Desktop:** User-downloadable LLMs, run on-machine (Ollama/llama-server; see MVP_PRD and § Platform and LLM strategy).
+- **Web:** LLM served client-side where supported (see § Platform and LLM strategy).
+- MVP: local AI only; offsite/AI server support is post-MVP.

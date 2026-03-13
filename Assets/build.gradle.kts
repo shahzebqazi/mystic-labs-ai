@@ -3,7 +3,7 @@ plugins {
     application
 }
 
-group = "dotai"
+group = "mystic"
 version = "1.0.0"
 
 repositories {
@@ -20,7 +20,7 @@ dependencies {
 }
 
 application {
-    mainClass.set("dotai.assets.MainKt")
+    mainClass.set("mystic.assets.MainKt")
 }
 
 tasks.test {

@@ -1,10 +1,9 @@
-# Build and deploy the docs site (glossary and technical terms) to GitHub Pages.
-# Trigger: push to main. Enable in repo Settings → Pages → Source: GitHub Actions.
 name: Deploy GitHub Pages
 
 on:
   push:
     branches: [main]
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -22,11 +21,43 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Build Jekyll site
-        uses: actions/jekyll-build-pages@v1
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
         with:
-          source: docs
-          token: ${{ secrets.GITHUB_TOKEN }}
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Generate brand assets
+        working-directory: Assets
+        run: ./gradlew run
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Mockups dependencies
+        working-directory: Mockups
+        run: npm install --include=peer
+
+      - name: Build Mockups
+        working-directory: Mockups
+        env:
+          BASE_PATH: /Codex/mockups/
+        run: npx vite build --outDir dist
+
+      - name: Assemble site
+        run: |
+          mkdir -p _site
+          cp -r Assets/output/* _site/
+          cp -r Mockups/dist _site/mockups
+          cat > _site/index.html <<'REDIRECT'
+          <!DOCTYPE html>
+          <html lang="en">
+          <head><meta charset="UTF-8"><meta http-equiv="refresh" content="0;url=preview/"></head>
+          <body><p>Redirecting to <a href="preview/">Brand Guide</a>…</p></body>
+          </html>
+          REDIRECT
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3

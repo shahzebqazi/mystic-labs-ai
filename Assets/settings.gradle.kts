@@ -6,4 +6,4 @@ pluginManagement {
     }
 }
 
-rootProject.name = "dotai-assets"
+rootProject.name = "mystic-assets"

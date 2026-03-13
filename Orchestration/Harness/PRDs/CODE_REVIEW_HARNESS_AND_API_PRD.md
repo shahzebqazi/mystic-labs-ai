@@ -44,6 +44,9 @@ todos:
   - id: arch-empty-skill-dirs
     content: "ARCHITECTURE: Skills/Chat/, Skills/Check/, Skills/Debug/, Skills/Plan/, Skills/Refactor/ are empty directories — a dispatcher scanning Skills/ would match these and find nothing inside."
     status: pending
+  - id: production-branch-strategy
+    content: "Adopt and document production-branch strategy: one production branch, multiple build targets (desktop, web, installers, scripts); do not serve or build from multiple feature branches. See §9 in this PRD."
+    status: pending
 isProject: true
 ---
 
@@ -219,6 +222,41 @@ Architecture audit identified structural gaps between the directory-level design
 ### Updated Scorecard Note
 
 Architecture clarity score should be adjusted from **7 → 6** given the gap between documented architecture and runtime enforcement. The directory structure is well-designed, but the harness code does not wire the conventions it describes.
+
+---
+
+## 9. Production Branch Strategy — Recommended Approach (2026-03-13)
+
+**Recommendation:** Use **one** `production` branch as the single source of truth for release. Build **all** deliverables (desktop installer, web app, packages, scripts) from that branch via a **matrix of build targets**. Do **not** configure production to “serve” or build from multiple feature branches (e.g. desktop-app, web-app).
+
+### Do not: production “serving” different branches
+
+If production is wired to build artifacts from different branches (e.g. “build desktop from `desktop-app`, web from `web-app`”):
+
+- There is no single source of truth for what is in production; each artifact comes from a different history.
+- Releases are hard to reason about (production desktop = branch A, production web = branch B).
+- Hotfixes and versioning become messy (fix and tag multiple branches).
+- This conflicts with the existing flow: feature → main → production.
+
+### Do: one production branch, multiple build targets
+
+- Keep a single **production** branch, updated from **main** (e.g. via PR).
+- On push to **production** (or on release tags), run CI that builds **all** deliverables from the **same** commit:
+  - Desktop installer (Electron, native, etc.)
+  - Web app (static or backend + frontend)
+  - Packages / scripts (CLI, npm package, etc.)
+- Use a **matrix strategy** in the workflow (e.g. `target: [desktop, web, cli]`) so one pipeline produces multiple artifacts from one source.
+- Feature branches (e.g. `desktop-app`, `web-app`) remain **feature branches** that merge into **main**; only **main → production** defines what gets built and released.
+
+### When to use separate release branches
+
+Use separate release branches (or repos) only if you have **separate products** with different release cadences or version numbers (e.g. desktop 2.x vs web 1.x). Then each product has its own release branch and CI. For a single product with multiple deliverables (desktop + web + scripts), one production branch with a build matrix is simpler and recommended.
+
+### Implementation notes
+
+- Extend `.github/workflows/deploy-blue-green.yml` (or add a dedicated `release.yml`) to run a matrix: each job builds one target (desktop, web, cli) from the same checkout of `production`.
+- Tag releases from `production` (e.g. `v1.2.0`); the same tag can trigger all build jobs.
+- Document this policy in CONTRIBUTING.md or `docs/REBASE_STRATEGY.md` so branch and release behavior stay consistent.
 
 ---
 
