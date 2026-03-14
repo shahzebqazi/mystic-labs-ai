@@ -1,9 +1,9 @@
 # Requirements Traceability
 
 **Purpose:** Map PRD tasks and documentation sources to user stories, functional requirements (FR), and non-functional requirements (NFR).  
-**User stories:** `Project/Product/UserStories/USER_STORIES.md`
-**Functional requirements:** `Project/Product/Requirements/Functional/FUNCTIONAL_REQUIREMENTS.md`
-**Non-functional requirements:** `Project/Product/Requirements/NFR/NON_FUNCTIONAL_REQUIREMENTS.md`
+**User stories:** `Documentation/UserStories/USER_STORIES.md`
+**Functional requirements:** `Documentation/Requirements/Functional/FUNCTIONAL_REQUIREMENTS.md`
+**Non-functional requirements:** `Documentation/Requirements/NFR/NON_FUNCTIONAL_REQUIREMENTS.md`
 
 ---
 

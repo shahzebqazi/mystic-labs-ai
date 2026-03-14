@@ -14,7 +14,7 @@ This repository is a **base repo**: a template and shared foundation you can add
 
 - Your project gets the full dotAi system: markdown-first agent orchestration, tasks (under `Orchestration/Tasks/`), rules, and local GGUF inference.
 - AI agents that work in your repo read `Orchestration/Harness/SYSTEM_PROMPT.md` and use the same conventions (jj, tasks, config).
-- You can customize per project via local overrides and `Orchestration/Constraints/RULES.md`; PRDs live under `Project/Product/PRDs/`.
+- You can customize per project via local overrides and `Orchestration/Constraints/RULES.md`; PRDs live under `Documentation/PRDs/`.
 
 No protocol servers or cloud APIs are required—just the `Project/` directory and (optionally) Docker for local models.
 

@@ -2,7 +2,7 @@
 
 **Source:** Project documentation (README, START_HERE, FEATURES_PRD, RULES, RELEASE_READINESS_REPORT, MENTAL_MAP).  
 **Format:** NFR id, category, statement, rationale/trace.  
-**Traceability:** See `Project/Product/Requirements/TRACEABILITY.md` when present.
+**Traceability:** See `Documentation/Requirements/TRACEABILITY.md` when present.
 
 ---
 

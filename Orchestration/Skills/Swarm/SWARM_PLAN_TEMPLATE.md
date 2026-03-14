@@ -44,4 +44,4 @@
 
 - Source PRD(s): [paths]
 - Task graph output: [e.g. project/TASK_GRAPH.md]
-- Config: [e.g. Documents/Plans/SWARM_CONFIG_*.json]
+- Config: [e.g. Documentation/Plans/SWARM_CONFIG_*.json]

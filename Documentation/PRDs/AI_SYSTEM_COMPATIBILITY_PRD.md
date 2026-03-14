@@ -30,7 +30,7 @@ todos:
     content: "Human to verify API compatibility (OpenAI-shaped model_endpoint, /v1/chat/completions). Confirm config location, endpoint override, and behavior with at least one live backend (e.g. Ollama or llama-server)."
     status: pending
   - id: update-compatibility-review
-    content: "After human verification of each item above, update Project/Product/Reports and Reviews/AI_SYSTEM_COMPATIBILITY_REVIEW.md with verification date, environment, and any caveats or fixes."
+    content: "After human verification of each item above, update Documentation/Reports and Reviews/AI_SYSTEM_COMPATIBILITY_REVIEW.md with verification date, environment, and any caveats or fixes."
     status: pending
 isProject: false
 ---
@@ -50,7 +50,7 @@ isProject: false
 
 - Full compatibility analysis: [AI_SYSTEM_COMPATIBILITY_REVIEW.md](../Reports%20and%20Reviews/AI_SYSTEM_COMPATIBILITY_REVIEW.md)
 - Config: `Orchestration/Memories/SETTINGS.json` (`model_endpoint`, `default_model`)
-- Desktop spec: `Orchestration/Agents/AGENT_PROMPT.md`, `Project/Product/PRDs/FEATURES_PRD.md`
+- Desktop spec: `Orchestration/Agents/AGENT_PROMPT.md`, `Documentation/PRDs/FEATURES_PRD.md`
 
 ## Verification checklist (summary)
 

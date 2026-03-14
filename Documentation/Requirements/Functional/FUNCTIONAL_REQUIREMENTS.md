@@ -2,7 +2,7 @@
 
 **Source:** Project documentation (README, START_HERE, CONTRIBUTING, MVP_PRD, FEATURES_PRD, RULES, DOCUMENTATION_AUTOMATION).  
 **Format:** Shall-statements, traceable to PRDs and user stories.  
-**Traceability:** See `Project/Product/Requirements/TRACEABILITY.md` when present.
+**Traceability:** See `Documentation/Requirements/TRACEABILITY.md` when present.
 
 ---
 
@@ -41,7 +41,7 @@
 - **FR-041** — Agents **shall** commit via jj (not git) with group-chat style messages unless overridden by user rules.
 - **FR-042** — Agents **shall** create a feature branch per task (see JJ.md § Feature branch per task).
 - **FR-043** — Agents **shall** read MENTAL_MAP.md at session start and update it as they learn.
-- **FR-044** — When a PRD task is completed and corresponding product docs do not exist, the system **shall** run the DOCUMENTATION_AUTOMATION protocol to produce user stories, use cases, FR, NFR, and related artifacts under Project/Product/.
+- **FR-044** — When a PRD task is completed and corresponding product docs do not exist, the system **shall** run the DOCUMENTATION_AUTOMATION protocol to produce user stories, use cases, FR, NFR, and related artifacts under Documentation/.
 
 ---
 
@@ -80,8 +80,8 @@
 
 ## FR-140 — FR-159: Documentation and prompts
 
-- **FR-140** — All prompts (authored and stored) **shall** live under Project/Product/Prompts/ (or project-defined equivalent).
-- **FR-141** — When documentation automation runs, artifacts **shall** be created under Project/Product/ (UserStories, UseCases, UML, DomainModel, Requirements/Functional, Requirements/NFR) and **shall** reference source PRD and task id.
+- **FR-140** — All prompts (authored and stored) **shall** live under Documentation/Prompts/ (or project-defined equivalent).
+- **FR-141** — When documentation automation runs, artifacts **shall** be created under Documentation/ (UserStories, UseCases, UML, DomainModel, Requirements/Functional, Requirements/NFR) and **shall** reference source PRD and task id.
 
 ---
 

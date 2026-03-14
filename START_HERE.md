@@ -12,7 +12,7 @@ dotAi is a declarative, markdown-first agent orchestration system. There are no 
 
 Read: [README.md](README.md) (User guide section) for the complete system explanation.
 
-**This repo's layout:** Rules and system live under `Orchestration/` (Constraints, Memories, Tasks). PRDs and references under `Documents/`. Agent patterns under `Orchestration/Agents/` and `Extensions/`. **Extensions** document technology compatibility (APIs, runtimes, tools)—see [Extensions/README.md](Extensions/README.md). **Skills** (command keywords with deterministic effects, e.g. summarize, generate) under `Orchestration/Skills/`. **Tasks** (families of actions: SWE, VCS, INFRA, DATA, TOOLS, PM, OS, etc.) under `Orchestration/Tasks/` — see `Orchestration/Tasks/README.md` for the task system and migration path (tasks will move from .md to tool calls, scripts, or bundled programs).
+**This repo's layout:** Rules and system live under `Orchestration/` (Constraints, Memories, Tasks). PRDs and references under `Documentation/`. Agent patterns under `Orchestration/Agents/` and `Extensions/`. **Extensions** document technology compatibility (APIs, runtimes, tools)—see [Extensions/README.md](Extensions/README.md). **Skills** (command keywords with deterministic effects, e.g. summarize, generate) under `Orchestration/Skills/`. **Tasks** (families of actions: SWE, VCS, INFRA, DATA, TOOLS, PM, OS, etc.) under `Orchestration/Tasks/` — see `Orchestration/Tasks/README.md` for the task system and migration path (tasks will move from .md to tool calls, scripts, or bundled programs).
 
 ## Base Repo Guidelines
 
@@ -131,7 +131,7 @@ Includes: agent email, execution level, model endpoint, GitHub integration flags
 
 ## Current Tasks
 
-Check: [Documents/PRDs/](Documents/PRDs/) for active product requirements.
+Check: [Documentation/PRDs/](Documentation/PRDs/) for active product requirements.
 
 PRDs use Cursor plan.md format (YAML frontmatter with todos).
 
@@ -147,23 +147,23 @@ When tasks from a PRD are **completed** and the corresponding project docs do **
 
 - **User stories** (As a … I want … So that …)
 - **Use cases** (actors, flows, pre/postconditions)
-- **UML** (use case diagrams, class/sequence diagrams — Mermaid or PlantUML in `Documents/UML/`)
-- **Domain model** (concepts, relationships, glossary in `Documents/DomainModel/`)
-- **Functional requirements** (shall-statements in `Documents/Requirements/Functional/`)
-- **NFR** (non-functional requirements in `Documents/Requirements/NFR/`)
-- **Traceability** (PRD task id → user story / use case / FR; optional index in `Documents/Requirements/TRACEABILITY.md`)
+- **UML** (use case diagrams, class/sequence diagrams — Mermaid or PlantUML in `Documentation/UML/`)
+- **Domain model** (concepts, relationships, glossary in `Documentation/DomainModel/`)
+- **Functional requirements** (shall-statements in `Documentation/Requirements/Functional/`)
+- **NFR** (non-functional requirements in `Documentation/Requirements/NFR/`)
+- **Traceability** (PRD task id → user story / use case / FR; optional index in `Documentation/Requirements/TRACEABILITY.md`)
 
-All such artifacts live under `Documents/`. Create only what is missing; do not overwrite existing substantive content.
+All such artifacts live under `Documentation/`. Create only what is missing; do not overwrite existing substantive content.
 
 ## Prompts
 
-**Canonical location:** All prompts are made (authored and stored) in [Documents/Prompts/](Documents/Prompts/). When creating, editing, or referencing prompt content, use this directory.
+**Canonical location:** All prompts are made (authored and stored) in [Documentation/Prompts/](Documentation/Prompts/). When creating, editing, or referencing prompt content, use this directory.
 
 **Generated text only:** When the user asks for generated text without specifying a file or save location, apply the **generate** skill: return the text in the conversation only; do not create or edit files. See `Orchestration/Skills/generate.md`.
 
 ## References
 
-External links and research: [Documents/References/URLS.md](Documents/References/URLS.md)
+External links and research: [Documentation/References/URLS.md](Documentation/References/URLS.md)
 
 ## Bootstrap Protocol
 
@@ -172,7 +172,7 @@ If no agents are running:
 2. Read README.md (User guide) for full context
 3. Read [Orchestration/Constraints/RULES.md](Orchestration/Constraints/RULES.md) and [Orchestration/Memories/system/](Orchestration/Memories/system/) (runtime, model_serving) and [Orchestration/Memories/prompts/CONTEXT_REFRESH.md](Orchestration/Memories/prompts/CONTEXT_REFRESH.md)
 4. Read [Orchestration/Memories/MENTAL_MAP.md](Orchestration/Memories/MENTAL_MAP.md)
-5. Check [Documents/PRDs/](Documents/PRDs/) for pending work
+5. Check [Documentation/PRDs/](Documentation/PRDs/) for pending work
 6. If no pending work, enter chatbot mode ([Orchestration/Tasks/SWE/CHATBOT.md](Orchestration/Tasks/SWE/CHATBOT.md))
 7. If pending work, evaluate whether to start as chatbot or request orchestrator
 
@@ -190,7 +190,7 @@ If no agents are running:
 
 ## Conventions
 
-- All prompts live in `Documents/Prompts/` (see [Prompts](#prompts) above).
+- All prompts live in `Documentation/Prompts/` (see [Prompts](#prompts) above).
 - All AI docs are UPPERCASE.md
 - Commit via jj, not git
 - Commit email: ai@dotai.dev (or per Orchestration/Memories/SETTINGS.json)

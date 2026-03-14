@@ -2,7 +2,7 @@
 
 **Source:** Project documentation (README, START_HERE, CONTRIBUTING, MVP_PRD, FEATURES_PRD, MENTAL_MAP, RULES, CHATBOT, DOCUMENTATION_AUTOMATION).  
 **Purpose:** Who, what, why in "As a … I want … So that …" form.  
-**Traceability:** See `Project/Product/Requirements/TRACEABILITY.md` when present.
+**Traceability:** See `Documentation/Requirements/TRACEABILITY.md` when present.
 
 ---
 

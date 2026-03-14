@@ -5,7 +5,7 @@ When the **swarm** skill is invoked, the AI agent follows this protocol to produ
 ## Step 1: Resolve scope
 
 - If the user said **one PRD** (by name or path): set **mode** = `single_prd`, **prd_ref** = that PRD id or path.
-- If the user said **all PRDs** or **parallel PRDs**: set **mode** = `all_prds_parallel`, **prd_list** = list of PRD ids or paths under `Documents/PRDs/` (or project-configured PRD path).
+- If the user said **all PRDs** or **parallel PRDs**: set **mode** = `all_prds_parallel`, **prd_list** = list of PRD ids or paths under `Documentation/PRDs/` (or project-configured PRD path).
 - If unclear: list available PRDs and ask which to include, or default to all.
 
 ## Step 2: Load PRDs
@@ -35,14 +35,14 @@ When the **swarm** skill is invoked, the AI agent follows this protocol to produ
   - Mode, PRD(s), task count, model assignments, subagent policy.
   - Task graph table and per-task detail.
   - Models used, execution notes, traceability.
-- Output in chat and/or write to `Documents/Plans/SWARM_PLAN_<date>_<scope>.md` if the user or project expects a persisted file.
+- Output in chat and/or write to `Documentation/Plans/SWARM_PLAN_<date>_<scope>.md` if the user or project expects a persisted file.
 
 ## Step 7: Emit swarm config (JSON)
 
 - Build a JSON object conforming to [swarm_config.schema.json](swarm_config.schema.json):
   - version, mode, prd_ref or prd_list, tasks (with id, prd_ref, model_key, depends_on, acceptance_criteria, subagent_type, task_type), optional models, subagent_policy.
 - Validate against the schema if tooling is available.
-- Output in chat and/or write to `Documents/Plans/SWARM_CONFIG_<date>_<scope>.json` when persistence is requested.
+- Output in chat and/or write to `Documentation/Plans/SWARM_CONFIG_<date>_<scope>.json` when persistence is requested.
 
 ## Step 8: Optional — Emit task graph for orchestrator
 

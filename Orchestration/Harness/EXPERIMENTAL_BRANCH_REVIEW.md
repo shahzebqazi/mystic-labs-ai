@@ -17,7 +17,7 @@ After the headless runner has been executed for 10 minutes (or any duration), us
 
 ## 3. Compare to the PRD
 
-- Open the PRD used for the run (default: `Project/Product Documents/PRDs/CODE_REVIEW_HARNESS_AND_API_PRD.md`).
+- Open the PRD used for the run (default: `Documentation/PRDs/CODE_REVIEW_HARNESS_AND_API_PRD.md`).
 - Check the `todos` in the frontmatter. See which tasks the model attempted and whether the suggestions align with the task descriptions.
 
 ## 4. Decide next steps

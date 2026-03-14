@@ -81,7 +81,7 @@
 │   ├── ci.yml                    # Lint + test (Orchestration/Tasks/SWE/api)
 │   └── deploy-blue-green.yml     # Blue-Green build + deploy placeholder
 └── Project/
-    ├── Project/Product/Reports and Reviews/
+    ├── Documentation/Reports and Reviews/
     │   ├── API_AUDIT_MVP.md
     │   └── RELEASE_READINESS_REPORT.md (this file)
     └── Orchestration/Tasks/

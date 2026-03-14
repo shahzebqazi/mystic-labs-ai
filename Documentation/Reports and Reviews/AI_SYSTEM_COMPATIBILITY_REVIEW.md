@@ -40,7 +40,7 @@
 ### 2.1 Ollama
 
 - **Compatibility:** ✅ **Supported.**
-- **Where:** Desktop stack in `Orchestration/Agents/AGENT_PROMPT.md` and `Project/Product/PRDs/FEATURES_PRD.md`.
+- **Where:** Desktop stack in `Orchestration/Agents/AGENT_PROMPT.md` and `Documentation/PRDs/FEATURES_PRD.md`.
 - **Details:**
   - Base URL: `http://localhost:11434/v1/`.
   - Uses `POST /v1/chat/completions`, streaming, `GET .../api/tags` for model list.
@@ -129,6 +129,6 @@
 - Config: `Orchestration/Memories/SETTINGS.json`
 - System/env: `Orchestration/Memories/system/runtime.md`, `system/model_serving.md`
 - Local model: `Orchestration/Tasks/INFRA/LLAMA_CPP.md`, `Orchestration/orchestrator-compose.yml`
-- Desktop (Ollama): `Orchestration/Agents/AGENT_PROMPT.md`, `Project/Product/PRDs/FEATURES_PRD.md`
+- Desktop (Ollama): `Orchestration/Agents/AGENT_PROMPT.md`, `Documentation/PRDs/FEATURES_PRD.md`
 - OpenCode: `Project/Extensions/Opencode/OPENCODE.md`, `START_HERE.md` (skills/AGENTS/OPENCODE)
-- External refs: `Project/References/URLS.md`, `Project/Product/Papers/WHITEPAPER.md`
+- External refs: `Project/References/URLS.md`, `Documentation/Papers/WHITEPAPER.md`

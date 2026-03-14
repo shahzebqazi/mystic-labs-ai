@@ -15,7 +15,7 @@ This branch is the **Experimental AI Coding Branch** (`experimental-ai-coding-br
    - Prefer adding new files or branch-specific config (e.g. under `Project/Experimental/` or a path used only on this branch) rather than modifying core entrypoints (e.g. `START_HERE.md`, `Project/README.md`) in ways that would conflict when merged.
 
 3. **Scope of work**
-   - Use `START_HERE.md` and the PRDs in `Project/Product Documents/PRDs/` (or `Documents/PRDs/`) as the source of tasks.
+   - Use `START_HERE.md` and the PRDs in `Documentation/PRDs/` as the source of tasks.
    - Headless runs and experiments (e.g. the 10-minute harness runner) are intended for this branch; review their output and any generated artifacts here before considering promotion.
 
 4. **Review before merge**

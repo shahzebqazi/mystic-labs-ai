@@ -4,7 +4,7 @@
 <!-- PREFERENCES (edit for your project): -->
 <!-- (none) -->
 
-This file is the **system prompt** for dotAi agents — the canonical convention that defines how you operate. (In AI runtimes, the content sent as the initial "system" message is the system prompt; this file is that source.) You are an AI agent in the dotAi system. This file lives in **Orchestration/Harness/**; project prompts and layout are under Project/ and Orchestration/. Read this file first, then follow the links below.
+This file is the **system prompt** for dotAi agents — the canonical convention that defines how you operate. (In AI runtimes, the content sent as the initial "system" message is the system prompt; this file is that source.) You are an AI agent in the dotAi system. This file lives in **Orchestration/Harness/**; project prompts and layout are under Documentation/ and Orchestration/. Read this file first, then follow the links below.
 
 ## System Overview
 
@@ -12,7 +12,7 @@ dotAi is a declarative, markdown-first agent orchestration system. There are no 
 
 Read: [README.md](../../README.md) (User guide section) for the complete system explanation.
 
-**This repo's layout:** Rules and system live under `Orchestration/` (Constraints, Memories, Tasks). **Documents/** contains only [Documents/README.md](../../Documents/README.md) (instructions for using project/user docs). All project and user documents (PRDs, requirements, prompts, references, user stories, reports, plans) live under **Project/Product/**. **AI harness documentation** is in the designated AI folder: [Project/Product/AI/](../../Project/Product/AI/README.md) (links to `Orchestration/Harness/`). Agent patterns under `Orchestration/Agents/` and `Extensions/`. **Extensions** document technology compatibility (APIs, runtimes, tools)—see [Extensions/README.md](../../Extensions/README.md). **Skills** (command keywords with deterministic effects, e.g. summarize, generate) under `Orchestration/Skills/`. **Tasks** (families of actions: SWE, VCS, INFRA, DATA, TOOLS, PM, OS, etc.) under `Orchestration/Tasks/` — see [Orchestration/Tasks/README.md](../Tasks/README.md) for the task system and migration path (tasks will move from .md to tool calls, scripts, or bundled programs).
+**This repo's layout:** Rules and system live under `Orchestration/` (Constraints, Memories, Tasks). All project and user documents (PRDs, requirements, prompts, references, user stories, reports, plans) live under **Documentation/** at the repo root. See [Orchestration/Harness/Documents/README.md](../Harness/Documents/README.md) for the path list. **AI harness documentation** is in `Orchestration/Harness/`. Agent patterns under `Orchestration/Agents/` and `Extensions/`. **Extensions** document technology compatibility (APIs, runtimes, tools)—see [Extensions/README.md](../../Extensions/README.md). **Skills** (command keywords with deterministic effects, e.g. summarize, generate) under `Orchestration/Skills/`. **Tasks** (families of actions: SWE, VCS, INFRA, DATA, TOOLS, PM, OS, etc.) under `Orchestration/Tasks/` — see [Orchestration/Tasks/README.md](../Tasks/README.md) for the task system and migration path (tasks will move from .md to tool calls, scripts, or bundled programs).
 
 ## Base Repo Guidelines
 
@@ -52,9 +52,9 @@ Tasks are **families of actions**; they live under `Orchestration/Tasks/` (SWE, 
 - [Orchestration/Tasks/SWE/ADAPTIVE_ELICITATION.md](../Tasks/SWE/ADAPTIVE_ELICITATION.md) -- requirements-first elicitation (ask before coding)
 
 ### Product & Documentation
-- [Orchestration/Tasks/PM/DOCUMENTATION_AUTOMATION.md](../Tasks/PM/DOCUMENTATION_AUTOMATION.md) -- **automated project docs**: when PRD tasks are completed and not already documented, create user stories, use cases, UML, domain model, functional requirements, NFR, and other product-lifecycle artifacts under Project/Product/ (see Current Tasks below)
-- [Orchestration/Tasks/PM/SESSION_PRD.md](../Tasks/PM/SESSION_PRD.md) -- populate a session PRD (Project/Product/PRDs/SESSION_<date>.md)
-- [Orchestration/Tasks/PM/UX_WIREFRAME.md](../Tasks/PM/UX_WIREFRAME.md) -- UX/UI and wireframe agent (master prompt in Project/Product/UX_WIREFRAME_AGENT_PROMPT.md)
+- [Orchestration/Tasks/PM/DOCUMENTATION_AUTOMATION.md](../Tasks/PM/DOCUMENTATION_AUTOMATION.md) -- **automated project docs**: when PRD tasks are completed and not already documented, create user stories, use cases, UML, domain model, functional requirements, NFR, and other product-lifecycle artifacts under Documentation/ (see Current Tasks below)
+- [Orchestration/Tasks/PM/SESSION_PRD.md](../Tasks/PM/SESSION_PRD.md) -- populate a session PRD (Documentation/PRDs/SESSION_<date>.md)
+- [Orchestration/Tasks/PM/UX_WIREFRAME.md](../Tasks/PM/UX_WIREFRAME.md) -- UX/UI and wireframe agent (master prompt in Documentation/UX_WIREFRAME_AGENT_PROMPT.md)
 
 ### Version Control
 - [Orchestration/Constraints/VCS_AND_FILE_GATE.md](../Constraints/VCS_AND_FILE_GATE.md) — **READ THIS** — Token conservation: no substantive work or file creation until repo/VCS or user has asked three times; chat mode exception. Teach commands instead of running them when asked; score user on git/VCS usage once repo exists.
@@ -125,7 +125,7 @@ Includes: agent email, execution level, model endpoint, GitHub integration flags
 
 ## Current Tasks
 
-Check: [Project/Product/PRDs/](../../Project/Product/PRDs/) for active product requirements.
+Check: [Documentation/PRDs/](../../Documentation/PRDs/) for active product requirements.
 
 PRDs use Cursor plan.md format (YAML frontmatter with todos).
 
@@ -141,23 +141,23 @@ When tasks from a PRD are **completed** and the corresponding project docs do **
 
 - **User stories** (As a … I want … So that …)
 - **Use cases** (actors, flows, pre/postconditions)
-- **UML** (use case diagrams, class/sequence diagrams — Mermaid or PlantUML in `Project/Product/UML/`)
-- **Domain model** (concepts, relationships, glossary in `Project/Product/DomainModel/`)
-- **Functional requirements** (shall-statements in `Project/Product/Requirements/Functional/`)
-- **NFR** (non-functional requirements in `Project/Product/Requirements/NFR/`)
-- **Traceability** (PRD task id → user story / use case / FR; optional index in `Project/Product/Requirements/TRACEABILITY.md`)
+- **UML** (use case diagrams, class/sequence diagrams — Mermaid or PlantUML in `Documentation/UML/`)
+- **Domain model** (concepts, relationships, glossary in `Documentation/DomainModel/`)
+- **Functional requirements** (shall-statements in `Documentation/Requirements/Functional/`)
+- **NFR** (non-functional requirements in `Documentation/Requirements/NFR/`)
+- **Traceability** (PRD task id → user story / use case / FR; optional index in `Documentation/Requirements/TRACEABILITY.md`)
 
-All such artifacts live under `Project/Product/`. Create only what is missing; do not overwrite existing substantive content.
+All such artifacts live under `Documentation/`. Create only what is missing; do not overwrite existing substantive content.
 
 ## Prompts
 
-**Canonical location:** All prompts are made (authored and stored) in [Project/Product/Prompts/](../../Project/Product/Prompts/). When creating, editing, or referencing prompt content, use this directory (create the subdir if missing).
+**Canonical location:** All prompts are made (authored and stored) in [Documentation/Prompts/](../../Documentation/Prompts/). When creating, editing, or referencing prompt content, use this directory (create the subdir if missing).
 
 **Generated text only:** When the user asks for generated text without specifying a file or save location, apply the **generate** skill: return the text in the conversation only; do not create or edit files. See `Orchestration/Skills/generate.md`.
 
 ## References
 
-External links and research: [Project/Product/References/URLS.md](../../Project/Product/References/URLS.md)
+External links and research: [Documentation/References/URLS.md](../../Documentation/References/URLS.md)
 
 ## Bootstrap Protocol
 
@@ -166,7 +166,7 @@ If no agents are running:
 2. Read README.md (User guide) for full context
 3. Read [Orchestration/Constraints/RULES.md](../Constraints/RULES.md) and [Orchestration/Memories/system/](../Memories/system/) (runtime, model_serving) and [Orchestration/Memories/prompts/CONTEXT_REFRESH.md](../Memories/prompts/CONTEXT_REFRESH.md)
 4. Read [Orchestration/Memories/MENTAL_MAP.md](../Memories/MENTAL_MAP.md)
-5. Check [Project/Product/PRDs/](../../Project/Product/PRDs/) for pending work
+5. Check [Documentation/PRDs/](../../Documentation/PRDs/) for pending work
 6. If no pending work, enter chatbot mode ([Orchestration/Tasks/SWE/CHATBOT.md](../Tasks/SWE/CHATBOT.md))
 7. If pending work, evaluate whether to start as chatbot or request orchestrator
 
@@ -184,8 +184,8 @@ If no agents are running:
 
 ## Conventions
 
-- **Documents/** — Contains only [Documents/README.md](../../Documents/README.md). Project and user documents (PRDs, requirements, prompts, references) live under **Project/Product/**. All prompts in `Project/Product/Prompts/` (see [Prompts](#prompts) above).
-- **Harness documentation** — In the designated AI folder in Product: [Project/Product/AI/](../../Project/Product/AI/README.md); spec and implementation in `Orchestration/Harness/`.
+- **Documentation/** — All project and user documents (PRDs, requirements, prompts, references) live under **Documentation/** at the repo root. All prompts in `Documentation/Prompts/` (see [Prompts](#prompts) above). See [Orchestration/Harness/Documents/README.md](../Harness/Documents/README.md).
+- **Harness documentation** — Spec and implementation in `Orchestration/Harness/`.
 - All AI docs are UPPERCASE.md
 - Commit via jj, not git
 - Commit email: ai@dotai.dev (or per Orchestration/Memories/SETTINGS.json)

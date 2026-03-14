@@ -11,17 +11,17 @@ Before producing any wireframes or mockups, the agent **must** internalize the f
 ### 1.1 What this project is
 
 - **Product:** Desktop AI coding harness (Electron app). Local LLM backend by default (Ollama; API at `http://localhost:11434` or project-configured llama-server at `http://localhost:8080`). OpenCode-style coding assistant.
-- **System:** dotAi — markdown-first agent orchestration. No protocol servers; files and jj commits are the protocol. See `Project/README.md` and `Project/SYSTEM_PROMPT.md` (convention) (system prompt / convention).
+- **System:** dotAi — markdown-first agent orchestration. No protocol servers; files and jj commits are the protocol. See `README.md` and `Orchestration/Harness/SYSTEM_PROMPT.md` (convention) (system prompt / convention).
 - **Roles:** Lightweight **chatbot** (interactive chat, project navigation, code help, jj commits) and optional **orchestrator** (multi-agent, Docker). UX should support both “simple chat” and “agent/task” mental models.
 - **Constraints:** Local-first, no telemetry, FOSS-friendly. No server-side logging of agent activity. Settings and state live in project config (e.g. `Orchestration/Memories/SETTINGS.json`); UI should reflect “config path override” and “local-only” as first-class options.
 
 ### 1.2 Authoritative project docs (agent must read)
 
-- `Project/README.md` — User guide, directory layout, base repo guidelines.
-- `Project/SYSTEM_PROMPT.md` (convention) — System prompt (convention), rules, tasks, bootstrap.
+- `README.md` — User guide, directory layout, base repo guidelines.
+- `Orchestration/Harness/SYSTEM_PROMPT.md` (convention) — System prompt (convention), rules, tasks, bootstrap.
 - `Orchestration/Memories/system/runtime.md`, `system/model_serving.md` — Runtime (OS, GPU, model endpoint, llama-server).
-- `Project/Product/PRDs/FEATURES_PRD.md` — Settings, backend URL, model, execution level, session restore, personas.
-- `Project/Product/PRDs/MVP_PRD.md` — MVP gate (Ollama/backend works locally), success criteria.
+- `Documentation/PRDs/FEATURES_PRD.md` — Settings, backend URL, model, execution level, session restore, personas.
+- `Documentation/PRDs/MVP_PRD.md` — MVP gate (Ollama/backend works locally), success criteria.
 - `Orchestration/Tasks/SWE/CHATBOT.md` — Chatbot capabilities and behavior.
 
 ### 1.3 Design principles from the repo
@@ -106,7 +106,7 @@ Additional project-relevant items to consider in flows (not necessarily separate
 You are generating UX/UI designs and wireframes for the **dotAi desktop chat application**. Your output must:
 
 1. **Align with the project**  
-   Read and use: `Project/README.md`, `Project/SYSTEM_PROMPT.md` (convention), `Orchestration/Memories/system/` (runtime.md, model_serving.md), `Project/Product/PRDs/FEATURES_PRD.md`, `Project/Product/PRDs/MVP_PRD.md`, and `Orchestration/Tasks/SWE/CHATBOT.md`. Respect local-first, no telemetry, and the base-repo guidelines.
+   Read and use: `README.md`, `Orchestration/Harness/SYSTEM_PROMPT.md` (convention), `Orchestration/Memories/system/` (runtime.md, model_serving.md), `Documentation/PRDs/FEATURES_PRD.md`, `Documentation/PRDs/MVP_PRD.md`, and `Orchestration/Tasks/SWE/CHATBOT.md`. Respect local-first, no telemetry, and the base-repo guidelines.
 
 2. **Match Ollama’s UI/UX spirit**  
    Clean, minimal, dark-first with light option, model-centric, chat as hero. Single main conversation view, clear model selector, subtle feedback, desktop-native layout.
