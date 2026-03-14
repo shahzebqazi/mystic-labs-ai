@@ -39,7 +39,5 @@
    - https://docs.github.com/en/pages
 2. Push docs updates from `research` to GitHub:
    - `git push origin research`
-3. Open repository settings and configure Pages branch if needed:
-   - https://github.com/shahzebqazi/agi-research.git
-4. Verify deployment by opening:
-   - your configured GitHub Pages URL from repository settings
+3. Open repository settings and configure Pages (source branch, e.g. `research`).
+4. Check the site at the repo’s Pages URL (e.g. https://shahzebqazi.github.io/agi-research/). See REFERENCES.md for the canonical list.

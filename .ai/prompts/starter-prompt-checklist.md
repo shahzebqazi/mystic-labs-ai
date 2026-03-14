@@ -8,7 +8,7 @@
 
 ## Phase 1: Repository and Branch Preconditions
 
-- [ ] Ensure the repo has branches: `main`, `research`, `development`, `training`, `benchmarking`.
+- [ ] Ensure the repo has branches: `main`, `research`, `training`, `benchmarking`. Docs live on `research` only; no pull-request workflow.
 - [ ] Checkout `research` before generating deliverables.
 - [ ] Confirm remote repository URL is configured.
 

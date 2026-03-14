@@ -10,28 +10,24 @@ https://docs.docker.com/compose/install/
 ## Repo and Pages
 
 https://github.com/shahzebqazi/agi-research.git
+https://shahzebqazi.github.io/agi-research/
 https://docs.github.com/en/pages
 
-## Hugging Face
+## Hugging Face & Ecosystem
 
 https://huggingface.co/docs/transformers
-https://huggingface.co/docs/accelerate
-https://huggingface.co/docs/peft
-https://huggingface.co/docs/smolagents
 https://huggingface.co/docs/transformers/model_doc/lfm2_moe
-
-## Hugging Face Ecosystem
-
 https://github.com/huggingface/lighteval
 https://huggingface.co/docs/lighteval
 https://github.com/huggingface/trl
 https://huggingface.co/docs/trl/index
+https://huggingface.co/docs/accelerate
 https://github.com/huggingface/accelerate
 https://huggingface.co/docs/accelerate/index
+https://huggingface.co/docs/peft
 https://github.com/huggingface/peft
 https://huggingface.co/docs/peft/index
 https://github.com/huggingface/smolagents
-https://huggingface.co/docs/smolagents
 
 ## Ollama
 

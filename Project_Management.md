@@ -1,24 +1,19 @@
 # Project Management
 
-## Critical Path and Branch Flow
+## Branch Model
 
-The project follows a constrained branch model to separate risk:
+Branches are kept separate by purpose; no pull-request workflow.
 
-- `main`: stable baseline and release-ready docs.
-- `research`: primary integration branch for documentation and tooling.
-- `development`: short-lived feature integration before merge to `research`.
-- `training`: model-training scripts and experiments.
-- `benchmarking`: evaluation and regression harnesses.
+- **main**: stable baseline.
+- **research**: documentation only. All project docs (Playbook, Project_Management, PRD, Research, REFERENCES) live here. This branch is separate from code branches.
+- **training**: model-training scripts and experiments.
+- **benchmarking**: evaluation and regression harnesses.
 
-Flow:
-
-1. Start work in `development`, `training`, or `benchmarking`.
-2. Open PRs into `research` after link and docs validation.
-3. Promote from `research` to `main` only after QA checks pass.
+Work on docs on `research`; work on training code on `training`; work on evaluation on `benchmarking`. Research is not a merge target for other branches.
 
 ## Research Onboarding
 
-1. Clone repo and switch to `research`.
+1. Clone repo and switch to `research` for docs.
 2. Read:
    - `README.md`
    - `PRD.md`
@@ -29,7 +24,7 @@ Flow:
    - `source venv/bin/activate`
 4. Start local environment:
    - `docker compose --profile full up`
-5. Validate links before opening a PR (no broken URLs).
+5. Validate links in docs (no broken URLs).
 
 ## Apache 2.0 Licensing Strategy
 
@@ -51,4 +46,4 @@ Strategy:
 
 - All URLs used in docs must be present in `REFERENCES.md`.
 - Research claims must include a citation URL.
-- Branch PRs require successful environment smoke test and link verification.
+- Environment smoke test and link verification before considering docs complete.

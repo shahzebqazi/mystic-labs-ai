@@ -2,7 +2,7 @@
 
 ## Product Goal
 
-Build an agent-driven research and testing toolkit aligned with LFM2 constraints: efficient inference, hybrid MoE behavior, and edge-aware execution.
+Build an agent-driven research and testing toolkit that fits LFM2’s constraints: efficient inference, hybrid MoE, and execution that works on edge or on-device.
 
 Primary references:
 
@@ -77,5 +77,5 @@ Users must receive transparent, auditable outputs with minimal cognitive overhea
 ## Success Metrics (2-Month Window)
 
 - 100% of doc links resolve successfully.
-- Core branch flow (`development`/`training`/`benchmarking` -> `research` -> `main`) is documented and followed.
+- Branches `research`, `training`, and `benchmarking` are maintained; docs live on `research` only.
 - Environment setup is reproducible on a clean machine in under 30 minutes.

@@ -1,8 +1,8 @@
 # AGI Research & Testing Toolkit
 
-**Executive Summary**
+**Summary**
 
-An AI Research & Testing Toolkit inspired by the [LFM2 (Liquid Foundation Model)](https://arxiv.org/abs/2511.23404) architecture—prioritizing efficiency, hybrid MoE (Mixture of Experts), and edge-compatibility. This repository supports **Learning**, **Research**, and **Testing** workflows with a 2-month scope for initial delivery.
+A research and testing toolkit built around the [LFM2 (Liquid Foundation Model)](https://arxiv.org/abs/2511.23404) work: hybrid MoE, efficiency-focused, and usable on edge or on-device. The repo is set up for **Learning**, **Research**, and **Testing** over an initial 2-month window.
 
 ## Scope (2 Months)
 
@@ -12,15 +12,16 @@ An AI Research & Testing Toolkit inspired by the [LFM2 (Liquid Foundation Model)
 | **Research**  | Ref-Agent link verification, academic synthesis, benchmarking APIs | Playbook, Project_Management, PRD, Research, REFERENCES |
 | **Testing**   | Docker/venv dev environment, GitHub Pages deployment, license audit | Repo structure, CI-ready baseline |
 
-Methodology is aligned with LFM2’s hardware-in-the-loop search: iterative, efficiency-focused, and suitable for edge and on-device deployment (e.g. [LFM2-8B MoE](https://www.liquid.ai/blog/lfm2-8b-a1b-an-efficient-on-device-mixture-of-experts)).
+The approach follows LFM2’s hardware-in-the-loop style: iterate under latency and memory limits, with an eye to edge deployment (see [LFM2-8B MoE](https://www.liquid.ai/blog/lfm2-8b-a1b-an-efficient-on-device-mixture-of-experts)).
 
 ## Branch Structure
 
-- **main** — Production/stable
-- **research** — Primary working branch for docs and tools (current)
-- **development** — Feature staging
+- **main** — Stable baseline
+- **research** — Documentation only (Playbook, Project_Management, PRD, Research, REFERENCES). Kept separate from code branches.
 - **training** — Model training scripts
 - **benchmarking** — Evaluation suites
+
+All docs live on `research`; clone and checkout `research` for the playbook and references.
 
 ## Quick Start
 

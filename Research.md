@@ -6,7 +6,7 @@ This review examines Liquid Foundation Models (LFM2), MoE efficiency trade-offs,
 
 ## 1) Liquid Foundation Models and Efficient Inference
 
-LFM2 research emphasizes high-quality inference with constrained active compute, using MoE routing to activate only a subset of experts per token. This supports lower effective compute at inference time compared with dense models of similar total parameter count.
+LFM2 emphasizes strong inference with limited active compute: MoE routing activates only a subset of experts per token. This supports lower effective compute at inference time compared with dense models of similar total parameter count.
 
 Citations:
 
@@ -58,4 +58,4 @@ For model-ops experimentation and adapters:
 
 ## Conclusion
 
-An LFM2-aligned toolkit should evaluate quality-per-active-parameter, preserve citation-grounded memory refresh, and provide edge-conscious workflows for local or near-edge deployment. The practical outcome is not just higher benchmark scores, but repeatable, auditable research-to-testing loops.
+An LFM2-aligned toolkit should track quality per active parameter, keep memory refresh tied to citations, and support workflows that run locally or near-edge. The aim is repeatable, auditable loops from research to testing—not just better numbers on a leaderboard.
