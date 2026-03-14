@@ -8,6 +8,6 @@ This directory holds **functional requirements (FR)** and **non-functional requi
 | **Non-functional requirements** | [NFR/NON_FUNCTIONAL_REQUIREMENTS.md](NFR/NON_FUNCTIONAL_REQUIREMENTS.md) | Security, privacy, performance, usability, operability, compliance (NFR-001, …). |
 | **Traceability** | [TRACEABILITY.md](TRACEABILITY.md) | Mapping from PRDs and docs to user stories, FR, and NFR. |
 
-**User stories** live in `Project/Product/UserStories/USER_STORIES.md` (As a … I want … So that …).
+**User stories** live in `Documentation/UserStories/USER_STORIES.md` (As a … I want … So that …).
 
 **Convention:** When adding or changing requirements, update TRACEABILITY.md and reference the source PRD or task id in the requirement doc.

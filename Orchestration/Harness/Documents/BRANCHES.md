@@ -1,6 +1,6 @@
 # Branch list and descriptions
 
-Quick reference for what each branch is for. Generated from branch names and recent commits.
+Quick reference for what each branch is for. Updated after branch and documentation refactor.
 
 ---
 
@@ -8,8 +8,9 @@ Quick reference for what each branch is for. Generated from branch names and rec
 
 | Branch | Description |
 |--------|-------------|
-| **main** | Stable, human-approved code. Default branch. CI/Pages deploy from here. |
-| **production** | Release/production line. CI runs on PRs to this and main. |
+| **main** | Stable, deployable trunk. GitHub Pages site (Brand Guide + Mockups) deploys from here. No `Documentation/` dir. |
+| **production** | Release line. In sync with main. CI runs on PRs to this and main. |
+| **development** | Dev-docs branch. Everything main has **plus** `Documentation/` (PRDs, Plans, Papers, References, Requirements, UserStories, Reports, Prompts). Feature branches are created from here and merged back here. |
 
 ---
 
@@ -17,40 +18,31 @@ Quick reference for what each branch is for. Generated from branch names and rec
 
 | Branch | Description |
 |--------|-------------|
-| **desktop-app** | Desktop app and GUI features (e.g. Mockups, desktop-specific UI). Keep in sync with main for non-GUI code. |
-| **benchmarks** | Benchmarking-related work. |
-| **assets** | Asset and static content (e.g. Pages, koi-pond Mockups). |
-| **docs/documentation-reorg** | Documentation restructure and doc-only changes. |
-| **docs/documentation-reorg-project** | (Remote only.) Alternate or follow-up docs reorg. |
-| **docs/template-plugin-positioning** | (Remote only.) Template and plugin positioning for docs. |
-| **experimental-ai-coding-branch** | Experimental AI coding and workflow changes (e.g. CI paths, layout). |
+| **feature/desktop-app** | Desktop app and GUI features. Branches from and merges into **development**. |
+| **assets** | Asset generators and static output only. Kotlin toolchain in `Assets/`, output in `Assets/output/`. Deploy workflow fetches from this branch for Brand Guide content. |
 
 ---
 
-## AGI-research (from former agi-research repo)
+## AGI-research (on origin)
 
-These branches were brought in from the deleted `agi-research` repo. They are research/toolkit-focused and diverge from main.
+Consolidated from former agi-research branches. Research/toolkit-focused.
 
 | Branch | Description |
 |--------|-------------|
-| **agi-research** | Main line of the former agi-research repo (research merge). |
-| **agi-research-benchmarking** | AI Research Toolkit: benchmarking and related prompts (`.ai/prompts`). |
-| **agi-research-training** | AI Research Toolkit: training and related prompts (`.ai/prompts`). |
-| **agi-research-research** | Research docs and copy: humanized copy, links, research/training/benchmark-only workflow (no PR workflow). |
-| **agi-research-libra-ai** | Libra AI / Library-Librarian content and exploration. |
-| **agi-research-type-system** | Type system and web framework exploration. |
+| **agi-research** | Consolidated research (main + libra-ai + type-system + research). LFM2 toolkit, Libra AI Library, type-system exploration. |
+| **agi-research-benchmarks** | Benchmarking and training content (`.ai/prompts`, evaluation). |
 
 ---
 
 ## Remotes
 
-- **origin** — GitHub (e.g. `shahzebqazi/Codex`). Most branches are pushed here.
-- **agi-research** — Legacy remote pointing at the old agi-research repo URL (repo deleted). Safe to remove: `git remote remove agi-research`.
+- **origin** — GitHub (e.g. `shahzebqazi/Codex`). All active branches are pushed here.
 
 ---
 
 ## Conventions (from [GIT.md](../../Tasks/VCS/GIT.md))
 
-- `main` = stable; `production` = release.
-- Human feature branches: `feature/name`, `docs/name`, `chore/name`, `hotfix/name`.
+- `main` = stable, deployable; `production` = release; `development` = dev docs + feature base.
+- All product and process docs live under **Documentation/** on the **development** branch only (PRDs, Plans, Papers, References, Requirements, UserStories, Reports, Prompts).
+- Human feature branches: `feature/name`, `docs/name`, `chore/name`, `hotfix/name`. Branch from **development** for feature work.
 - Agent work: `agent-name/task-id` (often managed by jj).
