@@ -1,0 +1,79 @@
+# Build the full GitHub Pages site:
+#   /              → redirect to preview/ (Brand Guide landing page)
+#   /preview/      → Brand Guide (index.html from assets branch)
+#   /mockups/      → Mockups Vite app
+# Brand assets (css, icons, logos, banners, heroes) come from the assets branch.
+#
+# Required: Settings > Pages > Build and deployment > Source = "GitHub Actions"
+name: Deploy Mockups to GitHub Pages
+
+on:
+  push:
+    branches: [main, docs/documentation-reorg]
+    paths:
+      - 'Mockups/**'
+      - '.github/workflows/deploy-mockups-pages.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: 'pages'
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install
+        working-directory: Mockups
+
+      - name: Build Mockups for subpath
+        run: npm run build
+        working-directory: Mockups
+        env:
+          BASE_PATH: /${{ github.event.repository.name }}/mockups/
+
+      - name: Fetch brand assets from assets branch
+        run: |
+          git fetch origin assets --depth=1
+          git checkout origin/assets -- Assets/output/
+
+      - name: Assemble site
+        run: |
+          mkdir -p _site
+          cp -r Assets/output/* _site/
+          cp -r Mockups/dist _site/mockups
+          cat > _site/index.html <<'REDIRECT'
+          <!DOCTYPE html>
+          <html lang="en">
+          <head><meta charset="UTF-8"><meta http-equiv="refresh" content="0;url=preview/"></head>
+          <body><p>Redirecting to <a href="preview/">Brand Guide</a>…</p></body>
+          </html>
+          REDIRECT
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deploy
+        uses: actions/deploy-pages@v4

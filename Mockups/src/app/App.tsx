@@ -1,155 +1,695 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { ChevronLeft, ChevronRight, Menu, Settings, User, Paperclip, Mic, Target, ChevronDown, Circle, PanelLeft, PanelRight, PanelBottom, X, Terminal, FileCode, Wrench, Cpu, Zap, Shield, Database, Code2, Layers, Activity, Bug, GitCommit, FolderOpen, File, Files, Puzzle, GitBranch, Search, ChevronRight as ChevronRightIcon, Folder } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Menu, User, Paperclip, Mic, Target, ChevronDown, Circle, PanelLeft, PanelRight, PanelBottom, X, Terminal, FileCode, Cpu, Zap, Shield, Database, Code2, Layers, Activity, Bug, GitCommit, FolderOpen, File, Files, Puzzle, GitBranch, Search, ChevronRight as ChevronRightIcon, Folder, MessageCircle, Network, Globe, Image as ImageIcon, LayoutList, Bot, MoreVertical, SlidersHorizontal, Percent, DollarSign, ZoomIn, ZoomOut, RotateCcw, Filter, Plus, HandMetal, Home, FileText, Scale, Columns3, Calendar, Settings, Wrench, LogOut, Lock, LockOpen } from 'lucide-react';
+import { ThreadGraph3D, type ThreadNode, type ThreadLink } from './components/ThreadGraph3D';
+import { WidgetGrid, WIDGET_REGISTRY, DEFAULT_WIDGETS } from './components/MiniBtop';
+import { useIsNarrowViewport } from './components/ui/use-mobile';
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuSeparator,
+  ContextMenuTrigger,
+  ContextMenuSub,
+  ContextMenuSubTrigger,
+  ContextMenuSubContent,
+  ContextMenuCheckboxItem,
+} from './components/ui/context-menu';
 
-type Screen = 'main' | 'settings' | 'mods';
+// File-type tagging: derive tag from name (and isDir) for consistent icon + color
+export type FileTag = 'dir' | 'md' | 'txt' | 'js' | 'ts' | 'tsx' | 'json' | 'license' | 'default';
+
+export function getFileTag(name: string, isDir: boolean): FileTag {
+  if (isDir) return 'dir';
+  const lower = name.toLowerCase();
+  if (/^license(\.[a-z]+)?$/i.test(lower) || lower === 'copying') return 'license';
+  const ext = lower.includes('.') ? lower.slice(lower.lastIndexOf('.') + 1) : '';
+  switch (ext) {
+    case 'md': return 'md';
+    case 'txt': return 'txt';
+    case 'js': case 'mjs': case 'cjs': return 'js';
+    case 'ts': return 'ts';
+    case 'tsx': case 'jsx': return 'tsx';
+    case 'json': case 'jsonc': return 'json';
+    default: return 'default';
+  }
+}
+
+const FILE_TAG_STYLES: Record<FileTag, { color: string; Icon: React.ComponentType<{ className?: string; style?: React.CSSProperties }> }> = {
+  dir:    { color: '#9ca3af', Icon: Folder },
+  md:     { color: '#79c0ff', Icon: FileText },
+  txt:    { color: '#e6edf3', Icon: FileText },
+  js:     { color: '#7ee787', Icon: FileCode },
+  ts:     { color: '#79c0ff', Icon: FileCode },
+  tsx:    { color: '#79c0ff', Icon: FileCode },
+  json:   { color: '#f0d77e', Icon: FileCode },
+  license: { color: '#f472b6', Icon: Scale },
+  default: { color: '#e5e5e5', Icon: File },
+};
+
+// Flowers background (Unsplash, free to use) — static for mockup
+const FLOWERS_BG = 'https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=1920&q=80';
+
+// 1440p laptop: 2560×1440 logical pixels (mimics QHD high-DPI laptop screen)
+const MOCKUP_WIDTH = 2560;
+const MOCKUP_HEIGHT = 1440;
+const MOCKUP_PADDING = 128;
+const SCALE_MIN = 0.2;
+const SCALE_MAX = 2;
+const SCALE_STEP = 0.15;
+
+type TabKind = 'home' | 'list' | 'kanban' | 'calendar' | 'graph' | 'editor' | 'terminal' | 'agent' | 'planner' | 'chat' | 'assistant';
+type Tab = { id: string; kind: TabKind };
+
+const TAB_LABELS: Record<TabKind, string> = {
+  home: 'Home',
+  list: 'List',
+  kanban: 'Kanban',
+  calendar: 'Calendar',
+  graph: 'Graph',
+  editor: 'Editor',
+  terminal: 'Terminal',
+  agent: 'Agent',
+  planner: 'Planner',
+  chat: 'Chat',
+  assistant: 'Assistant',
+};
+
+function nextTabId() {
+  return `tab-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
+}
 
 export default function App() {
-  const [currentScreen, setCurrentScreen] = useState<Screen>('main');
+  const isNarrow = useIsNarrowViewport();
+  const basePath = import.meta.env?.BASE_URL ?? '/';
+  const [tabs, setTabs] = useState<Tab[]>([
+    { id: 'tab-home', kind: 'home' },
+  ]);
+  const [activeTabId, setActiveTabId] = useState<string>('tab-home');
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [leftSidebarOpen, setLeftSidebarOpen] = useState(!isNarrow);
+  const [rightSidebarOpen, setRightSidebarOpen] = useState(!isNarrow);
+  const [terminalOpen, setTerminalOpen] = useState(false);
+  const [bottomPanelHeight, setBottomPanelHeight] = useState(() => {
+    const stored = localStorage.getItem('mystic-bottom-panel-height');
+    return stored ? Number(stored) : 40;
+  });
+  const [scale, setScale] = useState(1);
+  const [activeWidgets, setActiveWidgets] = useState<string[]>(() => {
+    const stored = localStorage.getItem('mystic-active-widgets');
+    return stored ? JSON.parse(stored) : DEFAULT_WIDGETS;
+  });
 
-  const screens: Array<{ id: Screen; label: string }> = [
-    { id: 'main', label: 'Main Chat View' },
-    { id: 'settings', label: 'Settings & Config' },
-    { id: 'mods', label: 'Mods & Personas' },
-  ];
+  useEffect(() => {
+    localStorage.setItem('mystic-active-widgets', JSON.stringify(activeWidgets));
+  }, [activeWidgets]);
 
-  const currentIndex = screens.findIndex(s => s.id === currentScreen);
-
-  const goNext = () => {
-    if (currentIndex < screens.length - 1) {
-      setCurrentScreen(screens[currentIndex + 1].id);
-    }
+  const toggleWidget = (id: string) => {
+    setActiveWidgets(prev =>
+      prev.includes(id) ? prev.filter(w => w !== id) : [...prev, id]
+    );
   };
 
-  const goPrev = () => {
-    if (currentIndex > 0) {
-      setCurrentScreen(screens[currentIndex - 1].id);
-    }
+  const [homeScreenLocked, setHomeScreenLocked] = useState(() => {
+    return localStorage.getItem('mystic-home-locked') === 'true';
+  });
+
+  useEffect(() => {
+    localStorage.setItem('mystic-home-locked', String(homeScreenLocked));
+  }, [homeScreenLocked]);
+
+  const activeTab = tabs.find((t) => t.id === activeTabId) ?? tabs[0];
+
+  const addTab = (kind: TabKind) => {
+    const id = nextTabId();
+    setTabs((prev) => [...prev, { id, kind }]);
+    setActiveTabId(id);
   };
 
-  return (
-    <div className="min-h-screen bg-[#000000] text-white flex flex-col">
-      {/* Presentation Header */}
-      <div className="border-b border-[#1A1A1A] bg-[#0A0A0A] sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-8 py-6">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h1 className="text-2xl font-semibold mb-1">dotAi Desktop Chat Application</h1>
-              <p className="text-sm text-[#666666]">UX/UI Design Mockups & Wireframes</p>
-            </div>
-            <div className="flex items-center gap-3">
-              {screens.map((screen, idx) => (
-                <button
-                  key={screen.id}
-                  onClick={() => setCurrentScreen(screen.id)}
-                  className={`px-4 py-2 rounded-md text-sm transition-all ${
-                    currentScreen === screen.id
-                      ? 'bg-[#1A1A1A] text-white border border-[#333333]'
-                      : 'text-[#666666] hover:text-white border border-transparent'
-                  }`}
+  const closeTab = (id: string) => {
+    if (id === 'tab-home') return;
+    setTabs((prev) => {
+      const next = prev.filter((t) => t.id !== id);
+      if (activeTabId === id && next.length) {
+        const idx = Math.max(0, prev.findIndex((t) => t.id === id) - 1);
+        setActiveTabId(next[idx].id);
+      }
+      return next;
+    });
+  };
+
+  // Fit mockup to viewport on load and resize (desktop only; narrow uses full-width layout)
+  useEffect(() => {
+    if (isNarrow) return;
+    const updateScaleToFit = () => {
+      const s = Math.min(
+        (window.innerWidth - MOCKUP_PADDING) / MOCKUP_WIDTH,
+        (window.innerHeight - MOCKUP_PADDING) / MOCKUP_HEIGHT,
+        1
+      );
+      setScale(Math.max(SCALE_MIN, s));
+    };
+    updateScaleToFit();
+    window.addEventListener('resize', updateScaleToFit);
+    return () => window.removeEventListener('resize', updateScaleToFit);
+  }, [isNarrow]);
+
+  // Cmd/Ctrl +/- zoom the mockup (app), not the page — prevent browser zoom (desktop only)
+  useEffect(() => {
+    if (isNarrow) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (!e.metaKey && !e.ctrlKey) return;
+      const zoomIn = e.key === '=' || e.key === '+';
+      const zoomOut = e.key === '-';
+      if (!zoomIn && !zoomOut) return;
+      e.preventDefault();
+      setScale((s) => {
+        const next = zoomIn ? s + SCALE_STEP : s - SCALE_STEP;
+        return Math.max(SCALE_MIN, Math.min(SCALE_MAX, next));
+      });
+    };
+    window.addEventListener('keydown', onKeyDown, { capture: true });
+    return () => window.removeEventListener('keydown', onKeyDown, { capture: true });
+  }, [isNarrow]);
+
+  const tabBar = (
+    <>
+    <div className="flex items-center gap-2 border-b border-[#1A1A1A] bg-[#0A0A0A] px-2 py-1.5 shrink-0 min-h-[36px]">
+      {!isNarrow && (
+        <div className="flex items-center gap-1.5 shrink-0 pointer-events-none">
+          <div className="w-3 h-3 rounded-full bg-[#FF5F57]" />
+          <div className="w-3 h-3 rounded-full bg-[#FEBC2E]" />
+          <div className="w-3 h-3 rounded-full bg-[#28C840]" />
+        </div>
+      )}
+      <div className="flex items-center gap-0.5 flex-1 min-w-0 overflow-x-auto scrollbar-hide">
+        {tabs.map((tab) => {
+          const isHome = tab.kind === 'home';
+          const tabClasses = `px-3 py-2 rounded-t text-sm font-mono flex items-center gap-1.5 shrink-0 ${activeTabId === tab.id ? (isHome ? 'bg-[#0a0a0a] text-[#E5E5E5] border border-transparent hover:border-[#1A1A1A] hover:border-b-transparent -mb-px' : 'bg-[#0a0a0a] text-[#E5E5E5] border border-[#1A1A1A] border-b-transparent -mb-px') : 'text-[#666666] hover:text-[#E5E5E5]'}`;
+
+          if (isHome) {
+            return (
+              <ContextMenu key={tab.id}>
+                <ContextMenuTrigger asChild>
+                  <button
+                    onClick={() => setActiveTabId(tab.id)}
+                    className={tabClasses}
+                  >
+                    <img src={`${basePath}brand/pixel-icon-64.png`} alt="Mystic" width={14} height={14} style={{ imageRendering: 'pixelated' }} />
+                  </button>
+                </ContextMenuTrigger>
+                <ContextMenuContent className="min-w-[10rem] bg-[#161b22] border-[#30363d] text-[#e6edf3] p-1 rounded-md shadow-lg">
+                  <ContextMenuItem className="focus:bg-[#30363d] focus:text-[#e6edf3] cursor-pointer rounded px-2 py-1.5 text-sm font-mono flex items-center gap-2">
+                    <Settings className="w-4 h-4" /> Config
+                  </ContextMenuItem>
+                  <ContextMenuItem className="focus:bg-[#30363d] focus:text-[#e6edf3] cursor-pointer rounded px-2 py-1.5 text-sm font-mono flex items-center gap-2">
+                    <Wrench className="w-4 h-4" /> Gizmos
+                  </ContextMenuItem>
+                  <ContextMenuSub>
+                    <ContextMenuSubTrigger className={`focus:bg-[#30363d] focus:text-[#e6edf3] rounded px-2 py-1.5 text-sm font-mono flex items-center gap-2 ${homeScreenLocked ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}>
+                      <Layers className="w-4 h-4" /> Widgets {homeScreenLocked && <Lock className="w-3 h-3 text-[#A1A1AA]" />}
+                    </ContextMenuSubTrigger>
+                    <ContextMenuSubContent className="min-w-[11rem] bg-[#161b22] border-[#30363d] text-[#e6edf3] p-1 rounded-md shadow-lg">
+                      {homeScreenLocked && (
+                        <div className="px-2 py-1.5 text-xs text-[#A1A1AA] font-mono flex items-center gap-1.5">
+                          <Lock className="w-3 h-3" /> Home screen locked
+                        </div>
+                      )}
+                      {WIDGET_REGISTRY.map(w => (
+                        <ContextMenuCheckboxItem
+                          key={w.id}
+                          checked={activeWidgets.includes(w.id)}
+                          disabled={homeScreenLocked}
+                          onCheckedChange={() => { if (!homeScreenLocked) toggleWidget(w.id); }}
+                          className={`focus:bg-[#30363d] focus:text-[#e6edf3] rounded px-2 py-1.5 text-sm font-mono ${homeScreenLocked ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                        >
+                          {w.label}
+                        </ContextMenuCheckboxItem>
+                      ))}
+                    </ContextMenuSubContent>
+                  </ContextMenuSub>
+                  <ContextMenuItem className="focus:bg-[#30363d] focus:text-[#e6edf3] cursor-pointer rounded px-2 py-1.5 text-sm font-mono flex items-center gap-2">
+                    <User className="w-4 h-4" /> User
+                  </ContextMenuItem>
+                  <ContextMenuSeparator className="my-1 h-px bg-[#30363d]" />
+                  <ContextMenuItem
+                    className="focus:bg-[#30363d] focus:text-[#e6edf3] cursor-pointer rounded px-2 py-1.5 text-sm font-mono flex items-center gap-2"
+                    onSelect={() => setHomeScreenLocked(prev => !prev)}
+                  >
+                    {homeScreenLocked ? <LockOpen className="w-4 h-4" /> : <Lock className="w-4 h-4" />}
+                    {homeScreenLocked ? 'Unlock Home Screen' : 'Lock Home Screen'}
+                  </ContextMenuItem>
+                  <ContextMenuSeparator className="my-1 h-px bg-[#30363d]" />
+                  <ContextMenuItem className="focus:bg-[#30363d] focus:text-[#e6edf3] cursor-pointer rounded px-2 py-1.5 text-sm font-mono flex items-center gap-2 text-[#E8728A]">
+                    <LogOut className="w-4 h-4" /> Log Out
+                  </ContextMenuItem>
+                </ContextMenuContent>
+              </ContextMenu>
+            );
+          }
+
+          return (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTabId(tab.id)}
+              className={tabClasses}
+            >
+              {TAB_LABELS[tab.kind]}
+              {tabs.length > 1 && (
+                <span
+                  className="opacity-70 hover:opacity-100 rounded p-0.5 hover:bg-[#333]"
+                  onClick={(e) => { e.stopPropagation(); closeTab(tab.id); }}
+                  aria-label="Close tab"
                 >
-                  {idx + 1}. {screen.label}
-                </button>
-              ))}
-            </div>
-          </div>
-          
-          {/* Progress Indicator */}
-          <div className="flex gap-2">
-            {screens.map((screen, idx) => (
-              <div
-                key={screen.id}
-                className="flex-1 h-0.5 rounded-full overflow-hidden bg-[#1A1A1A]"
-              >
-                <motion.div
-                  className="h-full bg-[#0EA5E9]"
-                  initial={{ width: '0%' }}
-                  animate={{ width: currentScreen === screen.id ? '100%' : '0%' }}
-                  transition={{ duration: 0.3 }}
-                />
-              </div>
-            ))}
-          </div>
+                  <X className="w-3 h-3" />
+                </span>
+              )}
+            </button>
+          );
+        })}
+        <ContextMenu>
+          <ContextMenuTrigger asChild>
+            <button
+              type="button"
+              className="p-2 rounded-t text-sm font-mono text-[#666666] hover:text-[#E5E5E5] hover:bg-[#1A1A1A] shrink-0"
+              title="New tab (right-click for menu)"
+              aria-label="New tab"
+              onClick={() => addTab('editor')}
+              onTouchStart={(e) => {
+                const timer = setTimeout(() => {
+                  e.currentTarget.dataset.longPress = 'true';
+                  e.currentTarget.dispatchEvent(new MouseEvent('contextmenu', { bubbles: true }));
+                }, 500);
+                e.currentTarget.dataset.longPressTimer = String(timer);
+              }}
+              onTouchEnd={(e) => {
+                clearTimeout(Number(e.currentTarget.dataset.longPressTimer));
+                if (e.currentTarget.dataset.longPress === 'true') {
+                  e.preventDefault();
+                  e.currentTarget.dataset.longPress = '';
+                }
+              }}
+            >
+              <Plus className="w-4 h-4" />
+            </button>
+          </ContextMenuTrigger>
+          <ContextMenuContent
+            alignOffset={4}
+            className="min-w-[11rem] bg-[#161b22] border-[#30363d] text-[#e6edf3] p-1 rounded-md shadow-lg"
+          >
+            <ContextMenuItem className="focus:bg-[#30363d] focus:text-[#e6edf3] cursor-pointer rounded px-2 py-1.5 text-sm font-mono flex items-center gap-2" onSelect={() => addTab('home')}>
+              <Home className="w-4 h-4" /> Home
+            </ContextMenuItem>
+            <ContextMenuItem className="focus:bg-[#30363d] focus:text-[#e6edf3] cursor-pointer rounded px-2 py-1.5 text-sm font-mono flex items-center gap-2" onSelect={() => addTab('list')}>
+              <LayoutList className="w-4 h-4" /> List
+            </ContextMenuItem>
+            <ContextMenuItem className="focus:bg-[#30363d] focus:text-[#e6edf3] cursor-pointer rounded px-2 py-1.5 text-sm font-mono flex items-center gap-2" onSelect={() => addTab('kanban')}>
+              <Columns3 className="w-4 h-4" /> Kanban
+            </ContextMenuItem>
+            <ContextMenuItem className="focus:bg-[#30363d] focus:text-[#e6edf3] cursor-pointer rounded px-2 py-1.5 text-sm font-mono flex items-center gap-2" onSelect={() => addTab('calendar')}>
+              <Calendar className="w-4 h-4" /> Calendar
+            </ContextMenuItem>
+            <ContextMenuItem className="focus:bg-[#30363d] focus:text-[#e6edf3] cursor-pointer rounded px-2 py-1.5 text-sm font-mono flex items-center gap-2" onSelect={() => addTab('graph')}>
+              <Network className="w-4 h-4" /> Graph
+            </ContextMenuItem>
+            <ContextMenuItem className="focus:bg-[#30363d] focus:text-[#e6edf3] cursor-pointer rounded px-2 py-1.5 text-sm font-mono flex items-center gap-2" onSelect={() => addTab('editor')}>
+              <FileCode className="w-4 h-4" /> Editor
+            </ContextMenuItem>
+            <ContextMenuItem className="focus:bg-[#30363d] focus:text-[#e6edf3] cursor-pointer rounded px-2 py-1.5 text-sm font-mono flex items-center gap-2" onSelect={() => addTab('terminal')}>
+              <Terminal className="w-4 h-4" /> Terminal
+            </ContextMenuItem>
+            <ContextMenuItem className="focus:bg-[#30363d] focus:text-[#e6edf3] cursor-pointer rounded px-2 py-1.5 text-sm font-mono flex items-center gap-2" onSelect={() => addTab('agent')}>
+              <Bot className="w-4 h-4" /> Agent
+            </ContextMenuItem>
+            <ContextMenuItem className="focus:bg-[#30363d] focus:text-[#e6edf3] cursor-pointer rounded px-2 py-1.5 text-sm font-mono flex items-center gap-2" onSelect={() => addTab('planner')}>
+              <LayoutList className="w-4 h-4" /> Planner
+            </ContextMenuItem>
+            <ContextMenuItem className="focus:bg-[#30363d] focus:text-[#e6edf3] cursor-pointer rounded px-2 py-1.5 text-sm font-mono flex items-center gap-2" onSelect={() => addTab('chat')}>
+              <MessageCircle className="w-4 h-4" /> Chat
+            </ContextMenuItem>
+            <ContextMenuItem className="focus:bg-[#30363d] focus:text-[#e6edf3] cursor-pointer rounded px-2 py-1.5 text-sm font-mono flex items-center gap-2" onSelect={() => addTab('assistant')}>
+              <Zap className="w-4 h-4" /> Assistant
+            </ContextMenuItem>
+          </ContextMenuContent>
+        </ContextMenu>
+      </div>
+      <div className="flex items-center gap-0.5 shrink-0 text-[#666666]">
+        <button onClick={() => setLeftSidebarOpen(!leftSidebarOpen)} className={`p-1.5 rounded ${leftSidebarOpen ? 'bg-[#E5E5E5]/10 text-[#E5E5E5]' : 'hover:bg-[#1A1A1A] hover:text-[#E5E5E5]'}`} title="Toggle left sidebar"><PanelLeft className="w-3.5 h-3.5" /></button>
+        <button onClick={() => setTerminalOpen(!terminalOpen)} className={`p-1.5 rounded ${terminalOpen ? 'bg-[#E5E5E5]/10 text-[#E5E5E5]' : 'hover:bg-[#1A1A1A] hover:text-[#E5E5E5]'}`} title="Toggle bottom panel"><PanelBottom className="w-3.5 h-3.5" /></button>
+        <button onClick={() => setRightSidebarOpen(!rightSidebarOpen)} className={`p-1.5 rounded ${rightSidebarOpen ? 'bg-[#E5E5E5]/10 text-[#E5E5E5]' : 'hover:bg-[#1A1A1A] hover:text-[#E5E5E5]'}`} title="Toggle right sidebar"><PanelRight className="w-3.5 h-3.5" /></button>
+      </div>
+    </div>
+    <div className="flex items-center border-b border-[#1A1A1A] bg-[#111113] px-3 py-1 shrink-0">
+      <span className="text-xs font-mono text-[#A1A1AA]">noob mode</span>
+    </div>
+    </>
+  );
+
+  const paneContent = (
+    <>
+      {activeTab.kind === 'home' && (
+        <MainChatView
+          narrow={isNarrow}
+          sidebarOpen={sidebarOpen}
+          setSidebarOpen={setSidebarOpen}
+          leftSidebarOpen={leftSidebarOpen}
+          setLeftSidebarOpen={setLeftSidebarOpen}
+          rightSidebarOpen={rightSidebarOpen}
+          setRightSidebarOpen={setRightSidebarOpen}
+          terminalOpen={terminalOpen}
+          setTerminalOpen={setTerminalOpen}
+          bottomPanelHeight={bottomPanelHeight}
+          setBottomPanelHeight={setBottomPanelHeight}
+          activeWidgets={activeWidgets}
+          homeScreenLocked={homeScreenLocked}
+          onOpenSettings={() => {}}        />
+      )}
+      {activeTab.kind === 'editor' && <EditorPaneMock />}
+      {activeTab.kind === 'list' && <ListPaneMock />}
+      {activeTab.kind === 'kanban' && <KanbanPaneMock />}
+      {activeTab.kind === 'calendar' && <CalendarPaneMock />}
+      {activeTab.kind === 'graph' && <GraphPaneMock />}
+      {activeTab.kind === 'terminal' && <TerminalPaneMock />}
+      {activeTab.kind === 'agent' && <AgentPaneMock />}
+      {activeTab.kind === 'planner' && <PlannerPaneMock />}
+      {activeTab.kind === 'chat' && <ChatPaneMock />}
+      {activeTab.kind === 'assistant' && <AssistantPaneMock />}
+    </>
+  );
+
+  // Narrow viewport: full-width responsive layout (no scaled mockup)
+  if (isNarrow) {
+    return (
+      <div className="min-h-screen h-dvh overflow-hidden relative flex flex-col bg-black">
+        {activeTab.kind === 'home' && (
+          <div
+            className="absolute inset-0 bg-cover bg-center pointer-events-none"
+            style={{
+              backgroundImage: `url(${FLOWERS_BG})`,
+              filter: 'blur(4px) saturate(1.2) contrast(0.95) brightness(0.5)',
+            }}
+          />
+        )}
+        <div className="relative z-10 flex flex-col flex-1 min-h-0 min-w-0 bg-[#0a0a0a]/95 rounded-t-xl overflow-hidden shadow-2xl">
+          {tabBar}
+          <div className="flex-1 min-h-0 min-w-0 overflow-hidden flex flex-col">{paneContent}</div>
         </div>
       </div>
+    );
+  }
 
-      {/* Main Content */}
-      <div className="flex-1 flex items-center justify-center p-8">
-        <div className="w-full max-w-7xl">
-          <AnimatePresence mode="wait">
-            {currentScreen === 'main' && (
-              <motion.div
-                key="main"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.4 }}
-              >
-                <MainChatView sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
-              </motion.div>
-            )}
-            
-            {currentScreen === 'settings' && (
-              <motion.div
-                key="settings"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.4 }}
-              >
-                <SettingsView />
-              </motion.div>
-            )}
-            
-            {currentScreen === 'mods' && (
-              <motion.div
-                key="mods"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.4 }}
-              >
-                <ModsView />
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
+  // Desktop: floating scaled mockup window
+  return (
+    <div className="min-h-screen overflow-hidden relative">
+      <div className="absolute inset-0 overflow-hidden bg-black">
+        {activeTab.kind === 'home' && (
+          <div
+            className="absolute inset-0 bg-cover bg-center"
+            style={{
+              backgroundImage: `url(${FLOWERS_BG})`,
+              filter: 'blur(4px) saturate(1.2) contrast(0.95) brightness(0.7)',
+            }}
+          />
+        )}
       </div>
-
-      {/* Navigation Controls */}
-      <div className="border-t border-[#1A1A1A] bg-[#0A0A0A] p-6">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <button
-            onClick={goPrev}
-            disabled={currentIndex === 0}
-            className="flex items-center gap-2 px-4 py-2 rounded-md bg-[#1A1A1A] hover:bg-[#222222] disabled:opacity-30 disabled:cursor-not-allowed transition-all border border-[#333333]"
+      <div className="absolute inset-0 flex items-center justify-center p-4 sm:p-6">
+        <div
+          className="origin-center"
+          style={{
+            width: MOCKUP_WIDTH,
+            height: MOCKUP_HEIGHT,
+            minWidth: MOCKUP_WIDTH,
+            minHeight: MOCKUP_HEIGHT,
+            flex: '0 0 auto',
+            transform: `scale(${scale})`,
+          }}
+        >
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="rounded-xl overflow-hidden shadow-2xl border border-[#333333]/80 bg-[#0a0a0a] flex flex-col"
+            style={{ width: MOCKUP_WIDTH, height: MOCKUP_HEIGHT }}
           >
-            <ChevronLeft className="w-4 h-4" />
-            <span className="text-sm">Previous</span>
-          </button>
-          
-          <div className="text-sm text-[#666666]">
-            {currentIndex + 1} of {screens.length}
-          </div>
-          
-          <button
-            onClick={goNext}
-            disabled={currentIndex === screens.length - 1}
-            className="flex items-center gap-2 px-4 py-2 rounded-md bg-[#1A1A1A] hover:bg-[#222222] disabled:opacity-30 disabled:cursor-not-allowed transition-all border border-[#333333]"
-          >
-            <span className="text-sm">Next</span>
-            <ChevronRight className="w-4 h-4" />
-          </button>
+            {tabBar}
+            <div className="flex-1 min-h-0 overflow-hidden">{paneContent}</div>
+          </motion.div>
         </div>
       </div>
     </div>
   );
 }
 
-function MainChatView({ sidebarOpen, setSidebarOpen }: { sidebarOpen: boolean; setSidebarOpen: (open: boolean) => void }) {
+// Project management mock data
+const MOCK_TASKS = [
+  { id: '1', title: 'Implement auth flow', status: 'in_progress' as const, assignee: 'Dev', due: 'Mar 14' },
+  { id: '2', title: 'API rate limiting', status: 'todo' as const, assignee: 'Backend', due: 'Mar 18' },
+  { id: '3', title: 'Dashboard redesign', status: 'done' as const, assignee: 'Design', due: 'Mar 10' },
+  { id: '4', title: 'E2E tests for checkout', status: 'in_progress' as const, assignee: 'QA', due: 'Mar 16' },
+  { id: '5', title: 'Document API v2', status: 'todo' as const, assignee: 'Dev', due: 'Mar 20' },
+  { id: '6', title: 'Fix mobile nav', status: 'todo' as const, assignee: 'Frontend', due: 'Mar 15' },
+];
+const MOCK_CALENDAR_EVENTS = [
+  { id: 'c1', title: 'Sprint planning', date: 'Mar 12', time: '10:00' },
+  { id: 'c2', title: 'API review', date: 'Mar 12', time: '14:00' },
+  { id: 'c3', title: 'Release cut-off', date: 'Mar 15', time: '17:00' },
+  { id: 'c4', title: 'Retro', date: 'Mar 16', time: '11:00' },
+];
+
+
+// Mock thread graph structures (nodes = messages/turns, links = reply flow) for 3D view
+const MOCK_THREAD_GRAPHS: Record<string, { nodes: ThreadNode[]; links: ThreadLink[] }> = {
+  general: {
+    nodes: [
+      { id: '1', name: 'User: Can you draft a jj commit?', role: 'user' },
+      { id: '2', name: 'Mystic: Here is the commit...', role: 'assistant' },
+      { id: '3', name: 'User: Add docs to scope', role: 'user' },
+      { id: '4', name: 'Mystic: Updated commit...', role: 'assistant' },
+      { id: '5', name: 'User: Confirm', role: 'user' },
+      { id: '6', name: 'System: Commit created', role: 'system' },
+    ],
+    links: [
+      { source: '1', target: '2' },
+      { source: '2', target: '3' },
+      { source: '3', target: '4' },
+      { source: '4', target: '5' },
+      { source: '5', target: '6' },
+    ],
+  },
+  'MVP PRD': {
+    nodes: [
+      { id: 'a', name: 'User: Outline MVP PRD', role: 'user' },
+      { id: 'b', name: 'Mystic: PRD structure...', role: 'assistant' },
+      { id: 'c', name: 'User: Add auth section', role: 'user' },
+      { id: 'd', name: 'Mystic: Auth requirements...', role: 'assistant' },
+      { id: 'e', name: 'User: LGTM', role: 'user' },
+    ],
+    links: [
+      { source: 'a', target: 'b' },
+      { source: 'b', target: 'c' },
+      { source: 'c', target: 'd' },
+      { source: 'd', target: 'e' },
+    ],
+  },
+  docs: {
+    nodes: [
+      { id: 'x', name: 'User: Generate docs', role: 'user' },
+      { id: 'y', name: 'Mystic: Documentation plan...', role: 'assistant' },
+      { id: 'z', name: 'User: Add API section', role: 'user' },
+    ],
+    links: [
+      { source: 'x', target: 'y' },
+      { source: 'y', target: 'z' },
+    ],
+  },
+};
+
+type GraphFilterRole = 'all' | 'user' | 'assistant' | 'system';
+
+function GraphView({
+  selectedThreadId,
+  threadGraphData,
+}: {
+  selectedThreadId: string;
+  threadGraphData: { nodes: ThreadNode[]; links: ThreadLink[] };
+  threadIds: string[];
+}) {
+  const graphRef = useRef<{ zoom: (level: number, ms: number) => void; zoomToFit: (ms: number, padding: number) => void } | null>(null);
+  const [graphBg, setGraphBg] = useState<'white' | 'black'>('black');
+  const [graphFilterRole, setGraphFilterRole] = useState<GraphFilterRole>('all');
+  const [filterMenuOpen, setFilterMenuOpen] = useState(false);
+
+  const { nodes, links } = useMemo(() => {
+    if (graphFilterRole === 'all') return threadGraphData;
+    const visibleIds = new Set(
+      threadGraphData.nodes.filter((n) => n.role === graphFilterRole).map((n) => n.id)
+    );
+    const filteredNodes = threadGraphData.nodes.filter((n) => visibleIds.has(n.id));
+    const filteredLinks = threadGraphData.links.filter(
+      (l) => visibleIds.has(String(l.source)) && visibleIds.has(String(l.target))
+    );
+    return { nodes: filteredNodes, links: filteredLinks };
+  }, [threadGraphData, graphFilterRole]);
+
+  const backgroundColor = graphBg === 'white' ? '#f6f8fa' : '#0d1117';
+
+  return (
+    <div className="flex flex-col h-full min-h-0 p-4 gap-3">
+      <div className="flex items-center gap-2 flex-wrap shrink-0">
+        <span className="text-[10px] font-mono text-[#8b949e] mr-2">Thread: #{selectedThreadId}</span>
+        <div className="flex items-center gap-1 border border-[#30363d] rounded overflow-hidden bg-[#161b22]">
+          <button
+            type="button"
+            onClick={() => graphRef.current?.zoom(1.5, 200)}
+            className="p-1.5 text-[#e6edf3] hover:bg-[#30363d] transition-colors"
+            title="Zoom in"
+          >
+            <ZoomIn className="w-3.5 h-3.5" />
+          </button>
+          <button
+            type="button"
+            onClick={() => graphRef.current?.zoom(0.66, 200)}
+            className="p-1.5 text-[#e6edf3] hover:bg-[#30363d] transition-colors"
+            title="Zoom out"
+          >
+            <ZoomOut className="w-3.5 h-3.5" />
+          </button>
+          <button
+            type="button"
+            onClick={() => graphRef.current?.zoomToFit(400, 50)}
+            className="p-1.5 text-[#e6edf3] hover:bg-[#30363d] transition-colors"
+            title="Reset view / fit"
+          >
+            <RotateCcw className="w-3.5 h-3.5" />
+          </button>
+        </div>
+        <div className="flex items-center gap-1 border border-[#30363d] rounded overflow-hidden bg-[#161b22]">
+          <button
+            type="button"
+            onClick={() => setGraphBg('white')}
+            className={`px-2 py-1.5 text-xs font-mono transition-colors ${graphBg === 'white' ? 'bg-[#e6edf3] text-[#0d1117]' : 'text-[#8b949e] hover:bg-[#30363d]'}`}
+            title="White background"
+          >
+            White
+          </button>
+          <button
+            type="button"
+            onClick={() => setGraphBg('black')}
+            className={`px-2 py-1.5 text-xs font-mono transition-colors ${graphBg === 'black' ? 'bg-[#30363d] text-[#e6edf3]' : 'text-[#8b949e] hover:bg-[#30363d]'}`}
+            title="Black background"
+          >
+            Black
+          </button>
+        </div>
+        <div className="relative">
+          <button
+            type="button"
+            onClick={() => setFilterMenuOpen((o) => !o)}
+            className="flex items-center gap-1.5 px-2 py-1.5 border border-[#30363d] rounded bg-[#161b22] text-[#e6edf3] hover:bg-[#30363d] transition-colors text-xs font-mono"
+            title="Filter by role"
+          >
+            <Filter className="w-3.5 h-3.5" />
+            Filter: {graphFilterRole === 'all' ? 'All' : graphFilterRole}
+          </button>
+          {filterMenuOpen && (
+            <>
+              <div className="fixed inset-0 z-10" aria-hidden onClick={() => setFilterMenuOpen(false)} />
+              <div className="absolute left-0 top-full mt-1 py-1 min-w-[120px] border border-[#30363d] rounded bg-[#161b22] shadow-lg z-20">
+                {(['all', 'user', 'assistant', 'system'] as const).map((role) => (
+                  <button
+                    key={role}
+                    type="button"
+                    onClick={() => {
+                      setGraphFilterRole(role);
+                      setFilterMenuOpen(false);
+                    }}
+                    className={`w-full text-left px-3 py-1.5 text-xs font-mono capitalize ${graphFilterRole === role ? 'bg-[#30363d] text-[#e6edf3]' : 'text-[#8b949e] hover:bg-[#30363d] hover:text-[#e6edf3]'}`}
+                  >
+                    {role}
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+      <div className="flex-1 min-h-[280px] flex items-center justify-center rounded border border-[#30363d] overflow-hidden">
+        <ThreadGraph3D
+          ref={graphRef}
+          nodes={nodes}
+          links={links}
+          width={620}
+          height={360}
+          backgroundColor={backgroundColor}
+        />
+      </div>
+      <div className="flex items-center gap-4 text-[10px] font-mono text-[#8b949e] shrink-0">
+        <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[#5EC4AB] inline-block" /> user</span>
+        <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[#D4A843] inline-block" /> assistant</span>
+        <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[#A78BDB] inline-block" /> system</span>
+      </div>
+    </div>
+  );
+}
+
+function MainChatView(
+  { narrow = false, sidebarOpen, setSidebarOpen, leftSidebarOpen, setLeftSidebarOpen, rightSidebarOpen, setRightSidebarOpen, terminalOpen, setTerminalOpen, bottomPanelHeight, setBottomPanelHeight, activeWidgets, homeScreenLocked, onOpenSettings }: { narrow?: boolean; sidebarOpen: boolean; setSidebarOpen: (open: boolean) => void; leftSidebarOpen: boolean; setLeftSidebarOpen: (open: boolean) => void; rightSidebarOpen: boolean; setRightSidebarOpen: (open: boolean) => void; terminalOpen: boolean; setTerminalOpen: (open: boolean) => void; bottomPanelHeight: number; setBottomPanelHeight: (h: number) => void; activeWidgets: string[]; homeScreenLocked: boolean; onOpenSettings: () => void }
+) {
   const [activeSidebarTab, setActiveSidebarTab] = useState<'files' | 'search' | 'git' | 'extensions'>('files');
+  const [selectedThreadId, setSelectedThreadId] = useState<string>('general');
   const [expandedFolders, setExpandedFolders] = useState<string[]>(['Orchestration']);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const lastPanelHeightRef = useRef<number>(bottomPanelHeight);
+
+  const PANEL_MAX = 95;
+
+  const toggleMaximizePanel = () => {
+    if (bottomPanelHeight >= PANEL_MAX - 1) {
+      setBottomPanelHeight(lastPanelHeightRef.current);
+    } else {
+      lastPanelHeightRef.current = bottomPanelHeight;
+      setBottomPanelHeight(PANEL_MAX);
+    }
+  };
+
+  const startResize = (e: React.MouseEvent | React.TouchEvent) => {
+    e.preventDefault();
+    const container = containerRef.current;
+    if (!container) return;
+    const containerRect = container.getBoundingClientRect();
+    const getY = (ev: MouseEvent | TouchEvent) =>
+      'touches' in ev ? ev.touches[0].clientY : (ev as MouseEvent).clientY;
+    const startY = 'touches' in e.nativeEvent ? e.nativeEvent.touches[0].clientY : (e.nativeEvent as MouseEvent).clientY;
+    const startHeight = bottomPanelHeight;
+
+    const onMove = (ev: MouseEvent | TouchEvent) => {
+      const dy = startY - getY(ev);
+      const containerH = containerRect.height;
+      const newPct = Math.min(80, Math.max(10, startHeight + (dy / containerH) * 100));
+      setBottomPanelHeight(newPct);
+    };
+
+    const onUp = () => {
+      document.removeEventListener('mousemove', onMove);
+      document.removeEventListener('mouseup', onUp);
+      document.removeEventListener('touchmove', onMove);
+      document.removeEventListener('touchend', onUp);
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    };
+
+    document.body.style.cursor = 'row-resize';
+    document.body.style.userSelect = 'none';
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onUp);
+    document.addEventListener('touchmove', onMove, { passive: false });
+    document.addEventListener('touchend', onUp);
+  };
+
+  useEffect(() => {
+    localStorage.setItem('mystic-bottom-panel-height', String(bottomPanelHeight));
+  }, [bottomPanelHeight]);
+
+  const threadGraphData = MOCK_THREAD_GRAPHS[selectedThreadId] ?? MOCK_THREAD_GRAPHS.general;
 
   const toggleFolder = (folder: string) => {
     setExpandedFolders(prev =>
@@ -157,468 +697,603 @@ function MainChatView({ sidebarOpen, setSidebarOpen }: { sidebarOpen: boolean; s
     );
   };
 
-  return (
-    <div className="bg-[#000000] rounded-xl overflow-hidden shadow-2xl border border-[#1A1A1A]">
-      {/* Window Chrome */}
-      <div className="bg-[#0A0A0A] border-b border-[#1A1A1A] px-4 py-3 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <div className="flex gap-1.5">
-            <div className="w-3 h-3 rounded-full bg-[#FF5F57]" />
-            <div className="w-3 h-3 rounded-full bg-[#FEBC2E]" />
-            <div className="w-3 h-3 rounded-full bg-[#28C840]" />
-          </div>
-        </div>
-        <div className="text-xs text-[#666666] font-mono">dotAi — Local Desktop Chat</div>
-        <div className="w-12" />
+  const leftSidebarContent = (
+    <div className="w-[260px] h-full flex flex-col min-w-0">
+      <div className="flex items-center justify-between gap-2 p-2 border-b border-[#1A1A1A] bg-[#0A0A0A] shrink-0">
+        <span className="text-xs font-mono text-[#666666] uppercase tracking-wide">Explorer</span>
+        <button onClick={() => setLeftSidebarOpen(false)} className="p-1.5 rounded text-[#666666] hover:bg-[#1A1A1A] hover:text-[#E5E5E5]" title="Hide sidebar">
+          <PanelLeft className="w-4 h-4" />
+        </button>
       </div>
-
-      {/* Main Content Area */}
-      <div className="flex h-[600px]">
-        {/* Left Icon Bar */}
-        <motion.div
-          initial={false}
-          animate={{ width: sidebarOpen ? 48 : 0 }}
-          className="bg-[#0A0A0A] border-r border-[#1A1A1A] overflow-hidden flex flex-col items-center py-4"
-        >
-          <div className="w-12 space-y-2">
+      <div className="flex items-center gap-0.5 px-2 py-1 border-b border-[#1A1A1A] bg-[#0A0A0A]/50">
+        <button onClick={() => setActiveSidebarTab('files')} className={`p-2 rounded transition-colors ${activeSidebarTab === 'files' ? 'bg-[#E5E5E5]/10 text-[#E5E5E5]' : 'text-[#666666] hover:text-[#E5E5E5]'}`} title="Files"><Folder className="w-4 h-4" /></button>
+        <button onClick={() => setActiveSidebarTab('search')} className={`p-2 rounded transition-colors ${activeSidebarTab === 'search' ? 'bg-[#E5E5E5]/10 text-[#E5E5E5]' : 'text-[#666666] hover:text-[#E5E5E5]'}`} title="Search"><Search className="w-4 h-4" /></button>
+        <button onClick={() => setActiveSidebarTab('git')} className={`p-2 rounded transition-colors ${activeSidebarTab === 'git' ? 'bg-[#E5E5E5]/10 text-[#E5E5E5]' : 'text-[#666666] hover:text-[#E5E5E5]'}`} title="Source Control"><GitBranch className="w-4 h-4" /></button>
+        <button onClick={() => setActiveSidebarTab('extensions')} className={`p-2 rounded transition-colors ${activeSidebarTab === 'extensions' ? 'bg-[#E5E5E5]/10 text-[#E5E5E5]' : 'text-[#666666] hover:text-[#E5E5E5]'}`} title="Extensions"><Puzzle className="w-4 h-4" /></button>
+      </div>
+      <div className="flex-1 overflow-y-auto p-2">
+      {activeSidebarTab === 'files' && (
+        <div className="space-y-0.5">
+          <div>
             <button
-              onClick={() => setActiveSidebarTab('files')}
-              className={`w-full aspect-square flex items-center justify-center rounded transition-colors ${
-                activeSidebarTab === 'files' ? 'bg-[#E5E5E5]/10 text-[#E5E5E5]' : 'text-[#666666] hover:text-[#E5E5E5]'
-              }`}
-              title="Explorer"
+              onClick={() => toggleFolder('Orchestration')}
+              className="w-full flex items-center gap-1 px-2 py-1 hover:bg-[#1A1A1A] rounded text-sm transition-colors"
             >
-              <Files className="w-5 h-5" />
+              <ChevronRightIcon className={`w-3 h-3 transition-transform ${expandedFolders.includes('Orchestration') ? 'rotate-90' : ''}`} />
+              {(() => {
+                const { color, Icon } = FILE_TAG_STYLES.dir;
+                return <Icon className="w-4 h-4 shrink-0" style={{ color }} />;
+              })()}
+              <span style={{ color: FILE_TAG_STYLES.dir.color }}>Orchestration</span>
             </button>
-            <button
-              onClick={() => setActiveSidebarTab('search')}
-              className={`w-full aspect-square flex items-center justify-center rounded transition-colors ${
-                activeSidebarTab === 'search' ? 'bg-[#E5E5E5]/10 text-[#E5E5E5]' : 'text-[#666666] hover:text-[#E5E5E5]'
-              }`}
-              title="Search"
-            >
-              <Search className="w-5 h-5" />
-            </button>
-            <button
-              onClick={() => setActiveSidebarTab('git')}
-              className={`w-full aspect-square flex items-center justify-center rounded transition-colors ${
-                activeSidebarTab === 'git' ? 'bg-[#E5E5E5]/10 text-[#E5E5E5]' : 'text-[#666666] hover:text-[#E5E5E5]'
-              }`}
-              title="Source Control"
-            >
-              <GitBranch className="w-5 h-5" />
-            </button>
-            <button
-              onClick={() => setActiveSidebarTab('extensions')}
-              className={`w-full aspect-square flex items-center justify-center rounded transition-colors ${
-                activeSidebarTab === 'extensions' ? 'bg-[#E5E5E5]/10 text-[#E5E5E5]' : 'text-[#666666] hover:text-[#E5E5E5]'
-              }`}
-              title="Extensions"
-            >
-              <Puzzle className="w-5 h-5" />
-            </button>
-          </div>
-        </motion.div>
-
-        {/* Left Sidebar Content */}
-        <motion.div
-          initial={false}
-          animate={{ width: sidebarOpen ? 280 : 0 }}
-          className="bg-[#000000] border-r border-[#1A1A1A] overflow-hidden"
-        >
-          <div className="w-[280px] h-full flex flex-col">
-            {/* Sidebar Header */}
-            <div className="px-4 py-3 border-b border-[#1A1A1A]">
-              <div className="text-xs uppercase tracking-wide text-[#666666] font-mono">
-                {activeSidebarTab === 'files' && 'Explorer'}
-                {activeSidebarTab === 'search' && 'Search'}
-                {activeSidebarTab === 'git' && 'Source Control'}
-                {activeSidebarTab === 'extensions' && 'Extensions'}
-              </div>
-            </div>
-
-            {/* Sidebar Content */}
-            <div className="flex-1 overflow-y-auto p-2">
-              {activeSidebarTab === 'files' && (
-                <div className="space-y-0.5">
-                  <div>
-                    <button
-                      onClick={() => toggleFolder('Orchestration')}
-                      className="w-full flex items-center gap-1 px-2 py-1 hover:bg-[#1A1A1A] rounded text-sm transition-colors"
+            {expandedFolders.includes('Orchestration') && (
+              <div className="ml-4 space-y-0.5">
+                {[
+                  { name: 'Agents', isDir: true },
+                  { name: 'Memories', isDir: true },
+                  { name: 'MVP_PRD.md', isDir: false },
+                  { name: 'CHATBOT.md', isDir: false },
+                  { name: 'README.md', isDir: false },
+                  { name: 'notes.txt', isDir: false },
+                  { name: 'index.js', isDir: false },
+                  { name: 'LICENSE', isDir: false },
+                ].map(({ name, isDir }) => {
+                  const tag = getFileTag(name, isDir);
+                  const { color, Icon } = FILE_TAG_STYLES[tag];
+                  const isSelected = name === 'MVP_PRD.md';
+                  return (
+                    <div
+                      key={name}
+                      className={`flex items-center gap-1 px-2 py-1 rounded text-sm cursor-pointer transition-colors ${isSelected ? 'bg-[#E5E5E5]/5' : 'hover:bg-[#1A1A1A]'}`}
                     >
-                      <ChevronRightIcon className={`w-3 h-3 transition-transform ${expandedFolders.includes('Orchestration') ? 'rotate-90' : ''}`} />
-                      <Folder className="w-4 h-4 text-[#E5E5E5]" />
-                      <span className="text-[#E5E5E5]">Orchestration</span>
-                    </button>
-                    {expandedFolders.includes('Orchestration') && (
-                      <div className="ml-4 space-y-0.5">
-                        <div className="flex items-center gap-1 px-2 py-1 hover:bg-[#1A1A1A] rounded text-sm cursor-pointer transition-colors">
-                          <Folder className="w-4 h-4 text-[#E5E5E5]" />
-                          <span className="text-[#E5E5E5]">Agents</span>
-                        </div>
-                        <div className="flex items-center gap-1 px-2 py-1 hover:bg-[#1A1A1A] rounded text-sm cursor-pointer transition-colors">
-                          <Folder className="w-4 h-4 text-[#E5E5E5]" />
-                          <span className="text-[#E5E5E5]">Memories</span>
-                        </div>
-                        <div className="flex items-center gap-1 px-2 py-1 hover:bg-[#1A1A1A] rounded text-sm cursor-pointer bg-[#E5E5E5]/5 transition-colors">
-                          <FileCode className="w-4 h-4 text-[#F59E0B]" />
-                          <span className="text-[#E5E5E5]">MVP_PRD.md</span>
-                        </div>
-                        <div className="flex items-center gap-1 px-2 py-1 hover:bg-[#1A1A1A] rounded text-sm cursor-pointer transition-colors">
-                          <FileCode className="w-4 h-4 text-[#F59E0B]" />
-                          <span className="text-[#E5E5E5]">CHATBOT.md</span>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {activeSidebarTab === 'git' && (
-                <div className="space-y-4">
-                  <div>
-                    <div className="text-xs text-[#666666] mb-2 font-mono">CHANGES</div>
-                    <div className="space-y-1 text-sm">
-                      <div className="flex items-center gap-2 px-2 py-1 hover:bg-[#1A1A1A] rounded cursor-pointer transition-colors">
-                        <span className="text-[#10B981]">M</span>
-                        <span className="text-[#E5E5E5]">MVP_PRD.md</span>
-                      </div>
-                      <div className="flex items-center gap-2 px-2 py-1 hover:bg-[#1A1A1A] rounded cursor-pointer transition-colors">
-                        <span className="text-[#F59E0B]">A</span>
-                        <span className="text-[#E5E5E5]">FEATURES.md</span>
-                      </div>
+                      <Icon className="w-4 h-4 shrink-0" style={{ color }} />
+                      <span style={{ color }}>{name}</span>
                     </div>
-                  </div>
-                </div>
-              )}
-
-              {activeSidebarTab === 'extensions' && (
-                <div className="space-y-2">
-                  <div className="px-2 py-2 bg-[#E5E5E5]/5 rounded border border-[#E5E5E5]/10">
-                    <div className="flex items-center gap-2 mb-1">
-                      <Zap className="w-4 h-4 text-[#E5E5E5]" />
-                      <span className="text-sm font-medium text-[#E5E5E5]">SWE Developer</span>
-                    </div>
-                    <div className="text-xs text-[#666666]">Full development access</div>
-                  </div>
-                  <div className="px-2 py-2 hover:bg-[#1A1A1A] rounded cursor-pointer transition-colors">
-                    <div className="flex items-center gap-2 mb-1">
-                      <Terminal className="w-4 h-4 text-[#666666]" />
-                      <span className="text-sm text-[#E5E5E5]">Standard Chat</span>
-                    </div>
-                    <div className="text-xs text-[#666666]">Basic assistance</div>
-                  </div>
-                </div>
-              )}
-            </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
-        </motion.div>
+        </div>
+      )}
 
-        {/* Center Area - Zen Mode */}
-        <div className="flex-1 flex flex-col min-w-0 bg-[#000000]">
-          <div className="flex-1 flex items-center justify-center p-8">
-            <div className="max-w-2xl w-full space-y-8">
-              {/* Greeting */}
-              <div className="text-center space-y-4">
-                <div className="text-4xl font-light text-[#E5E5E5]">
-                  Good evening.
-                </div>
-                <div className="text-lg text-[#666666]">
-                  What would you like to work on today?
-                </div>
+      {activeSidebarTab === 'git' && (
+        <div className="space-y-4">
+          <div>
+            <div className="text-xs text-[#666666] mb-2 font-mono">CHANGES</div>
+            <div className="space-y-1 text-sm">
+              <div className="flex items-center gap-2 px-2 py-1 hover:bg-[#1A1A1A] rounded cursor-pointer transition-colors">
+                <span className="text-[#10B981]">M</span>
+                <span style={{ color: FILE_TAG_STYLES[getFileTag('MVP_PRD.md', false)].color }}>MVP_PRD.md</span>
               </div>
-
-              {/* Zen Input */}
-              <div className="space-y-4">
-                <div className="relative">
-                  <input
-                    type="text"
-                    placeholder="Ask dotAi anything..."
-                    className="w-full bg-[#0A0A0A] border border-[#1A1A1A] rounded-lg px-6 py-4 text-base text-[#E5E5E5] placeholder:text-[#666666] outline-none focus:border-[#E5E5E5]/30 transition-colors"
-                  />
-                  <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2">
-                    <button className="p-2 hover:bg-[#1A1A1A] rounded transition-colors" title="Attach files">
-                      <Paperclip className="w-4 h-4 text-[#666666]" />
-                    </button>
-                    <button className="p-2 hover:bg-[#1A1A1A] rounded transition-colors" title="Voice input">
-                      <Mic className="w-4 h-4 text-[#666666]" />
-                    </button>
-                  </div>
-                </div>
-
-                {/* Quick Actions */}
-                <div className="flex items-center justify-center gap-3 text-xs">
-                  <button className="px-3 py-1.5 bg-[#0A0A0A] hover:bg-[#1A1A1A] border border-[#1A1A1A] rounded-md text-[#E5E5E5] transition-colors">
-                    <span className="flex items-center gap-1.5">
-                      <Cpu className="w-3 h-3" />
-                      Llama-3-8B
-                    </span>
-                  </button>
-                  <button className="px-3 py-1.5 bg-[#0A0A0A] hover:bg-[#1A1A1A] border border-[#1A1A1A] rounded-md text-[#E5E5E5] transition-colors">
-                    <span className="flex items-center gap-1.5">
-                      <Zap className="w-3 h-3" />
-                      SWE Developer
-                    </span>
-                  </button>
-                  <button className="px-3 py-1.5 bg-[#0A0A0A] hover:bg-[#1A1A1A] border border-[#1A1A1A] rounded-md text-[#E5E5E5] transition-colors">
-                    <span className="flex items-center gap-1.5">
-                      <Shield className="w-3 h-3" />
-                      Local Only
-                    </span>
-                  </button>
-                </div>
-              </div>
-
-              {/* Suggestions */}
-              <div className="space-y-3">
-                <div className="text-xs text-[#666666] uppercase tracking-wide font-mono">Suggestions</div>
-                <div className="grid grid-cols-2 gap-3">
-                  <button className="text-left p-4 bg-[#0A0A0A] hover:bg-[#1A1A1A] border border-[#1A1A1A] rounded-lg transition-colors group">
-                    <div className="flex items-start gap-2 mb-2">
-                      <GitCommit className="w-4 h-4 text-[#666666] group-hover:text-[#E5E5E5] transition-colors" />
-                      <span className="text-sm text-[#E5E5E5]">Review recent commits</span>
-                    </div>
-                    <div className="text-xs text-[#666666]">Analyze jj log and summarize changes</div>
-                  </button>
-                  <button className="text-left p-4 bg-[#0A0A0A] hover:bg-[#1A1A1A] border border-[#1A1A1A] rounded-lg transition-colors group">
-                    <div className="flex items-start gap-2 mb-2">
-                      <FileCode className="w-4 h-4 text-[#666666] group-hover:text-[#E5E5E5] transition-colors" />
-                      <span className="text-sm text-[#E5E5E5]">Update documentation</span>
-                    </div>
-                    <div className="text-xs text-[#666666]">Draft updates for project docs</div>
-                  </button>
-                  <button className="text-left p-4 bg-[#0A0A0A] hover:bg-[#1A1A1A] border border-[#1A1A1A] rounded-lg transition-colors group">
-                    <div className="flex items-start gap-2 mb-2">
-                      <Terminal className="w-4 h-4 text-[#666666] group-hover:text-[#E5E5E5] transition-colors" />
-                      <span className="text-sm text-[#E5E5E5]">Run diagnostic check</span>
-                    </div>
-                    <div className="text-xs text-[#666666]">System health and dependencies</div>
-                  </button>
-                  <button className="text-left p-4 bg-[#0A0A0A] hover:bg-[#1A1A1A] border border-[#1A1A1A] rounded-lg transition-colors group">
-                    <div className="flex items-start gap-2 mb-2">
-                      <Code2 className="w-4 h-4 text-[#666666] group-hover:text-[#E5E5E5] transition-colors" />
-                      <span className="text-sm text-[#E5E5E5]">Code review</span>
-                    </div>
-                    <div className="text-xs text-[#666666]">Check quality and patterns</div>
-                  </button>
-                </div>
+              <div className="flex items-center gap-2 px-2 py-1 hover:bg-[#1A1A1A] rounded cursor-pointer transition-colors">
+                <span className="text-[#F59E0B]">A</span>
+                <span style={{ color: FILE_TAG_STYLES[getFileTag('FEATURES.md', false)].color }}>FEATURES.md</span>
               </div>
             </div>
           </div>
         </div>
+      )}
+
+      {activeSidebarTab === 'extensions' && (
+        <div className="space-y-4 p-2">
+          <div>
+            <div className="flex items-center gap-1.5 px-2 py-1 text-xs font-mono text-[#0EA5E9] uppercase tracking-wide">
+              <LayoutList className="w-3.5 h-3.5" /> Planner
+            </div>
+            <div className="mt-1 space-y-1">
+              <div className="px-2 py-1.5 rounded text-sm text-[#E5E5E5] bg-[#1A1A1A]/50">Task planning</div>
+              <div className="px-2 py-1.5 rounded text-sm text-[#666666]">Roadmap view</div>
+            </div>
+          </div>
+          <div>
+            <div className="flex items-center gap-1.5 px-2 py-1 text-xs font-mono text-[#10B981] uppercase tracking-wide">
+              <Bot className="w-3.5 h-3.5" /> AI Agents
+            </div>
+            <div className="mt-1 space-y-1">
+              <div className="px-2 py-1.5 rounded text-sm flex items-center gap-2">
+                <Zap className="w-4 h-4 text-[#10B981]" />
+                <span className="text-[#E5E5E5]">SWE Developer</span>
+              </div>
+              <div className="px-2 py-1.5 rounded text-sm text-[#666666]">Orchestrator</div>
+            </div>
+          </div>
+          <div>
+            <div className="flex items-center gap-1.5 px-2 py-1 text-xs font-mono text-[#8B5CF6] uppercase tracking-wide">
+              <MessageCircle className="w-3.5 h-3.5" /> AI Chat bots
+            </div>
+            <div className="mt-1 space-y-1">
+              <div className="px-2 py-1.5 rounded text-sm flex items-center gap-2 bg-[#E5E5E5]/5">
+                <MessageCircle className="w-4 h-4 text-[#8B5CF6]" />
+                <span className="text-[#E5E5E5]">Standard Chatbot</span>
+              </div>
+              <div className="px-2 py-1.5 rounded text-sm text-[#666666]">Q&A assistant</div>
+            </div>
+          </div>
+          <div>
+            <div className="flex items-center gap-1.5 px-2 py-1 text-xs font-mono text-[#F59E0B] uppercase tracking-wide">
+              <Bug className="w-3.5 h-3.5" /> AI Debuggers
+            </div>
+            <div className="mt-1 space-y-1">
+              <div className="px-2 py-1.5 rounded text-sm flex items-center gap-2">
+                <Bug className="w-4 h-4 text-[#F59E0B]" />
+                <span className="text-[#E5E5E5]">Tech Lead / Reviewer</span>
+              </div>
+              <div className="px-2 py-1.5 rounded text-sm text-[#666666]">Trace analyzer</div>
+            </div>
+          </div>
+        </div>
+      )}
       </div>
     </div>
   );
-}
 
-function SettingsView() {
+  // Mobile/narrow: single scrollable column so all sections + status bar are reachable
+  if (narrow) {
+    return (
+      <div ref={containerRef} className="bg-[#0a0a0a] flex flex-col h-full min-h-0 overflow-hidden">
+        {/* Overlay drawers for sidebars */}
+        <AnimatePresence>
+          {leftSidebarOpen && (
+            <>
+              <div className="fixed inset-0 bg-black/60 z-40" aria-hidden onClick={() => setLeftSidebarOpen(false)} />
+              <motion.div
+                initial={{ x: '-100%' }}
+                animate={{ x: 0 }}
+                exit={{ x: '-100%' }}
+                transition={{ type: 'tween', duration: 0.2 }}
+                className="fixed left-0 top-0 bottom-0 w-[min(280px,85vw)] bg-[#000000] border-r border-[#1A1A1A] z-50 flex flex-col shadow-xl"
+              >
+                {leftSidebarContent}
+              </motion.div>
+            </>
+          )}
+        </AnimatePresence>
+        <AnimatePresence>
+          {rightSidebarOpen && (
+            <>
+              <div className="fixed inset-0 bg-black/60 z-40" aria-hidden onClick={() => setRightSidebarOpen(false)} />
+              <motion.div
+                initial={{ x: '100%' }}
+                animate={{ x: 0 }}
+                exit={{ x: '100%' }}
+                transition={{ type: 'tween', duration: 0.2 }}
+                className="fixed right-0 top-0 bottom-0 w-[min(260px,85vw)] bg-[#000000] border-l border-[#1A1A1A] z-50 flex flex-col shadow-xl"
+              >
+                <div className="w-full h-full flex flex-col min-w-0">
+                  <div className="flex items-center justify-between gap-2 p-2 border-b border-[#1A1A1A] bg-[#0A0A0A] shrink-0">
+                    <span className="flex items-center gap-1.5 text-xs font-mono text-[#666666] uppercase tracking-wide">
+                      <HandMetal className="w-3.5 h-3.5 text-[#8b949e]" aria-hidden />
+                      Threads
+                    </span>
+                    <button onClick={() => setRightSidebarOpen(false)} className="p-2 rounded text-[#666666] hover:bg-[#1A1A1A] hover:text-[#E5E5E5] touch-manipulation" title="Close"><PanelRight className="w-4 h-4 rotate-180" /></button>
+                  </div>
+                  <div className="flex-1 overflow-y-auto p-2">
+                    {(['general', 'MVP PRD', 'docs'] as const).map((tid) => (
+                      <button
+                        key={tid}
+                        onClick={() => setSelectedThreadId(tid)}
+                        className={`w-full text-left px-3 py-2.5 rounded text-sm cursor-pointer transition-colors touch-manipulation ${selectedThreadId === tid ? 'text-[#E5E5E5] bg-[#E5E5E5]/10' : 'text-[#666666] hover:bg-[#1A1A1A] hover:text-[#E5E5E5]'}`}
+                      >
+                        #{tid}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </motion.div>
+            </>
+          )}
+        </AnimatePresence>
+
+        {/* Single scrollable column: tasks, chat, btop */}
+        <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-contain" style={{ WebkitOverflowScrolling: 'touch' }}>
+          {/* Section: Chat */}
+          <section className="border-b border-[#1A1A1A] bg-[#0a0a0a]">
+            <div className="px-3 py-2 border-b border-[#1A1A1A] text-xs font-mono text-[#666666]">Chat</div>
+            <div className="p-3 space-y-3 font-mono text-xs max-h-[320px] overflow-y-auto">
+              <div className="flex flex-col gap-1">
+                <span className="text-[#8b949e]">User</span>
+                <div className="rounded bg-[#161b22] border border-[#30363d] px-2.5 py-2 text-[#e6edf3]">How do I install Arch Linux with ZFS as the root filesystem?</div>
+              </div>
+              <div className="flex flex-col gap-1">
+                <span className="text-[#8b949e]">Mystic</span>
+                <div className="rounded bg-[#0d1117] border border-[#30363d] px-2.5 py-2 text-[#e6edf3]">High-level steps: boot Arch ISO, load ZFS, create pool, datasets, install base, chroot, mkinitcpio, bootloader.</div>
+              </div>
+            </div>
+            <div className="p-2 border-t border-[#1A1A1A] bg-[#0a0a0a]">
+              <div className="w-full bg-[#0A0A0A] border border-[#1A1A1A] rounded-xl px-3 py-2.5 flex items-center gap-2 font-mono text-xs text-white touch-manipulation">
+                <span>Ask Mystic...</span>
+                <span className="w-2 h-3.5 bg-[#7ee787] animate-cursor-blink flex-shrink-0" aria-hidden />
+              </div>
+            </div>
+          </section>
+
+          {/* Section: Widgets */}
+          {activeWidgets.length > 0 && (
+            <section className="border-b border-[#1A1A1A] bg-[#0a0a0a]">
+              <div className="px-3 py-2 border-b border-[#1A1A1A] text-xs font-mono text-[#666666] flex items-center gap-2">
+                Widgets
+                {homeScreenLocked && <Lock className="w-3 h-3 text-[#A1A1AA]" />}
+              </div>
+              <WidgetGrid activeWidgets={activeWidgets} />
+            </section>
+          )}
+        </div>
+
+        <AnimatePresence>
+          {terminalOpen && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: `${bottomPanelHeight}%`, opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ type: 'tween', duration: 0.2 }}
+              className="absolute bottom-0 left-0 right-0 border-t border-[#1A1A1A] bg-[#0d1117] flex flex-col overflow-hidden z-50"
+              style={{ minHeight: 0 }}
+            >
+              <div
+                className="h-1.5 cursor-row-resize shrink-0 group flex items-center justify-center hover:bg-[#30363d]/50 active:bg-[#30363d]"
+                onMouseDown={startResize}
+                onTouchStart={startResize}
+                onDoubleClick={toggleMaximizePanel}
+              >
+                <div className="w-8 h-0.5 rounded-full bg-[#30363d] group-hover:bg-[#8b949e] transition-colors" />
+              </div>
+              <div className="flex items-center justify-between px-2 py-2 border-b border-[#30363d] shrink-0 bg-[#161b22]">
+                <span className="text-xs font-mono text-[#8b949e]">xonsh — Terminal</span>
+                <button onClick={() => setTerminalOpen(false)} className="p-2 text-[#8b949e] hover:text-[#e6edf3] rounded touch-manipulation"><X className="w-4 h-4" /></button>
+              </div>
+              <div className="flex-1 overflow-auto p-3 font-mono text-sm min-h-0">
+                <pre className="text-[#7ee787]">$ <span className="text-[#e6edf3]">_</span></pre>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    );
+  }
+
+  // Desktop layout
   return (
-    <div className="bg-[#000000] rounded-xl overflow-hidden shadow-2xl border border-[#1A1A1A]">
-      {/* Window Chrome */}
-      <div className="bg-[#0A0A0A] border-b border-[#1A1A1A] px-4 py-3 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <div className="flex gap-1.5">
-            <div className="w-3 h-3 rounded-full bg-[#FF5F57]" />
-            <div className="w-3 h-3 rounded-full bg-[#FEBC2E]" />
-            <div className="w-3 h-3 rounded-full bg-[#28C840]" />
-          </div>
-        </div>
-        <div className="text-xs text-[#666666] font-mono">dotAi — Settings</div>
-        <div className="w-12" />
-      </div>
+    <div ref={containerRef} className="bg-[#0a0a0a] overflow-hidden flex flex-col h-full min-h-0">
+      <div className="flex flex-col flex-1 min-h-0">
+        <div className="flex flex-1 min-h-0">
+          {/* Left Sidebar */}
+          <motion.div
+            initial={false}
+            animate={{ width: leftSidebarOpen ? 260 : 0 }}
+            className="bg-[#000000] border-r border-[#1A1A1A] overflow-hidden flex flex-col shrink-0"
+          >
+            {leftSidebarContent}
+          </motion.div>
 
-      {/* Header */}
-      <div className="bg-[#0A0A0A] border-b border-[#1A1A1A] px-6 py-4 flex items-center justify-between">
-        <button className="flex items-center gap-2 text-sm text-[#666666] hover:text-white transition-colors">
-          <ChevronLeft className="w-4 h-4" />
-          <span>Back to Chat</span>
-        </button>
-        <div className="text-lg font-medium flex items-center gap-2">
-          <Settings className="w-5 h-5 text-[#0EA5E9]" />
-          Settings
-        </div>
-        <div className="w-20" />
-      </div>
+          {/* Center + right column */}
+          <div className="flex-1 flex min-w-0 bg-[#0a0a0a] relative">
+            {/* Chat + btop */}
+            <div className="flex-1 min-w-0 flex flex-col shrink-0 bg-[#0a0a0a]">
+              {/* Chat: messages area + input at bottom with icons */}
+              <div className="flex-1 min-h-0 flex flex-col border-b border-[#1A1A1A] bg-[#0a0a0a] overflow-hidden">
+                <div className="flex-1 min-h-0 overflow-auto p-2 space-y-3 font-mono text-xs">
+                  <div className="flex flex-col gap-1">
+                    <span className="text-[#8b949e]">User</span>
+                    <div className="rounded bg-[#161b22] border border-[#30363d] px-2.5 py-2 text-[#e6edf3]">
+                      How do I install Arch Linux with ZFS as the root filesystem? I have a single NVMe and want encryption.
+                    </div>
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <span className="text-[#8b949e]">Mystic</span>
+                    <div className="rounded bg-[#0d1117] border border-[#30363d] px-2.5 py-2 text-[#e6edf3] space-y-1.5">
+                      <p>High-level steps:</p>
+                      <ol className="list-decimal list-inside space-y-0.5 text-[#8b949e]">
+                        <li>Boot the Arch ISO and load ZFS modules: <code className="text-[#7ee787]">zfs</code>, <code className="text-[#7ee787]">zfs_arc_max</code> if needed.</li>
+                        <li>Create a ZFS pool (e.g. <code className="text-[#7ee787]">zpool create -f -O encryption=aes-256-gcm -O keyformat=passphrase rpool /dev/nvme0n1</code>).</li>
+                        <li>Create datasets: <code className="text-[#7ee787]">root</code>, <code className="text-[#7ee787]">root/var</code>, maybe <code className="text-[#7ee787]">home</code>.</li>
+                        <li>Install base system into the pool, chroot, install <code className="text-[#7ee787]">zfs-dkms</code> + hooks, set up mkinitcpio and bootloader (e.g. systemd-boot) to load ZFS and unlock the pool.</li>
+                      </ol>
+                      <p className="text-[#8b949e]">I can give you exact commands for your layout (single disk, encryption) if you want.</p>
+                    </div>
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <span className="text-[#8b949e]">User</span>
+                    <div className="rounded bg-[#161b22] border border-[#30363d] px-2.5 py-2 text-[#e6edf3]">
+                      Yes, single NVMe, LUKS-style encryption. And use systemd-boot.
+                    </div>
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <span className="text-[#8b949e]">Mystic</span>
+                    <div className="rounded bg-[#0d1117] border border-[#30363d] px-2.5 py-2 text-[#e6edf3] space-y-1.5">
+                      <p>Here’s a minimal flow (single NVMe, ZFS native encryption, systemd-boot):</p>
+                      <pre className="text-[#7ee787] overflow-x-auto text-[10px] whitespace-pre">{`# Load ZFS
+modprobe zfs
 
-      {/* Settings Content */}
-      <div className="p-8 space-y-8 max-h-[600px] overflow-y-auto">
-        {/* Config Path */}
-        <div>
-          <div className="text-xs text-[#666666] mb-2 font-mono flex items-center gap-2">
-            <FileCode className="w-3 h-3" />
-            Configuration Path
-          </div>
-          <div className="bg-[#000000] rounded-md px-4 py-3 font-mono text-xs text-[#E5E5E5] border border-[#1A1A1A]">
-            ~/Project/Orchestration/Memories/SETTINGS.json
-          </div>
-        </div>
+# Create encrypted pool (replace nvme0n1 with your block device)
+zpool create -f -o ashift=12 -O encryption=aes-256-gcm \\
+  -O keyformat=passphrase -O keylocation=prompt -O mountpoint=none rpool /dev/nvme0n1
 
-        {/* Backend & Routing */}
-        <div>
-          <div className="text-sm font-medium mb-4 text-[#E5E5E5] flex items-center gap-2">
-            <Database className="w-4 h-4 text-[#0EA5E9]" />
-            Backend & Routing
-          </div>
-          <div className="space-y-3">
-            <label className="flex items-center gap-3 p-3 rounded-md hover:bg-[#0A0A0A] cursor-pointer transition-colors border border-[#1A1A1A]">
-              <input type="radio" name="backend" defaultChecked className="w-4 h-4 accent-[#0EA5E9]" />
-              <div className="flex-1">
-                <div className="text-sm text-[#E5E5E5]">Local Default</div>
-                <div className="text-xs text-[#666666] font-mono">http://localhost:11434</div>
-              </div>
-            </label>
-            
-            <label className="flex items-center gap-3 p-3 rounded-md hover:bg-[#0A0A0A] cursor-pointer transition-colors border border-transparent">
-              <input type="radio" name="backend" className="w-4 h-4 accent-[#0EA5E9]" />
-              <div className="flex-1">
-                <div className="text-sm text-[#E5E5E5]">Custom Llama-Server</div>
-                <div className="text-xs text-[#666666] font-mono">http://localhost:8080</div>
-              </div>
-            </label>
-            
-            <label className="flex items-center gap-3 p-3 rounded-md bg-[#0EA5E9]/10 border border-[#0EA5E9]/30 cursor-pointer">
-              <input type="checkbox" defaultChecked className="w-4 h-4 accent-[#0EA5E9]" />
-              <div className="flex-1">
-                <div className="text-sm text-[#E5E5E5] flex items-center gap-2">
-                  <Shield className="w-3.5 h-3.5 text-[#0EA5E9]" />
-                  Strictly Local-Only
+# Datasets
+zfs create -o mountpoint=/ -o canmount=noauto rpool/root
+zfs create rpool/root/arch
+zfs create -o mountpoint=/home rpool/home
+zfs mount rpool/root/arch`}</pre>
+                      <p className="text-[#8b949e]">Then <code className="text-[#7ee787]">pacstrap</code>, chroot, install <code className="text-[#7ee787]">zfs-dkms linux linux-headers</code>, add <code className="text-[#7ee787]">zfs</code> to mkinitcpio hooks and to the bootloader cmdline. I can spell out the chroot + systemd-boot steps next.</p>
+                    </div>
+                  </div>
                 </div>
-                <div className="text-xs text-[#666666]">Disable external API fallback</div>
+                <div className="shrink-0 border-t border-[#1A1A1A] p-2 bg-[#0a0a0a]">
+                  <div className="flex items-center gap-1.5 mb-1.5">
+                    <button type="button" className="p-1.5 rounded text-[#666666] hover:bg-[#1A1A1A] hover:text-[#E5E5E5]" title="Image upload"><ImageIcon className="w-3.5 h-3.5" /></button>
+                    <button type="button" className="p-1.5 rounded text-[#666666] hover:bg-[#1A1A1A] hover:text-[#E5E5E5]" title="Voice input"><Mic className="w-3.5 h-3.5" /></button>
+                    <button type="button" className="p-1.5 rounded text-[#666666] hover:bg-[#1A1A1A] hover:text-[#E5E5E5] flex items-center gap-1" title="Mode"><SlidersHorizontal className="w-3.5 h-3.5" /><span className="text-[10px]">mode</span></button>
+                    <button type="button" className="p-1.5 rounded text-[#666666] hover:bg-[#1A1A1A] hover:text-[#E5E5E5] flex items-center gap-1" title="Model"><Bot className="w-3.5 h-3.5" /><span className="text-[10px]">model</span><span className="text-[10px] text-[#8b949e] font-mono ml-0.5" title="Llama 3.2">L3.2</span></button>
+                    <span className="flex items-center gap-0.5 text-[10px] text-[#666666] ml-auto" title="Context rotation"><Percent className="w-3 h-3" /> rot 0%</span>
+                    <span className="flex items-center gap-0.5 text-[10px] text-[#666666]" title="Cost"><DollarSign className="w-3 h-3" /> $0.00</span>
+                  </div>
+                  <div className="w-full bg-[#0A0A0A] border border-[#1A1A1A] rounded-xl px-2.5 py-2 flex items-center gap-0.5 font-mono text-xs text-white">
+                    <span className="text-white">Ask Mystic...</span>
+                    <span className="inline-block w-2 h-3.5 bg-[#7ee787] animate-cursor-blink flex-shrink-0" aria-hidden />
+                  </div>
+                </div>
               </div>
-            </label>
-          </div>
-        </div>
-
-        {/* Security & Execution */}
-        <div>
-          <div className="text-sm font-medium mb-4 text-[#E5E5E5] flex items-center gap-2">
-            <Shield className="w-4 h-4 text-[#0EA5E9]" />
-            Security & Execution
-          </div>
-          <div className="space-y-3">
-            <div>
-              <label className="text-xs text-[#666666] block mb-2 font-mono">Execution Level</label>
-              <select className="w-full bg-[#000000] border border-[#1A1A1A] rounded-md px-4 py-2.5 text-sm text-[#E5E5E5] outline-none focus:border-[#0EA5E9]/50 transition-colors font-mono">
-                <option>Ask for Confirmation</option>
-                <option>Auto-execute Safe Commands</option>
-                <option>Always Ask</option>
-              </select>
-              <div className="text-xs text-[#666666] mt-1.5 font-mono">Confirm all jj / destructive actions</div>
+              {/* Widgets grid */}
+              <div className="flex-1 min-h-0 overflow-auto flex flex-col">
+                {homeScreenLocked && activeWidgets.length > 0 && (
+                  <div className="flex items-center gap-1.5 px-3 py-1 text-xs font-mono text-[#A1A1AA] border-b border-[#1A1A1A] shrink-0">
+                    <Lock className="w-3 h-3" /> Widgets locked
+                  </div>
+                )}
+                <WidgetGrid activeWidgets={activeWidgets} />
+              </div>
             </div>
           </div>
+
+          {/* Right Sidebar - Threads */}
+          <motion.div
+            initial={false}
+            animate={{ width: rightSidebarOpen ? 220 : 0 }}
+            className="bg-[#000000] border-l border-[#1A1A1A] overflow-hidden flex flex-col shrink-0"
+          >
+            <div className="w-[220px] h-full flex flex-col min-w-0">
+              <div className="flex items-center justify-between gap-2 p-2 border-b border-[#1A1A1A] bg-[#0A0A0A] shrink-0">
+                <span className="flex items-center gap-1.5 text-xs font-mono text-[#666666] uppercase tracking-wide">
+                  <HandMetal className="w-3.5 h-3.5 text-[#8b949e]" aria-hidden />
+                  Threads
+                </span>
+                <button onClick={() => setRightSidebarOpen(false)} className="p-1.5 rounded text-[#666666] hover:bg-[#1A1A1A] hover:text-[#E5E5E5]" title="Hide sidebar">
+                  <PanelRight className="w-4 h-4 rotate-180" />
+                </button>
+              </div>
+              <div className="flex-1 overflow-y-auto p-2">
+                <div className="space-y-0.5">
+                  {(['general', 'MVP PRD', 'docs'] as const).map((tid) => (
+                    <button
+                      key={tid}
+                      onClick={() => setSelectedThreadId(tid)}
+                      className={`w-full text-left px-2 py-1.5 rounded text-sm cursor-pointer transition-colors ${selectedThreadId === tid ? 'text-[#E5E5E5] bg-[#E5E5E5]/10' : 'text-[#666666] hover:bg-[#1A1A1A] hover:text-[#E5E5E5]'}`}
+                    >
+                      #{tid}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </motion.div>
         </div>
 
-        {/* Session Management */}
-        <div>
-          <div className="text-sm font-medium mb-4 text-[#E5E5E5] flex items-center gap-2">
-            <Activity className="w-4 h-4 text-[#0EA5E9]" />
-            Session Management
-          </div>
-          <div className="space-y-3">
-            <label className="flex items-center gap-3 p-3 rounded-md hover:bg-[#0A0A0A] cursor-pointer transition-colors border border-transparent">
-              <input type="checkbox" defaultChecked className="w-4 h-4 accent-[#0EA5E9]" />
-              <div className="text-sm text-[#E5E5E5]">Restore last session on app start</div>
-            </label>
-            
-            <button className="w-full px-4 py-2.5 bg-[#0A0A0A] hover:bg-[#1A1A1A] rounded-md text-sm text-[#E5E5E5] transition-colors border border-[#1A1A1A]">
-              Start Fresh Session
-            </button>
-          </div>
-        </div>
       </div>
+
+      {/* Slide-up terminal (opens from bottom) */}
+      <AnimatePresence>
+        {terminalOpen && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: `${bottomPanelHeight}%`, opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ type: 'tween', duration: 0.2 }}
+            className="absolute bottom-0 left-0 right-0 border-t border-[#1A1A1A] bg-[#0d1117] flex flex-col overflow-hidden z-50"
+            style={{ minHeight: 0 }}
+          >
+            <div
+              className="h-1.5 cursor-row-resize shrink-0 group flex items-center justify-center hover:bg-[#30363d]/50 active:bg-[#30363d]"
+              onMouseDown={startResize}
+              onTouchStart={startResize}
+              onDoubleClick={toggleMaximizePanel}
+            >
+              <div className="w-8 h-0.5 rounded-full bg-[#30363d] group-hover:bg-[#8b949e] transition-colors" />
+            </div>
+            <div className="flex items-center justify-between px-2 py-1.5 border-b border-[#30363d] shrink-0 bg-[#161b22]">
+              <span className="text-xs font-mono text-[#8b949e]">xonsh — Terminal</span>
+              <button onClick={() => setTerminalOpen(false)} className="p-1 text-[#8b949e] hover:text-[#e6edf3] rounded"><X className="w-4 h-4" /></button>
+            </div>
+            <div className="flex-1 overflow-auto p-3 font-mono text-sm min-h-0">
+              <pre className="text-[#7ee787]">$ <span className="text-[#e6edf3]">_</span></pre>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
 
-function ModsView() {
+function ListPaneMock() {
   return (
-    <div className="bg-[#000000] rounded-xl overflow-hidden shadow-2xl border border-[#1A1A1A]">
-      {/* Window Chrome */}
-      <div className="bg-[#0A0A0A] border-b border-[#1A1A1A] px-4 py-3 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <div className="flex gap-1.5">
-            <div className="w-3 h-3 rounded-full bg-[#FF5F57]" />
-            <div className="w-3 h-3 rounded-full bg-[#FEBC2E]" />
-            <div className="w-3 h-3 rounded-full bg-[#28C840]" />
-          </div>
-        </div>
-        <div className="text-xs text-[#666666] font-mono">dotAi — Mods & Personas</div>
-        <div className="w-12" />
-      </div>
+    <div className="bg-[#000000] overflow-auto h-full p-4">
+      <ul className="space-y-2 font-mono text-sm max-w-2xl mx-auto">
+        {MOCK_TASKS.map(t => (
+          <li key={t.id} className="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-3 px-3 py-3 rounded-lg bg-[#0A0A0A] border border-[#1A1A1A]">
+            <span className="text-[#666666] w-4 shrink-0">{t.id}</span>
+            <span className="font-medium text-[#E5E5E5] flex-1">{t.title}</span>
+            <span className={`text-xs ${t.status === 'done' ? 'text-[#7ee787]' : t.status === 'in_progress' ? 'text-[#79c0ff]' : 'text-[#f0d77e]'}`}>{t.status}</span>
+            <span className="text-xs text-[#666666]">{t.assignee}</span>
+            <span className="text-xs text-[#666666]">{t.due}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
 
-      {/* Header */}
-      <div className="bg-[#0A0A0A] border-b border-[#1A1A1A] px-6 py-4">
-        <div className="text-lg font-medium flex items-center gap-2">
-          <Wrench className="w-5 h-5 text-[#0EA5E9]" />
-          Select Active Mod / Persona
-        </div>
-      </div>
-
-      {/* Mods List */}
-      <div className="p-8 space-y-4 max-h-[600px] overflow-y-auto">
-        {/* Standard Chatbot */}
-        <label className="block p-5 rounded-lg border-2 border-[#0EA5E9] bg-[#0EA5E9]/10 cursor-pointer transition-all">
-          <div className="flex items-start gap-4">
-            <input type="radio" name="persona" defaultChecked className="mt-1 w-5 h-5 accent-[#0EA5E9]" />
-            <div className="flex-1">
-              <div className="flex items-center gap-2 mb-2">
-                <Terminal className="w-5 h-5 text-[#0EA5E9]" />
-                <div className="font-medium text-[#E5E5E5]">Standard Chatbot</div>
-                <span className="px-2 py-0.5 bg-[#1A1A1A] rounded text-xs text-[#666666] font-mono border border-[#333333]">Default</span>
-              </div>
-              <div className="text-sm text-[#999999]">
-                Lightweight, general assistance and project navigation.
-              </div>
+function KanbanPaneMock() {
+  return (
+    <div className="bg-[#000000] overflow-auto h-full p-4">
+      <div className="flex gap-4 h-full min-h-[200px] max-w-4xl mx-auto">
+        {(['todo', 'in_progress', 'done'] as const).map(col => (
+          <div key={col} className="flex-1 min-w-[140px] rounded-lg bg-[#0A0A0A] border border-[#1A1A1A] p-4">
+            <div className="text-xs font-mono uppercase text-[#666666] mb-3 tracking-wide">{col.replace('_', ' ')}</div>
+            <div className="space-y-2">
+              {MOCK_TASKS.filter(t => t.status === col).map(t => (
+                <div key={t.id} className={`p-3 rounded-lg border text-sm text-[#0a0a0a] font-medium ${col === 'todo' ? 'bg-[#bfdbfe] border-[#93c5fd]' : col === 'in_progress' ? 'bg-[#fde68a] border-[#fcd34d]' : 'bg-[#bbf7d0] border-[#86efac]'}`}>{t.title}</div>
+              ))}
             </div>
           </div>
-        </label>
-
-        {/* SWE Developer */}
-        <label className="block p-5 rounded-lg border-2 border-[#1A1A1A] hover:border-[#333333] bg-[#0A0A0A] hover:bg-[#0F0F0F] cursor-pointer transition-all">
-          <div className="flex items-start gap-4">
-            <input type="radio" name="persona" className="mt-1 w-5 h-5 accent-[#0EA5E9]" />
-            <div className="flex-1">
-              <div className="flex items-center gap-2 mb-2">
-                <Zap className="w-5 h-5 text-[#10B981]" />
-                <div className="font-medium text-[#E5E5E5]">SWE Developer (Orchestrator)</div>
-              </div>
-              <div className="text-sm text-[#999999] mb-3">
-                Full access to jj commits, Docker management, and file creation.
-              </div>
-              <div className="flex flex-wrap gap-2">
-                <span className="px-2 py-1 bg-[#000000] rounded text-xs text-[#666666] font-mono border border-[#1A1A1A]">jj commits</span>
-                <span className="px-2 py-1 bg-[#000000] rounded text-xs text-[#666666] font-mono border border-[#1A1A1A]">Docker</span>
-                <span className="px-2 py-1 bg-[#000000] rounded text-xs text-[#666666] font-mono border border-[#1A1A1A]">File creation</span>
-              </div>
-            </div>
-          </div>
-        </label>
-
-        {/* Tech Lead */}
-        <label className="block p-5 rounded-lg border-2 border-[#1A1A1A] hover:border-[#333333] bg-[#0A0A0A] hover:bg-[#0F0F0F] cursor-pointer transition-all">
-          <div className="flex items-start gap-4">
-            <input type="radio" name="persona" className="mt-1 w-5 h-5 accent-[#0EA5E9]" />
-            <div className="flex-1">
-              <div className="flex items-center gap-2 mb-2">
-                <Bug className="w-5 h-5 text-[#F59E0B]" />
-                <div className="font-medium text-[#E5E5E5]">Tech Lead / Reviewer</div>
-                <span className="px-2 py-0.5 bg-[#F59E0B]/10 rounded text-xs text-[#F59E0B] font-mono border border-[#F59E0B]/30">Read-only</span>
-              </div>
-              <div className="text-sm text-[#999999]">
-                Read-only mode. Criticizes code quality and checks against base repo guidelines.
-              </div>
-            </div>
-          </div>
-        </label>
-
-        {/* Load Custom */}
-        <button className="w-full p-5 rounded-lg border-2 border-dashed border-[#333333] hover:border-[#666666] bg-transparent hover:bg-[#0A0A0A] transition-all">
-          <div className="flex items-center justify-center gap-2 text-[#666666] hover:text-[#E5E5E5] transition-colors">
-            <span className="text-2xl">+</span>
-            <div className="text-sm font-medium font-mono">Load custom persona from Orchestration/Agents/Personas/</div>
-          </div>
-        </button>
+        ))}
       </div>
     </div>
   );
 }
+
+function CalendarPaneMock() {
+  return (
+    <div className="bg-[#000000] overflow-auto h-full p-4">
+      <div className="max-w-2xl mx-auto">
+        <div className="grid grid-cols-7 grid-rows-[auto_1fr_1fr_1fr_1fr_1fr] gap-1.5 min-h-[400px] font-mono text-sm">
+          {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(d => (
+            <div key={d} className="text-center text-[#666666] text-xs py-1">{d}</div>
+          ))}
+          {Array.from({ length: 35 }, (_, i) => {
+            const day = i - 1;
+            const dateStr = `Mar ${day}`;
+            const events = MOCK_CALENDAR_EVENTS.filter(e => e.date === dateStr);
+            return (
+              <div key={i} className="border border-[#1A1A1A] rounded p-1 min-h-[60px] bg-[#0A0A0A]">
+                <div className="text-xs text-[#666666]">{day > 0 && day <= 31 ? day : ''}</div>
+                {events.map(ev => (
+                  <div key={ev.id} className="text-[10px] text-[#79c0ff] mt-1 truncate">{ev.title}</div>
+                ))}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function GraphPaneMock() {
+  const threadGraphData = MOCK_THREAD_GRAPHS.general;
+  return (
+    <div className="bg-[#000000] overflow-hidden h-full flex items-center justify-center">
+      <GraphView selectedThreadId="general" threadGraphData={threadGraphData} threadIds={['general', 'MVP PRD', 'docs']} />
+    </div>
+  );
+}
+
+function EditorPaneMock() {
+  return (
+    <div className="h-full flex flex-col bg-[#0d1117] border border-[#30363d] font-mono text-sm overflow-hidden">
+      <div className="px-3 py-1.5 border-b border-[#30363d] text-[#8b949e] shrink-0">file.md — NORMAL</div>
+      <pre className="p-3 text-[#e6edf3] whitespace-pre flex-1 min-h-0 overflow-auto">1  │</pre>
+    </div>
+  );
+}
+
+function TerminalPaneMock() {
+  return (
+    <div className="h-full flex flex-col bg-[#0d1117] border border-[#30363d] font-mono text-sm overflow-hidden">
+      <div className="px-3 py-1.5 border-b border-[#30363d] text-[#8b949e] shrink-0">xonsh — Terminal</div>
+      <pre className="p-3 text-[#7ee787] flex-1 min-h-0 overflow-auto">$ <span className="text-[#e6edf3]">_</span></pre>
+    </div>
+  );
+}
+
+function AgentPaneMock() {
+  return (
+    <div className="h-full flex flex-col bg-[#0d1117] border border-[#30363d] overflow-hidden p-4">
+      <div className="flex items-center gap-2 text-[#8b949e] font-mono text-sm mb-4">
+        <Bot className="w-5 h-5 text-[#10B981]" /> Agent
+      </div>
+      <div className="flex-1 rounded border border-[#30363d] bg-[#161b22] p-4 text-[#e6edf3] text-sm">
+        Agent pane (mock) — run tasks, tools, commits.
+      </div>
+    </div>
+  );
+}
+
+function PlannerPaneMock() {
+  return (
+    <div className="h-full flex flex-col bg-[#0d1117] border border-[#30363d] overflow-hidden p-4">
+      <div className="flex items-center gap-2 text-[#8b949e] font-mono text-sm mb-4">
+        <LayoutList className="w-5 h-5 text-[#0EA5E9]" /> Planner
+      </div>
+      <div className="flex-1 rounded border border-[#30363d] bg-[#161b22] p-4 text-[#e6edf3] text-sm">
+        Planner pane (mock) — task planning, roadmap view.
+      </div>
+    </div>
+  );
+}
+
+function ChatPaneMock() {
+  return (
+    <div className="h-full flex flex-col bg-[#0d1117] border border-[#30363d] overflow-hidden p-4">
+      <div className="flex-1 rounded border border-[#30363d] bg-[#161b22] p-3 font-mono text-sm text-[#e6edf3]">
+        Ask Mystic anything...
+      </div>
+      <div className="text-xs text-[#8b949e] font-mono mt-2 shrink-0">New chat thread (mock)</div>
+    </div>
+  );
+}
+
+function AssistantPaneMock() {
+  return (
+    <div className="h-full flex flex-col bg-[#0d1117] border border-[#30363d] overflow-hidden p-4">
+      <div className="flex items-center gap-2 text-[#8b949e] font-mono text-sm mb-4">
+        <Zap className="w-5 h-5 text-[#F59E0B]" /> Assistant
+      </div>
+      <div className="flex-1 rounded border border-[#30363d] bg-[#161b22] p-4 text-[#e6edf3] text-sm">
+        Assistant pane (mock) — Q&A, lightweight help.
+      </div>
+    </div>
+  );
+}
+
+function XonshPaneMock() {
+  return (
+    <div className="bg-[#0d1117] rounded border border-[#30363d] font-mono text-sm overflow-hidden">
+      <div className="px-3 py-1.5 border-b border-[#30363d] text-[#8b949e]">xonsh</div>
+      <pre className="p-3 text-[#7ee787]">$ <span className="text-[#e6edf3]">_</span></pre>
+    </div>
+  );
+}
+
+function FilePaneMock() {
+  return (
+    <div className="bg-[#0d1117] rounded border border-[#30363d] font-mono text-sm overflow-hidden">
+      <div className="px-3 py-1.5 border-b border-[#30363d] text-[#8b949e]">file.md — NORMAL</div>
+      <pre className="p-3 text-[#e6edf3] whitespace-pre">1  │</pre>
+    </div>
+  );
+}
+
+function BrowserPaneMock() {
+  return (
+    <div className="bg-[#0d1117] rounded border border-[#30363d] overflow-hidden">
+      <div className="flex items-center gap-2 px-3 py-2 border-b border-[#30363d] bg-[#161b22]">
+        <div className="flex gap-1.5">
+          <div className="w-2.5 h-2.5 rounded-full bg-[#ff5f57]" /><div className="w-2.5 h-2.5 rounded-full bg-[#febc2e]" /><div className="w-2.5 h-2.5 rounded-full bg-[#28c840]" />
+        </div>
+        <div className="flex-1 rounded bg-[#0d1117] px-2 py-1 text-xs text-[#8b949e]">https://</div>
+      </div>
+      <div className="p-4 text-center text-[#8b949e] text-sm">Browser preview (mock)</div>
+    </div>
+  );
+}
+
+function ImagePaneMock() {
+  return (
+    <div className="bg-[#0d1117] rounded border border-[#30363d] overflow-hidden">
+      <div className="aspect-video flex items-center justify-center border border-dashed border-[#30363d] text-[#8b949e] text-sm font-mono">
+        <ImageIcon className="w-12 h-12 opacity-50" />
+        <span className="ml-2">Image preview (mock)</span>
+      </div>
+    </div>
+  );
+}
+
