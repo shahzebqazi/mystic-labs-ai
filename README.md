@@ -91,7 +91,7 @@ OpenAI-compatible API at `http://localhost:8080`.
   extensions/            Add-ons
 ```
 
-**In this repo** the AI content is under `Project/`: rules in `Orchestration/Constraints/RULES.md`, system and config in `Orchestration/Memories/` (system/, MENTAL_MAP.md, DEFAULTS.md, SETTINGS.json), tasks in `Orchestration/Tasks/` (SWE, VCS, INFRA, DATA, TOOLS, PM, OS, etc.), agent patterns in `Orchestration/Agents/Tools/` and `Extensions/`, PRDs in `Project/Product/PRDs/`, references in `Project/Product/References/`. Documents/ contains only a README; all project and user docs live under Project/Product/. See [Orchestration/Harness/SYSTEM_PROMPT.md](Orchestration/Harness/SYSTEM_PROMPT.md) for linked paths.
+**In this repo** the AI content is under `Project/`: rules in `Orchestration/Constraints/RULES.md`, system and config in `Orchestration/Memories/` (system/, MENTAL_MAP.md, DEFAULTS.md, SETTINGS.json), tasks in `Orchestration/Tasks/` (SWE, VCS, INFRA, DATA, TOOLS, PM, OS, etc.), agent patterns in `Orchestration/Agents/Tools/` and `Extensions/`, PRDs in `Documentation/PRDs/`, references in `Documentation/References/`. See [START_HERE.md](START_HERE.md) for full layout. See [Orchestration/Harness/SYSTEM_PROMPT.md](Orchestration/Harness/SYSTEM_PROMPT.md) for linked paths.
 
 **Naming:** AI doc filenames are `UPPERCASE.md`; task subdirs under `Orchestration/Tasks/` are UPPERCASE (e.g. `SWE/`, `DATA/`).
 

@@ -83,7 +83,7 @@ A glossary for new and intermediate users of AI tooling and orchestration. Defin
 
 **Markdown-first** — Keeping instructions, tasks, and config in markdown files so both humans and AI can read and edit them without special tooling. See also: prompt-as-protocol, task.
 
-**PRD (Product Requirements Document)** — A document that describes goals, requirements, and often trackable tasks (todos) for a feature or release. PRDs in this repo live under Project/Product/PRDs (or Documents/PRDs). See also: task.
+**PRD (Product Requirements Document)** — A document that describes goals, requirements, and often trackable tasks (todos) for a feature or release. PRDs in this repo live under Documentation/PRDs. See also: task.
 
 **MENTAL_MAP** — A project file (e.g. Orchestration/Memories/MENTAL_MAP.md) that stores code style, preferences, and learnings so agents can stay consistent across sessions. See also: memory, task.
 

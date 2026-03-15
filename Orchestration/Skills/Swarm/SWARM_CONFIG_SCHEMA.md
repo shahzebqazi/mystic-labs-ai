@@ -8,7 +8,7 @@ Swarm config is a JSON object that describes **mode**, **tasks**, **models**, an
 |-------|------|----------|-------------|
 | **version** | string | yes | Schema version, e.g. `"0.1.0"`. |
 | **mode** | string | yes | `"single_prd"` or `"all_prds_parallel"`. |
-| **prd_ref** | string | conditional | For `single_prd`, the PRD id or path (e.g. `MVP_PRD`, `Documents/PRDs/MVP_PRD.md`). |
+| **prd_ref** | string | conditional | For `single_prd`, the PRD id or path (e.g. `MVP_PRD`, `Documentation/PRDs/MVP_PRD.md`). |
 | **prd_list** | string[] | conditional | For `all_prds_parallel`, list of PRD ids or paths. |
 | **tasks** | task[] | yes | List of tasks with id, prd_ref, owner, model_key, depends_on, acceptance_criteria, subagent_type. |
 | **models** | object | no | Map of model_key → { endpoint?, provider?, role? }. Omit to use project default. |

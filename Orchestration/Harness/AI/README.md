@@ -13,4 +13,4 @@ The AI harness is the Python backend + Lua GUI that provides conversation state,
 | **Lua GUI** | [Orchestration/Harness/lua_gui/README.md](../../../Orchestration/Harness/lua_gui/README.md) | Terminal and IUP clients. |
 | **Python package** | `Orchestration/Harness/python/harness/` | Implementation (server, conversation, guard rails, blocklist). |
 
-Use the paths above when referencing harness behavior, API, or run instructions. Project and user documents (PRDs, requirements, prompts) live under **Project/Product/**; Documents/ contains only a README (see [Documents/README.md](../../../Documents/README.md)).
+Use the paths above when referencing harness behavior, API, or run instructions. Project and user documents (PRDs, requirements, prompts) live under **Documentation/**; Documentation/ is the canonical dev-docs root (PRDs, Plans, References, etc.). See [START_HERE.md](../../../START_HERE.md) and [Orchestration/Harness/Documents/README.md](../Documents/README.md).

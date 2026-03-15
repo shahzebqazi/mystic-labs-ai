@@ -58,7 +58,7 @@ The **scaffold** is the markdown protocol agents use; it lives alongside the har
 - Rules: `Orchestration/Constraints/RULES.md`
 - System / memory: `Orchestration/Memories/system/` (runtime, model_serving), `Memories/prompts/CONTEXT_REFRESH.md`, `MENTAL_MAP.md`
 - Tasks: `Orchestration/Tasks/`, `Orchestration/Agents/AGENT_PROMPT.md`
-- PRDs: `Project/Product/PRDs/`
+- PRDs: `Documentation/PRDs/`
 
 See project README and MVP_PRD for scaffold gaps (case sensitivity, task validation, etc.).
 
@@ -80,4 +80,4 @@ See project README and MVP_PRD for scaffold gaps (case sensitivity, task validat
 
 The original spec described an Electron desktop app. This repo implements **Python harness + Lua GUI** instead. Any frontend that can call the harness HTTP API (e.g. Electron, a web UI, or another Lua toolkit) can reuse the same server.
 
-See also: `Orchestration/Agents/AGENT_PROMPT.md`, `Project/Product/PRDs/FEATURES_PRD.md`, `Project/Product/PRDs/MVP_PRD.md`.
+See also: `Orchestration/Agents/AGENT_PROMPT.md`, `Documentation/PRDs/FEATURES_PRD.md`, `Documentation/PRDs/MVP_PRD.md`.

@@ -26,7 +26,7 @@ The **Swarm** skill lets AI agents generate and configure **agent swarms** that 
 
 ## Relation to project
 
-- **PRDs:** `Documents/PRDs/` or `project/PRDs/` (see START_HERE and CONTRIBUTING). Swarm targets PRD todos and acceptance criteria.
+- **PRDs:** `Documentation/PRDs/` (see START_HERE and CONTRIBUTING). Swarm targets PRD todos and acceptance criteria.
 - **Task graph:** Produced swarm plan can emit `project/TASK_GRAPH.md` (or equivalent) for orchestrator or subagent execution.
 - **Orchestration:** See [Orchestration/Tasks/SWE/ORCHESTRATOR.md](../../Tasks/SWE/ORCHESTRATOR.md) and [LEAD_ARCHITECT.md](../../Tasks/SWE/LEAD_ARCHITECT.md) for how the swarm plan is consumed.
 
