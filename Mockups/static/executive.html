@@ -46,7 +46,12 @@
       font-size: 1rem;
     }
     .nav-brand:hover { color: var(--mystic-accent-gold); }
-    .nav-brand img { width: 24px; height: 24px; image-rendering: pixelated; }
+    .nav-brand img {
+      width: 24px;
+      height: 24px;
+      flex-shrink: 0;
+      object-fit: contain;
+    }
     .nav-links { display: flex; gap: 1.5rem; }
     .nav-links a {
       text-decoration: none;
@@ -132,7 +137,7 @@
   <nav class="nav">
     <div class="nav-inner">
       <a href="./" class="nav-brand">
-        <img src="icons/pixel/icon-dark-64x64.png" alt="">
+        <img src="icons/logo-mark-on-dark.svg" alt="" width="24" height="24">
         Mystic
       </a>
       <div class="nav-links">
