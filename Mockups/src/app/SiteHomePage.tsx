@@ -1,26 +1,12 @@
-import { useState, useEffect } from 'react';
 import { Link } from 'react-router';
 import { motion } from 'motion/react';
 import { ArrowRight, Sparkles } from 'lucide-react';
 import { StarField, useStarField } from './components/StarField';
 
-const basePath =
-  typeof import.meta !== 'undefined' && import.meta.env?.BASE_URL != null
-    ? import.meta.env.BASE_URL
-    : '/';
+const basePath = import.meta.env?.BASE_URL ?? '/';
 
 export function SiteHomePage() {
   const { dots, sparkles } = useStarField();
-  const [ready, setReady] = useState(false);
-
-  useEffect(() => {
-    const t = setTimeout(() => setReady(true), 80);
-    return () => clearTimeout(t);
-  }, []);
-
-  if (!ready) {
-    return <div className="min-h-dvh bg-[#0A0A0B]" />;
-  }
 
   return (
     <div className="min-h-dvh overflow-x-hidden relative bg-[#0A0A0B] text-[#FAFAFA]">

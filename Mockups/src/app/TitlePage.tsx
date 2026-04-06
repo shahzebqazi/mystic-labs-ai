@@ -33,10 +33,7 @@ export function TitlePage({ onStart }: TitlePageProps) {
     return () => clearTimeout(t);
   }, []);
 
-  const basePath = (import.meta as Record<string, unknown>).env &&
-    typeof (import.meta as Record<string, Record<string, string>>).env?.BASE_URL === 'string'
-    ? (import.meta as Record<string, Record<string, string>>).env.BASE_URL
-    : '/';
+  const basePath = import.meta.env?.BASE_URL ?? '/';
 
   if (!ready) return <div className="min-h-screen bg-[#0A0A0B]" />;
 

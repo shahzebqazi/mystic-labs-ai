@@ -67,6 +67,8 @@ export function generateStarLayout(seed: number, density: number, sparkleCount: 
   return { dots, sparkles };
 }
 
+export type StarLayout = ReturnType<typeof generateStarLayout>;
+
 export function useStarField(seed = 42, density = 120, sparkleCount = 8) {
   return useMemo(() => generateStarLayout(seed, density, sparkleCount), [seed, density, sparkleCount]);
 }
@@ -132,7 +134,7 @@ function SparkleIcon({ sparkle }: { sparkle: Sparkle }) {
   );
 }
 
-export function StarField({ dots, sparkles }: { dots: ReturnType<typeof generateStarLayout>['dots']; sparkles: ReturnType<typeof generateStarLayout>['sparkles'] }) {
+export function StarField({ dots, sparkles }: Pick<StarLayout, 'dots' | 'sparkles'>) {
   return (
     <div className="absolute inset-0 overflow-hidden" aria-hidden>
       {dots.map((star, i) => (
